@@ -1,0 +1,131 @@
+﻿@model List<KitapProject.DTO.ProductDTO.ResultProductDTO>
+
+@{
+    ViewData["Title"] = "Products";
+}
+
+<h1>Product List</h1>
+
+<p>
+    <a asp-action="CreateProduct" class="btn btn-primary">Create New Product</a>
+</p>
+
+@if (Model != null && Model.Any())
+{
+    <table class="table table-striped table-hover">
+        <thead>
+            <tr>
+                <th>Image</th>
+                <th>Product Name</th>
+                <th>Author</th>
+                <th>Price</th>
+                <th>Category</th>
+                <th>Status</th>
+                <th>Popular Product</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model)
+            {
+                <tr>
+                    <td>
+                        <img src="@item.ImageURl" alt="@item.Name" style="width: 50px; height: 50px; object-fit: cover; border-radius: 5px;" />
+                    </td>
+                    <td>@item.Name</td>
+                    <td>@item.Author</td>
+                    <td>@item.Price.ToString("C")</td>
+                    <td>@item.CategoryName</td>
+                    <td>
+                        @if (item.Status)
+                        {
+                            <span class="badge bg-success">Active</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-danger">Inactive</span>
+                        }
+                    </td>
+                    <td>
+                        @if (item.PopulerProduct)
+                        {
+                            <span class="badge bg-info">Yes</span>
+                        }
+                        else
+                        {
+                            <span class="badge bg-secondary">No</span>
+                        }
+                    </td>
+                    <td>
+                        <a asp-action="Detail" asp-route-id="@item.ProductId" class="btn btn-info btn-sm">Details</a>
+                        <a asp-action="UpdateProduct" asp-route-id="@item.ProductId" class="btn btn-warning btn-sm">Edit</a>
+                        <button class="btn btn-danger btn-sm delete-product-btn" data-id="@item.ProductId">Delete</button>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+else
+{
+    <div class="alert alert-info" role="alert">
+        No products found.
+    </div>
+}
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.querySelectorAll('.delete-product-btn').forEach(button => {
+            button.addEventListener('click', function() {
+                const productId = this.dataset.id;
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#3085d6',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        fetch('/Product/DeleteProductConfirmed/' + productId, {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/x-www-form-urlencoded',
+                                'RequestVerificationToken': document.querySelector('input[name="__RequestVerificationToken"]').value // Include anti-forgery token
+                            },
+                            body: 'id=' + productId // Pass the ID in the body for POST
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                Swal.fire(
+                                    'Deleted!',
+                                    'Your product has been deleted.',
+                                    'success'
+                                ).then(() => {
+                                    location.reload(); // Reload the page to reflect changes
+                                });
+                            } else {
+                                Swal.fire(
+                                    'Error!',
+                                    'There was an error deleting the product.',
+                                    'error'
+                                );
+                            }
+                        })
+                        .catch(error => {
+                            console.error('Error:', error);
+                            Swal.fire(
+                                'Error!',
+                                'An unexpected error occurred.',
+                                'error'
+                            );
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+}

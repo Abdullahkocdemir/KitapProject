@@ -5,97 +5,135 @@ using KitapProject.Entities;
 using Microsoft.EntityFrameworkCore;
 using AutoMapper;
 using AutoMapper.QueryableExtensions;
+using Microsoft.AspNetCore.Hosting;
+using System.IO;
+using Microsoft.AspNetCore.Mvc.Rendering;
 
 namespace KitapProject.Controllers
 {
-
     public class ProductController : Controller
     {
         private readonly BookContext _context;
         private readonly IMapper _mapper;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public ProductController(BookContext context, IMapper mapper)
+        public ProductController(BookContext context, IMapper mapper, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
             _mapper = mapper;
+            _webHostEnvironment = webHostEnvironment;
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index() 
+        public async Task<IActionResult> Index()
         {
             var productDtos = await _context.Products
+                                            .Include(p => p.Category)
                                             .ProjectTo<ResultProductDTO>(_mapper.ConfigurationProvider)
                                             .ToListAsync();
 
-            return Ok(productDtos);
+            return View(productDtos);
         }
 
-
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetProductById(int id)
+        [HttpGet]
+        public async Task<IActionResult> Detail(int id)
         {
-            var product = await _context.Products.FindAsync(id);
-            if (product == null)
+            var productDto = await _context.Products
+                                           .Where(p => p.ProductId == id)
+                                           .ProjectTo<GetByIdProductDTO>(_mapper.ConfigurationProvider)
+                                           .FirstOrDefaultAsync();
+
+            if (productDto == null)
             {
-                return NotFound($"ID'si {id} olan ürün bulunamadı.");
+                return NotFound();
             }
 
-            var productDto = new GetByIdProductDTO
-            {
-                ProductId = product.ProductId,
-                Name = product.Name,
-                Author = product.Author,
-                Description = product.Description,
-                ImageURl = product.ImageURl,
-                CreatedDate = product.CreatedDate,
-                UpdatedDate = product.UpdatedDate,
-                Status = product.Status,
-                PopulerProduct = product.PopulerProduct,
-                Price = product.Price,
-                CategoryId = product.CategoryId
-            };
-            return Ok(productDto);
+            return View(productDto);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> CreateProduct()
+        {
+            // Kategorileri veritabanından çek ve ViewBag'e List<SelectListItem> olarak ata
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
+            return View();
         }
 
         [HttpPost]
-        public async Task<IActionResult> CreateProduct([FromBody] CreateProductDTO createProductDto)
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> CreateProduct([FromForm] CreateProductDTO createProductDto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                // ModelState geçerli değilse, kategorileri tekrar yükle
+                ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
+                return View(createProductDto);
             }
 
             var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryId == createProductDto.CategoryId);
             if (!categoryExists)
             {
-                return BadRequest($"CategoryId {createProductDto.CategoryId} bulunamadı.");
+                ModelState.AddModelError("CategoryId", "Seçilen kategori bulunamadı.");
+                // Kategori bulunamazsa, kategorileri tekrar yükle
+                ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
+                return View(createProductDto);
             }
 
-            var product = new Product
+            var product = _mapper.Map<Product>(createProductDto);
+
+            if (createProductDto.ImageFile != null && createProductDto.ImageFile.Length > 0)
             {
-                Name = createProductDto.Name,
-                Author = createProductDto.Author,
-                Description = createProductDto.Description,
-                ImageURl = createProductDto.ImageURl,
-                Price = createProductDto.Price,
-                CategoryId = createProductDto.CategoryId,
-                CreatedDate = DateTime.Now, // Oluşturulma tarihi otomatik belirlenir
-                Status = true, // Varsayılan olarak aktif
-                PopulerProduct = false // Varsayılan olarak popüler değil
-            };
+                var imageUrl = await SaveImageAsync(createProductDto.ImageFile);
+                product.ImageURl = imageUrl;
+            }
+            else
+            {
+                product.ImageURl = "/images/default_product.png"; // Varsayılan resim yolu
+            }
+
+            product.CreatedDate = DateTime.UtcNow; // Evrensel saat kullanılıyor
+            product.Status = true;
+            product.PopulerProduct = false;
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetProductById), new { id = product.ProductId }, product);
+            return RedirectToAction("Index");
         }
 
-        [HttpPut]
-        public async Task<IActionResult> UpdateProduct([FromBody] UpdateProductDTO updateProductDto)
+        [HttpGet]
+        public async Task<IActionResult> UpdateProduct(int id)
+        {
+            var product = await _context.Products.FindAsync(id);
+            if (product == null)
+            {
+                return NotFound();
+            }
+
+            // Kategorileri veritabanından çek ve ViewBag'e List<SelectListItem> olarak ata
+            ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", product.CategoryId);
+
+            var updateProductDto = _mapper.Map<UpdateProductDTO>(product);
+            updateProductDto.CurrentImageUrl = product.ImageURl;
+
+            return View(updateProductDto);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateProduct([FromForm] UpdateProductDTO updateProductDto)
         {
             if (!ModelState.IsValid)
             {
-                return BadRequest(ModelState);
+                // ModelState geçerli değilse, kategorileri tekrar yükle ve mevcut resim URL'sini tut
+                // AsNoTracking kullanmak, mevcut Product nesnesinin takip edilmesini engeller, bu sayede View'e gönderilen DTO'nun performansı artar.
+                var productForView = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.ProductId == updateProductDto.ProductId);
+                ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", updateProductDto.CategoryId);
+                if (productForView != null)
+                {
+                    updateProductDto.CurrentImageUrl = productForView.ImageURl;
+                }
+                return View(updateProductDto);
             }
 
             var product = await _context.Products.FindAsync(updateProductDto.ProductId);
@@ -107,43 +145,110 @@ namespace KitapProject.Controllers
             var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryId == updateProductDto.CategoryId);
             if (!categoryExists)
             {
-                return BadRequest($"CategoryId {updateProductDto.CategoryId} bulunamadı.");
+                ModelState.AddModelError("CategoryId", "Seçilen kategori bulunamadı.");
+                // Kategori bulunamazsa, kategorileri tekrar yükle ve mevcut resim URL'sini tut
+                ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", updateProductDto.CategoryId);
+                updateProductDto.CurrentImageUrl = product.ImageURl;
+                return View(updateProductDto);
             }
 
+            // Yeni resim yüklendiyse
+            if (updateProductDto.ImageFile != null && updateProductDto.ImageFile.Length > 0)
+            {
+                // Eski resmi sil (varsayılan resim değilse)
+                await DeleteImageAsync(product.ImageURl);
+
+                // Yeni resmi kaydet
+                var newImageUrl = await SaveImageAsync(updateProductDto.ImageFile);
+                product.ImageURl = newImageUrl;
+            }
+
+            // Diğer alanları güncelle
             product.Name = updateProductDto.Name;
             product.Author = updateProductDto.Author;
             product.Description = updateProductDto.Description;
-            product.ImageURl = updateProductDto.ImageURl;
             product.Price = updateProductDto.Price;
             product.Status = updateProductDto.Status;
             product.PopulerProduct = updateProductDto.PopulerProduct;
             product.CategoryId = updateProductDto.CategoryId;
-            product.UpdatedDate = DateTime.Now; // Güncelleme tarihi otomatik belirlenir
+            product.UpdatedDate = DateTime.UtcNow; // Evrensel saat kullanılıyor
 
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
 
-            return NoContent(); // Başarılı güncelleme için 204 No Content
+            return RedirectToAction("Index");
         }
 
-        /// <summary>
-        /// Belirtilen ID'ye sahip ürünü siler.
-        /// </summary>
-        /// <param name="id">Silinecek ürün ID'si</param>
-        /// <returns>Silme sonucu</returns>
-        [HttpDelete("{id}")]
+        [HttpGet]
         public async Task<IActionResult> DeleteProduct(int id)
+        {
+            var product = await _context.Products
+                                        .Include(p => p.Category)
+                                        .ProjectTo<GetByIdProductDTO>(_mapper.ConfigurationProvider)
+                                        .FirstOrDefaultAsync(p => p.ProductId == id);
+
+            if (product == null)
+            {
+                return NotFound();
+            }
+            return View(product); // Onay sayfasını gösterecek
+        }
+
+        [HttpPost, ActionName("DeleteProduct")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteProductConfirmed(int id)
         {
             var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
-                return NotFound($"ID'si {id} olan ürün bulunamadı.");
+                return NotFound();
             }
+
+            // Resmi sil (varsayılan resim değilse)
+            await DeleteImageAsync(product.ImageURl);
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
-            return NoContent(); // Başarılı silme için 204 No Content
+            return RedirectToAction("Index");
+        }
+
+
+
+        private async Task<string> SaveImageAsync(IFormFile imageFile)
+        {
+            // Dosyayı wwwroot/Product klasörüne kaydet
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Product");
+            if (!Directory.Exists(uploadsFolder))
+            {
+                Directory.CreateDirectory(uploadsFolder);
+            }
+
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + imageFile.FileName;
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
+            {
+                await imageFile.CopyToAsync(fileStream);
+            }
+
+            // Veritabanına kaydedilecek göreceli yolu döndür
+            return "/Product/" + uniqueFileName;
+        }
+
+        private async Task DeleteImageAsync(string? imageUrl)
+        {
+            // Varsayılan resim değilse ve URL boş değilse resmi sil
+            if (!string.IsNullOrEmpty(imageUrl) && imageUrl != "/images/default_product.png")
+            {
+                // `_webHostEnvironment.WebRootPath` kullanarak fiziksel yolu oluştur
+                string filePath = Path.Combine(_webHostEnvironment.WebRootPath, imageUrl.TrimStart('/'));
+                if (System.IO.File.Exists(filePath))
+                {
+                    // Dosyayı asenkron olarak sil
+                    await Task.Run(() => System.IO.File.Delete(filePath));
+                }
+            }
         }
     }
 }

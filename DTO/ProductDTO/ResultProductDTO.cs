@@ -12,6 +12,6 @@
         public bool Status { get; set; }
         public bool PopulerProduct { get; set; }
         public decimal Price { get; set; }
-        public string CategoryName { get; set; } = string.Empty; // Kategori adını göstermek için
+        public string CategoryName { get; set; } = string.Empty;
     }
 }

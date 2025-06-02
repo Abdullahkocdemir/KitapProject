@@ -6,7 +6,8 @@
         public string Name { get; set; } = string.Empty;
         public string Author { get; set; } = string.Empty;
         public string Description { get; set; } = string.Empty;
-        public string ImageURl { get; set; } = string.Empty;
+        public IFormFile? ImageFile { get; set; } // Yeni dosya yükleme için
+        public string? CurrentImageUrl { get; set; } = string.Empty; // Mevcut resmin URL'si
         public DateTime? UpdatedDate { get; set; }
         public bool Status { get; set; }
         public bool PopulerProduct { get; set; }
