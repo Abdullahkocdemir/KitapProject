@@ -1,107 +1,187 @@
 ﻿@model KitapProject.DTO.ProductDTO.GetByIdProductDTO
 
 @{
-    ViewData["Title"] = "Product Details";
+    ViewData["Title"] = "Ürün Detayı";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Ensure this points to your admin layout
 }
 
-<h1>Product Details</h1>
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Ürün Detayı</h1>
+        <p class="page-subtitle">Ürün hakkında ayrıntılı bilgileri görüntüleyin</p>
+    </div>
 
-@if (Model != null)
-{
-    <div>
-        <hr />
-        <dl class="row">
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Name)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Name)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Author)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Author)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Description)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.Description)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Price)
-            </dt>
-            <dd class="col-sm-10">
-                @Model.Price.ToString("C")
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.ImageURl)
-            </dt>
-            <dd class="col-sm-10">
+    <div class="table-container product-detail-wrapper">
+        <div class="row g-4">
+            <div class="col-md-4 text-center">
+                <label class="form-label d-block text-start mb-2">Ürün Resmi</label>
                 @if (!string.IsNullOrEmpty(Model.ImageURl))
                 {
-                    <img src="@Model.ImageURl" alt="@Model.Name" style="max-width: 200px; height: auto;" />
+                    <img src="@Model.ImageURl" alt="@Model.Name" class="img-fluid rounded-lg shadow-sm product-detail-image">
                 }
                 else
                 {
-                    <span>No Image</span>
+                    <img src="/images/default_product.png" alt="Varsayılan Resim" class="img-fluid rounded-lg shadow-sm product-detail-image">
                 }
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.CategoryId)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.CategoryId)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.Status)
-            </dt>
-            <dd class="col-sm-10">
-                @if (Model.Status)
-                {
-                    <span class="badge bg-success">Active</span>
-                }
-                else
-                {
-                    <span class="badge bg-danger">Inactive</span>
-                }
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.PopulerProduct)
-            </dt>
-            <dd class="col-sm-10">
-                @if (Model.PopulerProduct)
-                {
-                    <span class="badge bg-info">Yes</span>
-                }
-                else
-                {
-                    <span class="badge bg-secondary">No</span>
-                }
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.CreatedDate)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.CreatedDate)
-            </dd>
-            <dt class="col-sm-2">
-                @Html.DisplayNameFor(model => model.UpdatedDate)
-            </dt>
-            <dd class="col-sm-10">
-                @Html.DisplayFor(model => model.UpdatedDate)
-            </dd>
-        </dl>
+            </div>
+            <div class="col-md-8">
+                <form>
+                    <div class="form-group mb-3">
+                        <label for="ProductId" class="form-label">Ürün ID</label>
+                        <input type="text" class="form-control" value="@Model.ProductId" readonly>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="Name" class="form-label">Ürün Adı</label>
+                        <input type="text" class="form-control" value="@Model.Name" readonly>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="Author" class="form-label">Yazar</label>
+                        <input type="text" class="form-control" value="@Model.Author" readonly>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="Description" class="form-label">Açıklama</label>
+                        <textarea class="form-control" rows="5" readonly>@Model.Description</textarea>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="Price" class="form-label">Fiyat</label>
+                        <input type="text" class="form-control" value="₺@Model.Price.ToString("N2")" readonly>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="Category" class="form-label">Kategori</label>
+                        <input type="text" class="form-control" value="@Model.CategoryName" readonly>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="Status" class="form-label">Durum</label>
+                        <input type="text" class="form-control" value="@(Model.Status ? "Aktif" : "Pasif")" readonly>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="PopulerProduct" class="form-label">Popüler Ürün</label>
+                        <input type="text" class="form-control" value="@(Model.PopulerProduct ? "Evet" : "Hayır")" readonly>
+                    </div>
+
+                    <div class="form-group mb-3">
+                        <label for="CreatedDate" class="form-label">Oluşturulma Tarihi</label>
+                        <input type="text" class="form-control" value="@Model.CreatedDate.ToShortDateString()" readonly>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="UpdatedDate" class="form-label">Son Güncelleme Tarihi</label>
+                        <input type="text" class="form-control" value="@(Model.UpdatedDate.HasValue ? Model.UpdatedDate.Value.ToShortDateString() : "Henüz Güncellenmedi")" readonly>
+                    </div>
+
+                    <div class="d-flex justify-content-end gap-2 mt-4">
+                        <a href="/Product/UpdateProduct/@Model.ProductId" class="btn btn-edit">
+                            <i class="fas fa-edit"></i> Ürünü Düzenle
+                        </a>
+                        <a href="/Product/Index" class="btn btn-secondary btn-back">
+                            <i class="fas fa-arrow-left"></i> Ürün Listesine Geri Dön
+                        </a>
+                    </div>
+                </form>
+            </div>
+        </div>
     </div>
-    <div>
-        <a asp-action="UpdateProduct" asp-route-id="@Model?.ProductId" class="btn btn-warning">Edit</a> |
-        <a asp-action="Index" class="btn btn-secondary">Back to List</a>
-    </div>
-}
-else
-{
-    <div class="alert alert-warning" role="alert">
-        Product not found.
-    </div>
+</div>
+
+@section Scripts {
+    <style>
+        .product-detail-wrapper {
+            background: white;
+            border-radius: 16px;
+            padding: 2.5rem;
+            box-shadow: var(--shadow-md);
+            border: 1px solid var(--border-color);
+            color: var(--text-primary);
+        }
+
+        .product-detail-image {
+            width: 100%;
+            height: auto; /* Otomatik yüksekliğe ayarla */
+            max-width: 300px; /* Maksimum genişliği ayarla */
+            max-height: 300px; /* Maksimum yüksekliği ayarla */
+            object-fit: contain; /* Resmi kutunun içine sığdır, oranı koruyarak */
+            border-radius: 12px;
+            box-shadow: var(--shadow-sm);
+            margin: 0 auto; /* Resmi ortala */
+            display: block; /* margin: auto için block olması gerekli */
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            padding: 0.75rem 1rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            background-color: #f0f4f8; /* Hafif gri arka plan */
+            color: var(--text-primary);
+            cursor: default; /* Ok tuşu olmamasını sağlar */
+            opacity: 0.9; /* Okunabilirliği artırır */
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Hafif iç gölge */
+        }
+
+            .form-control:focus {
+                outline: none;
+                border-color: var(--border-color); /* Odaklanmada bile border rengini değiştirme */
+                box-shadow: none; /* Odaklanmada bile box-shadow'u kaldırma */
+            }
+
+        .btn-edit {
+            background: linear-gradient(135deg, var(--warning-color), #d97706);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+            .btn-edit:hover {
+                transform: translateY(-1px);
+                box-shadow: var(--shadow-md);
+                color: white;
+                background: linear-gradient(135deg, #d97706, #b45309);
+            }
+
+        .btn-back {
+            background: var(--secondary-color);
+            color: white;
+            padding: 0.75rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            text-decoration: none;
+        }
+
+            .btn-back:hover {
+                background: #4a5568;
+                transform: translateY(-1px);
+                box-shadow: var(--shadow-md);
+                color: white;
+            }
+    </style>
 }

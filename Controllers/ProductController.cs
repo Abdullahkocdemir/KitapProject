@@ -52,7 +52,7 @@ namespace KitapProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> CreateProduct()
+        public async Task<IActionResult> Create()
         {
             // Kategorileri veritabanından çek ve ViewBag'e List<SelectListItem> olarak ata
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
@@ -61,7 +61,7 @@ namespace KitapProject.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> CreateProduct([FromForm] CreateProductDTO createProductDto)
+        public async Task<IActionResult> Create([FromForm] CreateProductDTO createProductDto)
         {
             if (!ModelState.IsValid)
             {
@@ -88,12 +88,10 @@ namespace KitapProject.Controllers
             }
             else
             {
-                product.ImageURl = "/images/default_product.png"; // Varsayılan resim yolu
+                product.ImageURl = "/images/default_product.png"; 
             }
 
-            product.CreatedDate = DateTime.UtcNow; // Evrensel saat kullanılıyor
-            product.Status = true;
-            product.PopulerProduct = false;
+            product.CreatedDate = DateTime.UtcNow; 
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
@@ -102,7 +100,7 @@ namespace KitapProject.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> UpdateProduct(int id)
+        public async Task<IActionResult> Edit(int id)
         {
             var product = await _context.Products.FindAsync(id);
             if (product == null)
@@ -121,7 +119,7 @@ namespace KitapProject.Controllers
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> UpdateProduct([FromForm] UpdateProductDTO updateProductDto)
+        public async Task<IActionResult> Edit([FromForm] UpdateProductDTO updateProductDto)
         {
             if (!ModelState.IsValid)
             {
