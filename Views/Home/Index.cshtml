@@ -3,6 +3,40 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+    <h1 class="display-4">Kitap Projenize Hoş Geldiniz!</h1>
+    <p>Redis entegrasyonunu test ediyoruz.</p>
+
+    <hr /> @if (ViewBag.Message != null)
+    {
+        <h3 class="text-primary">@ViewBag.Message</h3>
+    }
+
+    @if (ViewBag.RedisValue != null)
+    {
+        <p>
+            **Redis'ten Gelen Değer:** <br />
+            <code>@ViewBag.RedisValue</code>
+        </p>
+    }
+    else
+    {
+        <p>Redis'ten herhangi bir değer alınamadı veya Redis'e henüz veri yazılmadı.</p>
+    }
+
+    <hr /> <p>ASP.NET Core hakkında bilgi edinmek için <a href="https://docs.microsoft.com/aspnet/core">bu dokümantasyona</a> bakabilirsiniz.</p>
 </div>
+
+<hr />
+<h2>Redis'e Manuel Veri Gönder</h2>
+<form asp-controller="Home" asp-action="SendDataToRedis" method="post">
+    <div class="form-group">
+        <label for="keyName">Anahtar Adı:</label>
+        <input type="text" id="keyName" name="keyName" class="form-control" required />
+    </div>
+    <div class="form-group mt-2">
+        <label for="keyValue">Değer:</label>
+        <input type="text" id="keyValue" name="keyValue" class="form-control" required />
+    </div>
+    <button type="submit" class="btn btn-primary mt-3">Redis'e Gönder</button>
+</form>
+<hr />

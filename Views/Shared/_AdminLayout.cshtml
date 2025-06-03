@@ -62,36 +62,19 @@
                 color: white;
                 box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
             }
+
+        /* Yeni eklenecek stil */
+        .user-greeting {
+            color: white;
+            font-weight: 600;
+            margin-right: 15px;
+        }
     </style>
 
 </head>
 
 <body>
-    <header>
-    <nav class="container">
-        <a href="#" class="logo">
-            <i class="fas fa-book-open"></i>
-            Kitap Dünyası
-        </a>
-
-        <ul class="nav-menu">
-            <li><a href="#ana-sayfa">Ana Sayfa</a></li>
-            <li><a href="#kategoriler-section">Kategoriler</a></li>
-            <li><a href="#kitaplar">Kitaplar</a></li>
-            <li><a href="#okur-yorumlari">Yorumlar</a></li>
-            <li><a href="#hakkimizda">Hakkımızda</a></li>
-        </ul>
-
-        <div class="header-actions">
-            <a href="/Account/Login/" class="auth-btn auth-btn-secondary">Giriş Yap</a>
-            <a href="/Account/Register/" class="auth-btn auth-btn-primary">Kayıt Ol</a>
-            <a class="cart-container" id="cart-container" href="/Home/Sepetim/">
-                <i class="fas fa-shopping-cart cart-icon"></i>
-                <span class="cart-count" id="cart-item-count">0</span>
-            </a>
-        </div>
-    </nav>
-</header>
+    @await Component.InvokeAsync("_DefaultHeaderPartial")
 
     <main>
         <div class="content-wrapper">
@@ -105,7 +88,10 @@
                     <li><a class="category-btn" href="/Admin/Orders"><i class="fas fa-receipt"></i> Siparişler</a></li>
                     <li><a class="category-btn" href="/Admin/Invoices"><i class="fas fa-file-invoice-dollar"></i> Faturalar</a></li>
                     <li><a class="category-btn" href="/Admin/AccountManagement"><i class="fas fa-user-circle"></i> Hesap Yönetimi</a></li>
-                    <li><a class="category-btn" href="/Account/Logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a></li>
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li><a class="category-btn" href="/Account/Logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a></li>
+                    }
                 </ul>
             </aside>
 
@@ -269,8 +255,8 @@
                 quoteAuthorElement.textContent = `- ${quote.author}`;
 
                 dailyQuoteElement.classList.remove('fade-out');
-                quoteAuthorElement.classList.remove('fade-in-quote');
                 dailyQuoteElement.classList.add('fade-in-quote');
+                quoteAuthorElement.classList.remove('fade-out'); // Ensure author also fades in
                 quoteAuthorElement.classList.add('fade-in-quote');
 
                 setTimeout(() => {
@@ -358,7 +344,7 @@
 
         // --- Hesap Yönetimi Aksiyonları ---
         function setupAccountActions() {
-            const accountActionButtons = document.querySelectorAll('.sidebar button[data-action]');
+            const accountActionButtons = document.querySelectorAll('.sidebar .category-btn'); // Corrected selector to target the anchors
             const accountContentSections = document.querySelectorAll('.account-content-section');
 
             // Function to hide all content sections
@@ -370,39 +356,70 @@
             }
 
             accountActionButtons.forEach(button => {
-                button.addEventListener('click', function () {
-                    const action = this.dataset.action;
+                button.addEventListener('click', function (e) {
+                    // Prevent default link behavior if it's not a logout link
+                    if (this.getAttribute('href') !== '/Account/Logout') {
+                        e.preventDefault();
+                    }
 
                     // Remove 'active' class from all sidebar buttons
                     accountActionButtons.forEach(btn => btn.classList.remove('active'));
                     // Add 'active' class to the clicked button
                     this.classList.add('active');
 
-                    // Hide all content sections first
-                    hideAllAccountContent();
+                    // Handle content display based on the link's href
+                    const href = this.getAttribute('href');
+                    let targetContentId = '';
 
-                    // Show the relevant content section based on the data-action
-                    const targetContentId = `${action}-content`;
-                    const targetContent = document.getElementById(targetContentId);
-                    if (targetContent) {
-                        targetContent.style.display = 'block';
-                        targetContent.classList.add('active-content'); // Add active class for potential animations
-                    } else {
-                        // Fallback for actions without specific content divs, or to show a general message
-                        alert('İçerik yükleniyor: ' + action);
+                    // Map hrefs to content section IDs
+                    if (href === '/Admin/Dashboard') targetContentId = 'dashboard-content';
+                    else if (href === '/Product/Index/') targetContentId = 'urunler-content';
+                    else if (href === '/Admin/Categories') targetContentId = 'kategoriler-content';
+                    else if (href === '/Admin/Customers') targetContentId = 'musteriler-content';
+                    else if (href === '/Admin/Orders') targetContentId = 'siparisler-content'; // Assuming this will lead to a specific section for orders
+                    else if (href === '/Admin/Invoices') targetContentId = 'faturalar-content';
+                    else if (href === '/Admin/AccountManagement') targetContentId = 'hesap-yonetimi-content';
+                    // No need to hide/show for logout, it's a navigation
+                    else if (href === '/Account/Logout') return; // Let the link navigate
+
+                    if (targetContentId) {
+                        hideAllAccountContent();
+                        const targetContent = document.getElementById(targetContentId);
+                        if (targetContent) {
+                            targetContent.style.display = 'block';
+                            targetContent.classList.add('active-content');
+                        } else {
+                            // If a specific content div doesn't exist, you might want to load it dynamically or show a default.
+                            console.warn(`Content section with ID '${targetContentId}' not found.`);
+                            // Optionally, redirect if it's a page navigation rather than section toggle
+                            if (href.startsWith('/Admin/') || href.startsWith('/Product/')) {
+                                window.location.href = href;
+                            }
+                        }
+                    } else if (href.startsWith('/Admin/') || href.startsWith('/Product/')) {
+                        // For links that are meant to navigate to entirely new pages
+                        window.location.href = href;
                     }
                 });
             });
 
-            // Set default active state and show content for "Siparişlerim" on load
-            // This part runs once on DOMContentLoaded due to how it's called.
-            const defaultButton = document.querySelector('.sidebar button[data-action="siparislerim"]');
+            // Set default active state for the "Siparişlerim" link in the sidebar
+            // This part runs once on DOMContentLoaded.
+            // We need to ensure the correct content section is visible on initial load.
+            const defaultButton = document.querySelector('.sidebar .category-btn[href="/Admin/Orders"]'); // Assuming Orders is the default
             if (defaultButton) {
-                defaultButton.classList.add('active'); // Ensure the button itself is active
-                const defaultContent = document.getElementById('siparislerim-content');
+                defaultButton.classList.add('active');
+                const defaultContent = document.getElementById('siparislerim-content'); // Assuming 'siparislerim-content' is the default section
                 if (defaultContent) {
-                    defaultContent.style.display = 'block'; // Make the default content visible
+                    defaultContent.style.display = 'block';
                     defaultContent.classList.add('active-content');
+                }
+            } else {
+                // Fallback if 'siparislerim' is not the default or its link isn't found
+                // Ensure at least one content section is visible if no specific default is set or found.
+                const firstActiveContent = document.querySelector('.account-content-section.active-content');
+                if (firstActiveContent) {
+                    firstActiveContent.style.display = 'block';
                 }
             }
         }

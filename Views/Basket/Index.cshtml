@@ -10,32 +10,32 @@
     <title>Kitap Dünyası - Sepetim</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="stylesheet" href="~/css/WebSite.css" />
-        <style>
-    .cart-item {
-    display: flex;
-    align-items: center;
-    gap: 15px;
-    padding: 10px;
-    border-bottom: 1px solid #ccc;
-    }
+    <style>
+        .cart-item {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
 
-    .cart-item-image {
-    width: 80px;
-    height: 100px;
-    flex-shrink: 0;
-    overflow: hidden;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    }
+        .cart-item-image {
+            width: 80px;
+            height: 100px;
+            flex-shrink: 0;
+            overflow: hidden;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+        }
 
-    .cart-item-image img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-    }
+            .cart-item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+                display: block;
+            }
 
-    </style> 
+    </style>
 </head>
 <body>
     @await Component.InvokeAsync("_DefaultHeaderPartials")
@@ -121,11 +121,14 @@
                 booksSubtotal += itemTotal;
 
                 // ImageUrl kontrolü ve varsayılan görsel atama
-                let imageUrl = item.imageUrl || item.image || item.ImageUrl || item.Picture || '/wwwroot/Product/no-image.png'; // YENİ: Birden fazla isim kontrolü ve varsayılan yol
+                // wwwroot klasörü doğrudan URL'de kullanılmaz, bu yüzden yolu '/images/no-image.png' olarak güncelledim.
+                // Lütfen projenizin wwwroot klasörü altında 'images' adında bir klasör oluşturup
+                // 'no-image.png' dosyasını oraya koyduğunuzdan emin olun.
+                let imageUrl = item.imageUrl || item.image || item.ImageUrl || item.Picture || '/images/no-image.png';
 
                 // Eğer imageUrl boş string ise varsayılan görseli kullan
                 if (!imageUrl || imageUrl === '' || imageUrl === 'undefined' || imageUrl === 'null') {
-                    imageUrl = '/wwwroot/Product/no-image.png'; // YENİ: Varsayılan görsel yolunu sizin belirttiğiniz gibi ayarladık
+                    imageUrl = '/images/no-image.png';
                 }
 
                 const cartItemDiv = document.createElement('div');
@@ -133,20 +136,20 @@
                 cartItemDiv.dataset.bookId = item.id;
 
                 cartItemDiv.innerHTML = `
-                            <div class="cart-item-image">
-                                <img src="${imageUrl}" onerror="this.onerror=null;this.src='/wwwroot/Product/no-image.png';" alt="${item.name}" /> @* YENİ: onerror path'ini güncelledik *@
-                            </div>
-                            <div class="cart-item-details">
-                                <div class="cart-item-title">${item.name}</div>
-                                <div class="cart-item-price">₺${item.price.toFixed(2)}</div>
-                            </div>
-                            <div class="cart-item-quantity">
-                                <button data-action="decrease">-</button>
-                                <span>${item.quantity}</span>
-                                <button data-action="increase">+</button>
-                            </div>
-                            <button class="remove-item-btn" data-action="remove">Sil</button>
-                        `;
+                                        <div class="cart-item-image">
+                                            <img src="${imageUrl}" onerror="this.onerror=null;this.src='/images/no-image.png';" alt="${item.name}" />
+                                        </div>
+                                        <div class="cart-item-details">
+                                            <div class="cart-item-title">${item.name}</div>
+                                            <div class="cart-item-price">₺${item.price.toFixed(2)}</div>
+                                        </div>
+                                        <div class="cart-item-quantity">
+                                            <button data-action="decrease">-</button>
+                                            <span>${item.quantity}</span>
+                                            <button data-action="increase">+</button>
+                                        </div>
+                                        <button class="remove-item-btn" data-action="remove">Sil</button>
+                                    `;
                 cartItemsContainer.appendChild(cartItemDiv);
             });
 
@@ -187,21 +190,40 @@
         }
 
         if (checkoutButton) {
-            checkoutButton.addEventListener('click', (e) => {
-                e.preventDefault();
-                if (cart.length > 0) {
-                    alert("Siparişiniz başarıyla alındı! Teşekkür ederiz.");
-                    cart = [];
-                    saveCart();
-                } else {
+            checkoutButton.addEventListener('click', async (e) => { // 'async' anahtar kelimesi eklendi
+                e.preventDefault(); // Varsayılan bağlantı tıklamasını engeller
+
+                // Sepet boşsa uyarı ver ve işlemi durdur
+                if (cart.length === 0) {
                     alert("Sepetiniz boş. Lütfen önce ürün ekleyin.");
+                    return;
+                }
+
+                try {
+                    // Sunucudan kullanıcının login durumunu kontrol et
+                    // Endpoint'i doğru controller ve action adıyla eşleştirdiğinizden emin olun.
+                    // Örneğin: /Basket/CheckLoginStatus (eğer BasketController içinde tanımlıysa)
+                    const response = await fetch('/Basket/CheckLoginStatus');
+                    const data = await response.json(); // Yanıtı JSON olarak ayrıştır
+
+                    if (data.isLoggedIn) {
+                        // Kullanıcı giriş yapmışsa Order/Index'e yönlendir
+                        window.location.href = '/Order/Index'; // Sipariş tamamlama sayfasına yönlendir
+                    } else {
+                        // Kullanıcı giriş yapmamışsa Account/Login'e yönlendir
+                        window.location.href = '/Account/Login'; // Giriş sayfasına yönlendir
+                    }
+                } catch (error) {
+                    console.error('Login durumu kontrol edilirken bir hata oluştu:', error);
+                    alert('Bir hata oluştu. Lütfen daha sonra tekrar deneyin.');
                 }
             });
         }
 
-        // Geliştirilmiş sepete ekleme fonksiyonu (bu fonksiyon aslında index.cshtml'de tanımlı ama sepet sayfasında da bulunması bir hata değil)
+        // Bu fonksiyon sepet dışından ürün eklemek için kullanılır.
+        // Eğer index.cshtml gibi başka bir sayfada da kullanılıyorsa, burada tekrar tanımlanması bir sorun değildir.
         function addToCart(product) {
-            console.log('Sepete eklenen ürün:', product); // Debug için
+            console.log('Sepete eklenen ürün:', product);
 
             const cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
 
@@ -209,8 +231,7 @@
             if (existing) {
                 existing.quantity++;
             } else {
-                // Farklı image özellik isimlerini kontrol et
-                let imageUrl = product.imageUrl || product.image || product.ImageUrl || product.Picture || '/wwwroot/Product/no-image.png';
+                let imageUrl = product.imageUrl || product.image || product.ImageUrl || product.Picture || '/images/no-image.png';
 
                 cart.push({
                     id: product.id,
@@ -222,23 +243,22 @@
             }
 
             localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
-            console.log('Güncellenmiş sepet:', cart); // Debug için
+            console.log('Güncellenmiş sepet:', cart);
 
-            // Sayfa sepet sayfasındaysa yeniden render et
+            // Sayfa sepet sayfasıysa, sepeti yeniden render et
             if (cartItemsContainer) {
                 updateCartCount();
                 renderCartItems();
             }
         }
 
-        // Global olarak erişilebilir yap
+        // Bu fonksiyonu global olarak erişilebilir yapıyoruz
         window.addToCart = addToCart;
 
         document.addEventListener('DOMContentLoaded', () => {
             updateCartCount();
             renderCartItems();
 
-            // Debug: Mevcut sepeti konsola yazdır
             console.log('Sayfa yüklendiğinde sepet:', cart);
         });
     </script>

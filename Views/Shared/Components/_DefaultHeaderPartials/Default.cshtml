@@ -14,9 +14,36 @@
         </ul>
 
         <div class="header-actions">
-            <a href="/Account/Login/" class="auth-btn auth-btn-secondary">Giriş Yap</a>
-            <a href="/Account/Register/" class="auth-btn auth-btn-primary">Kayıt Ol</a>
-            <a class="cart-container" id="cart-container" href="/Basket/Index/">
+            @* Check if the user is authenticated *@
+            @if (User.Identity.IsAuthenticated)
+            {
+                <span class="user-greeting">
+                    @{
+                        var fullName = User.FindFirst("FullName")?.Value; // This will now find the "FullName" claim you added.
+                        if (string.IsNullOrEmpty(fullName))
+                        {
+                            var firstName = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value; // This will find the GivenName claim.
+                            var lastName = User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value;   // This will find the Surname claim.
+                            if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
+                            {
+                                fullName = $"{firstName} {lastName}"; // Combines them if found.
+                            }
+                            else
+                            {
+                                fullName = User.Identity.Name; // Fallback only if no first/last name claims are found.
+                            }
+                        }
+                    }
+                    @fullName
+                </span>
+                <a href="/Account/Logout/" class="auth-btn auth-btn-secondary">Çıkış Yap</a>
+            }
+            else
+            {
+                <a href="/Account/Login/" class="auth-btn auth-btn-secondary">Giriş Yap</a>
+                <a href="/Account/Register/" class="auth-btn auth-btn-primary">Kayıt Ol</a>
+            }
+            <a class="cart-container" id="cart-container" href="/Home/Sepetim/">
                 <i class="fas fa-shopping-cart cart-icon"></i>
                 <span class="cart-count" id="cart-item-count">0</span>
             </a>

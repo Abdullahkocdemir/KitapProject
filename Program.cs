@@ -1,13 +1,21 @@
+using Microsoft.AspNetCore.Identity;
+using System.ComponentModel.DataAnnotations;
 using FluentValidation;
 using KitapProject.Context;
 using KitapProject.Entities;
 using KitapProject.Mapping;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
+using StackExchange.Redis; // Bu satýrý ekleyin!
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("PostgreSqlConnection");
+
+// Redis baðlantýsýný servis olarak ekle
+// --- REDIS SERVÝSÝ BURAYA EKLENÝYOR ---
+builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
+    ConnectionMultiplexer.Connect(builder.Configuration.GetSection("Redis:ConnectionString").Value!));
+// --- REDIS SERVÝSÝ BURAYA EKLENDÝ ---
 
 // DbContext ve Identity servislerini ekle
 builder.Services.AddDbContext<BookContext>(options =>
@@ -35,6 +43,7 @@ builder.Services.AddIdentity<AppUser, AppRole>(options => // AppRole kullandýðýn
 })
 .AddEntityFrameworkStores<BookContext>() // Identity'nin veritabaný deposunu belirtir
 .AddDefaultTokenProviders(); // Þifre sýfýrlama, e-posta onayý vb. için token saðlayýcýlarýný ekler
+
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
