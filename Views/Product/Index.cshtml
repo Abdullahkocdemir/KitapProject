@@ -110,7 +110,8 @@
         const noResults = $("#noResults");
         const loading = $("#loading");
 
-
+        // Model'den gelen veriyi JavaScript'te kullanılabilir hale getirin
+        const allProducts = @Html.Raw(Json.Serialize(Model));
 
         let currentPage = 1;
         let filteredProducts = [];
@@ -134,28 +135,62 @@
 
             // Loading göster
             loading.show();
-            $("#productTable").hide();
+            $("#productTable").hide(); // Tabloyu gizle
 
             setTimeout(() => {
                 loading.hide();
-                $("#productTable").show();
 
                 if (filteredProducts.length === 0) {
                     noResults.show();
-                    $("#productTable").hide();
+                    $("#productTable").hide(); // Tabloyu gizli tut
                     pagination.empty();
                     return;
                 }
 
                 noResults.hide();
+                $("#productTable").show(); // Tabloyu göster
 
                 // Mevcut sayfanın ürünlerini göster
                 const start = (currentPage - 1) * itemsPerPage;
                 const end = start + itemsPerPage;
                 const pageProducts = filteredProducts.slice(start, end);
 
+                // Tablo içeriğini temizle ve yeni ürünleri ekle
+                $("#productTable tbody").empty();
+                pageProducts.forEach(item => {
+                    const row = `
+                                <tr>
+                                    <td><span class="product-id">${item.ProductId}</span></td>
+                                    <td><span class="product-name">${item.Name}</span></td>
+                                    <td><span class="category-badge">${item.CategoryName}</span></td>
+                                    <td>
+                                        <span class="popular-badge ${item.PopulerProduct ? "popular-yes" : "popular-no"}">
+                                            <i class="fas ${item.PopulerProduct ? "fa-star" : "fa-star-o"}"></i>
+                                            ${item.PopulerProduct ? "Evet" : "Hayır"}
+                                        </span>
+                                    </td>
+                                    <td><span class="price">₺${item.Price.toFixed(2).replace('.', ',')}</span></td>
+                                    <td>
+                                        <div class="actions-group">
+                                            <button class="action-btn btn-view" title="Görüntüle" data-id="${item.ProductId}">
+                                                <i class="fas fa-eye"></i>
+                                            </button>
+                                            <button class="action-btn btn-edit" title="Düzenle" data-id="${item.ProductId}">
+                                                <i class="fas fa-edit"></i>
+                                            </button>
+                                            <button class="action-btn btn-delete" title="Sil" data-id="${item.ProductId}" data-name="${item.Name}">
+                                                <i class="fas fa-trash-alt"></i>
+                                            </button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            `;
+                    $("#productTable tbody").append(row);
+                });
+
+
                 renderPagination(totalPages);
-            }, 300);
+            }, 300); // 300ms gecikme
         }
 
         function renderPagination(totalPages) {
@@ -165,10 +200,10 @@
 
             for (let i = 1; i <= totalPages; i++) {
                 const pageItem = $(`
-                        <li class="page-item ${i === currentPage ? 'active' : ''}">
-                            <a class="page-link" href="#" data-page="${i}">${i}</a>
-                        </li>
-                    `);
+                                    <li class="page-item ${i === currentPage ? 'active' : ''}">
+                                        <a class="page-link" href="#" data-page="${i}">${i}</a>
+                                    </li>
+                                `);
                 pagination.append(pageItem);
             }
         }
@@ -216,9 +251,10 @@
                 if (result.isConfirmed) {
                     // AJAX ile silme işlemi
                     $.ajax({
-                        url: `/AdminProduct/Delete/${productId}`,
+                        url: `/Product/Delete/${productId}`, // Controller adınız "Product" ise bu doğru
                         type: 'POST',
                         success: function () {
+                            // allProducts dizisinden silinen ürünü çıkar
                             const index = allProducts.findIndex(p => p.ProductId === productId);
                             if (index > -1) {
                                 allProducts.splice(index, 1);
@@ -230,9 +266,9 @@
                                 icon: 'success',
                                 timer: 2000,
                                 showConfirmButton: false
+                            }).then(() => { // SweetAlert kapandıktan sonra yönlendirme yap
+                                window.location.href = "/Product/Index"; // Index sayfasına yönlendir
                             });
-
-                            renderProducts();
                         },
                         error: function () {
                             Swal.fire({
@@ -257,7 +293,6 @@
             window.location.href = `/Product/Edit/${productId}`;
         });
 
-        // İlk yükleme
         renderProducts();
     });
 </script>

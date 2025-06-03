@@ -1,0 +1,415 @@
+﻿@using KitapProject.Entities
+@model List<Product>
+
+@{
+    Layout = null; // Or your actual layout file like "_Layout"
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitap Dünyası - Kitaplarımızı Keşfet</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" integrity="sha512-SnH5WK+bZxgPHs44uWIX+LLJAJ9/2PkPKZ5QiAj6Ta86w+fsb2TkcmfRyVX3pBnMFcV7oQPJkl9QevSCWr3W6A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="~/css/WebSite.css" />
+</head>
+
+<body>
+    @await Component.InvokeAsync("_DefaultHeaderPartials")
+
+    <main>
+        <section class="hero-section">
+            <h1 class="hero-title">Kitap Dünyasına Hoş Geldiniz</h1>
+            <p class="hero-subtitle">Binlerce kitap arasından favorilerinizi keşfedin</p>
+            <div class="cta-buttons">
+                <a href="#kitaplar" class="btn btn-primary">Kitapları Keşfet</a>
+                <a href="#paylas" class="btn btn-secondary">Kitap Paylaş</a>
+            </div>
+        </section>
+
+        <div class="search-container">
+            <div class="search-bar">
+                <input type="text" id="search-input" placeholder="Kitap veya yazar ara...">
+                <button class="search-btn" id="search-btn">
+                    <i class="fas fa-search"></i> Ara
+                </button>
+            </div>
+        </div>
+
+        <section id="kategoriler-section" class="dynamic-section container">
+            <h2 class="section-title">Popüler Kategoriler</h2>
+            <div class="category-grid">
+                <div class="category-card" data-category="roman">
+                    <div class="category-icon">
+                        <i class="fas fa-book-open"></i>
+                    </div>
+                    <h3>Roman</h3>
+                    <p>Edebiyatın büyülü dünyasında kaybolun.</p>
+                </div>
+                <div class="category-card" data-category="bilim">
+                    <div class="category-icon">
+                        <i class="fas fa-flask"></i>
+                    </div>
+                    <h3>Bilim</h3>
+                    <p>Bilimin sırlarını çözmeye başlayın.</p>
+                </div>
+                <div class="category-card" data-category="sanat">
+                    <div class="category-icon">
+                        <i class="fas fa-paint-brush"></i>
+                    </div>
+                    <h3>Sanat</h3>
+                    <p>Yaratıcılığınızı geliştirin.</p>
+                </div>
+                <div class="category-card" data-category="is-kariyer">
+                    <div class="category-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <h3>İş & Kariyer</h3>
+                    <p>Profesyonel gelişiminizi destekleyin.</p>
+                </div>
+                <div class="category-card" data-category="tarih">
+                    <div class="category-icon">
+                        <i class="fas fa-landmark"></i>
+                    </div>
+                    <h3>Tarih</h3>
+                    <p>Geçmişin izlerini sürün.</p>
+                </div>
+                <div class="category-card" data-category="cocuk">
+                    <div class="category-icon">
+                        <i class="fas fa-child"></i>
+                    </div>
+                    <h3>Çocuk Kitapları</h3>
+                    <p>Minik okurlar için eğlenceli dünyalar.</p>
+                </div>
+                <div class="category-card" data-category="seyahat">
+                    <div class="category-icon">
+                        <i class="fas fa-plane"></i>
+                    </div>
+                    <h3>Seyahat</h3>
+                    <p>Yeni yerler keşfedin, dünyayı dolaşın.</p>
+                </div>
+                <div class="category-card" data-category="yemek">
+                    <div class="category-icon">
+                        <i class="fas fa-utensils"></i>
+                    </div>
+                    <h3>Yemek</h3>
+                    <p>Mutfakta yeni lezzetler deneyin.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="kitaplar" class="dynamic-section container">
+            <h2 class="section-title">Öne Çıkan Kitaplar</h2>
+            <div class="books-grid" id="featured-books-grid"> @* Added ID for potential future JS use cases *@
+                @if (Model != null && Model.Any())
+                {
+                    @foreach (var item in Model)
+                    {
+                        <div class="book-card" data-book-id="@item.ProductId"> @* Added data-book-id for JavaScript *@
+                            <div class="book-image">
+                                @if (!string.IsNullOrEmpty(item.ImageUrl))
+                                {
+                                    <img src="@item.ImageUrl" alt="@item.Name" />
+                                }
+                                else
+                                {
+                                    <span>Resim Yok<br>@item.Name</span>
+                                }
+                            </div>
+                            <div class="book-content">
+                                <h3 class="book-title">@item.Name</h3>
+                                <p class="book-author">@item.Author</p>
+                                <div class="book-price">₺@item.Price.ToString("F2")</div> @* Formatted price *@
+                                <div class="book-actions">
+                                    <button class="btn-book-action btn-primary-book-action" 
+                                            data-book-id="@item.ProductId"
+                                            data-book-name="@item.Name"
+                                            data-book-price="@item.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                            data-book-imageurl="@item.ImageUrl"> @* YENİ: ImageUrl'ı data özelliği olarak ekledik *@
+                                        <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                                    </button>
+                                    <button class="btn-book-action btn-secondary-book-action" data-book-id="@item.ProductId">
+                                        <i class="fas fa-book-open"></i> Oku
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                else
+                {
+                    <p>Şu anda öne çıkan kitap bulunmamaktadır.</p>
+                }
+            </div>
+        </section>
+
+        <section class="stats-section container">
+            <h2 class="section-title">Platformumuz Rakamlarla</h2>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">50,000+</div>
+                    <div class="stat-label">Kitap</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">100,000+</div>
+                    <div class="stat-label">Aktif Kullanıcı</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">1M+</div>
+                    <div class="stat-label">Okunan Sayfa</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">25,000+</div>
+                    <div class="stat-label">Paylaşılan Kitap</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="okur-yorumlari" class="testimonials-section container">
+            <h2 class="section-title">Okurlarımız Ne Diyor?</h2>
+            <div class="testimonial-grid">
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-text">"Kitap Dünyası harika bir platform! Aradığım her kitabı kolayca buldum ve yeni yazarlar keşfettim. Okuma deneyimim çok daha zenginleşti."</p>
+                    <div class="testimonial-author">- Ayşe Yılmaz</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-text">"Kütüphaneme eklemek istediğim kitapları buradan takip ediyorum. Hem satın alma hem de okuma seçenekleri çok pratik."</p>
+                    <div class="testimonial-author">- Can Demir</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★☆</div>
+                    <p class="testimonial-text">"Topluluk özelliği sayesinde aynı zevklere sahip insanlarla tanışmak harika. Kitap tartışmaları çok keyifli geçiyor."</p>
+                    <div class="testimonial-author">- Zeynep Kaya</div>
+                </div>
+                <div class="testimonial-card">
+                    <div class="testimonial-rating">★★★★★</div>
+                    <p class="testimonial-text">"Mobil uygulamanın da olması süper. Her yerde, her an kitaplarıma ulaşabiliyorum. Gerçekten de bir kitap kurdunun ihtiyacı olan her şey burada!"</p>
+                    <div class="testimonial-author">- Emre Akın</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="gunun-alintisi" class="quote-of-the-day-section container">
+            <h2 class="section-title">Günün İlham Veren Satırları</h2>
+            <div class="quote-display">
+                <p class="quote-content" id="daily-quote">
+                    "Okumak, bilginin en derin kuyularından kana kana içmek gibidir. Her yeni sayfa, yeni bir dünyaya açılan kapıdır."
+                </p>
+                <div class="quote-author" id="quote-author">- Mevlana</div>
+            </div>
+            <button class="btn-book-action btn-secondary-book-action" id="new-quote-btn" style="margin-top: 2rem;">Yeni Bir Alıntı Göster</button>
+        </section>
+
+        <section class="call-to-action-section container">
+            <h2>Siz de Kitap Dünyası'na Katılın!</h2>
+            <p>Okuma serüveninizi bir üst seviyeye taşıyın. Binlerce kitaba erişin, kendi yorumlarınızı paylaşın ve yeni okuma arkadaşları edinin.</p>
+            <a href="#kayit-ol" class="btn auth-btn-primary">Hemen Ücretsiz Katıl</a>
+        </section>
+    </main>
+
+    @await Component.InvokeAsync("_DefaultFooterPartials")
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
+        const cartItemCountSpan = document.getElementById('cart-item-count');
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+            attachGlobalEventListeners();
+            displayQuote();
+            observeSectionsForAnimations();
+        });
+
+        function attachGlobalEventListeners() {
+            const searchBtn = document.getElementById('search-btn');
+            const searchInput = document.getElementById('search-input');
+            if (searchBtn && searchInput) {
+                searchBtn.addEventListener('click', () => {
+                    const searchTerm = searchInput.value.trim();
+                    alert(`"${searchTerm}" için arama yapılıyor... (Bu bir demo özelliğidir)`);
+                });
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        searchBtn.click();
+                    }
+                });
+            }
+
+            const cartContainer = document.getElementById('cart-container');
+            if (cartContainer) {
+                cartContainer.addEventListener('click', () => {
+                    // Sepet sayfasına yönlendirme yapabiliriz.
+                    window.location.href = '/Basket/Index';
+                });
+            }
+
+            // "Sepete Ekle" butonları için dinleyici
+            document.querySelectorAll('.book-card .btn-primary-book-action').forEach(button => {
+                button.addEventListener('click', function() {
+                    const bookId = this.dataset.bookId;
+                    const bookName = this.dataset.bookName;
+                    const bookPrice = parseFloat(this.dataset.bookPrice); // Fiyatı sayıya dönüştür
+                    const bookImageUrl = this.dataset.bookImageurl; // YENİ: ImageUrl'ı aldık
+
+                    const bookToAdd = {
+                        id: bookId,
+                        name: bookName,
+                        price: bookPrice,
+                        imageUrl: bookImageUrl // YENİ: imageUrl'ı objeye ekledik
+                    };
+                    addToCart(bookToAdd);
+                    alert(`${bookName} sepete eklendi!`);
+                });
+            });
+
+            // "Oku" butonları için dinleyici
+            document.querySelectorAll('.book-card .btn-secondary-book-action').forEach(button => {
+                button.addEventListener('click', function() {
+                    const bookTitle = this.closest('.book-content').querySelector('.book-title').textContent;
+                    const bookId = this.dataset.bookId; // data-book-id attribute'undan ID'yi al
+                    alert(`${bookTitle} (ID: ${bookId}) şimdi okunuyor... (Bu bir demo özelliğidir)`);
+                });
+            });
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            if (cartItemCountSpan) {
+                cartItemCountSpan.textContent = totalItems;
+                if (totalItems > 0) {
+                    cartItemCountSpan.classList.add('bounce');
+                    setTimeout(() => {
+                        cartItemCountSpan.classList.remove('bounce');
+                    }, 500);
+                }
+            }
+        }
+
+        // addToCart fonksiyonunu buraya taşıdık ki index.cshtml'de de kullanılabilsin
+        function addToCart(book) { 
+            const existingBook = cart.find(item => item.id === book.id);
+            if (existingBook) {
+                existingBook.quantity++;
+            } else {
+                // YENİ: imageUrl bilgisini de kaydediyoruz
+                cart.push({ ...book, quantity: 1, imageUrl: book.imageUrl }); 
+            }
+            saveCart();
+        }
+
+        function saveCart() {
+            localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
+            updateCartCount();
+            // Not: index sayfasında renderCartItems'ı çağırmaya gerek yok, bu sadece sepet sayfasında.
+        }
+
+        const quotes = [
+            {
+                quote: "Okumak, bilginin en derin kuyularından kana kana içmek gibidir. Her yeni sayfa, yeni bir dünyaya açılan kapıdır.",
+                author: "Mevlana"
+            },
+            {
+                quote: "İnsan ruhunun gıdası kitaplardır. Okudukça büyür, gelişimini sürdürür ve hayatı daha derinden anlar.",
+                author: "Fyodor Dostoyevski"
+            },
+            {
+                quote: "Bir kitap, uykusuz bir gecenin ve sonsuz bir düşüncenin ürünüdür.",
+                author: "George Orwell"
+            },
+            {
+                quote: "En iyi arkadaşım, bana okumadığım bir kitabı veren kişidir.",
+                author: "Abraham Lincoln"
+            },
+            {
+                quote: "Kitaplar, hiç kapanmayan pencerelerdir.",
+                author: "Nazım Hikmet"
+            },
+            {
+                quote: "Okumadan geçen bir gün, kaybolmuş bir gündür.",
+                author: "Anonim"
+            }
+        ];
+
+        let currentQuoteIndex = 0;
+        const dailyQuoteElement = document.getElementById('daily-quote');
+        const quoteAuthorElement = document.getElementById('quote-author');
+        const newQuoteButton = document.getElementById('new-quote-btn');
+
+        function displayQuote() {
+            if (!dailyQuoteElement || !quoteAuthorElement) return;
+
+            dailyQuoteElement.classList.add('fade-out');
+            quoteAuthorElement.classList.add('fade-out');
+
+            setTimeout(() => {
+                const quote = quotes[currentQuoteIndex];
+                dailyQuoteElement.textContent = `"${quote.quote}"`;
+                quoteAuthorElement.textContent = `- ${quote.author}`;
+
+                dailyQuoteElement.classList.remove('fade-out');
+                quoteAuthorElement.classList.remove('fade-out');
+                dailyQuoteElement.classList.add('fade-in-quote');
+                quoteAuthorElement.classList.add('fade-in-quote');
+
+                setTimeout(() => {
+                    dailyQuoteElement.classList.remove('fade-in-quote');
+                    quoteAuthorElement.classList.remove('fade-in-quote');
+                }, 1000);
+            }, 300);
+
+            currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+        }
+
+        if (newQuoteButton) {
+            newQuoteButton.addEventListener('click', displayQuote);
+        }
+
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        function observeSectionsForAnimations() {
+            document.querySelectorAll('.dynamic-section, .stats-section, .testimonials-section, .quote-of-the-day-section, .call-to-action-section').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelector('.hero-section h1').style.animationPlayState = 'running';
+            document.querySelector('.hero-section p').style.animationPlayState = 'running';
+            document.querySelector('.cta-buttons').style.animationPlayState = 'running';
+        });
+    </script>
+</body>
+</html>

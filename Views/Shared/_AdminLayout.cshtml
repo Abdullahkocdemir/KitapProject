@@ -67,14 +67,38 @@
 </head>
 
 <body>
-    @await Component.InvokeAsync("_DefaultHeaderPartials")
+    <header>
+    <nav class="container">
+        <a href="#" class="logo">
+            <i class="fas fa-book-open"></i>
+            Kitap Dünyası
+        </a>
+
+        <ul class="nav-menu">
+            <li><a href="#ana-sayfa">Ana Sayfa</a></li>
+            <li><a href="#kategoriler-section">Kategoriler</a></li>
+            <li><a href="#kitaplar">Kitaplar</a></li>
+            <li><a href="#okur-yorumlari">Yorumlar</a></li>
+            <li><a href="#hakkimizda">Hakkımızda</a></li>
+        </ul>
+
+        <div class="header-actions">
+            <a href="/Account/Login/" class="auth-btn auth-btn-secondary">Giriş Yap</a>
+            <a href="/Account/Register/" class="auth-btn auth-btn-primary">Kayıt Ol</a>
+            <a class="cart-container" id="cart-container" href="/Home/Sepetim/">
+                <i class="fas fa-shopping-cart cart-icon"></i>
+                <span class="cart-count" id="cart-item-count">0</span>
+            </a>
+        </div>
+    </nav>
+</header>
 
     <main>
         <div class="content-wrapper">
             <aside class="sidebar">
                 <h3>Hesap Yönetimi</h3>
                 <ul class="category-list">
-                    <li><a class="category-btn active" href="/Admin/Dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
+                    <li><a class="category-btn" href="/Admin/Dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
                     <li><a class="category-btn" href="/Product/Index/"><i class="fas fa-box-open"></i> Ürünler</a></li>
                     <li><a class="category-btn" href="/Admin/Categories"><i class="fas fa-folder-open"></i> Kategoriler</a></li>
                     <li><a class="category-btn" href="/Admin/Customers"><i class="fas fa-users"></i> Müşteriler</a></li>

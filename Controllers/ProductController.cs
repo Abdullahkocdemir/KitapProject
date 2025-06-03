@@ -28,9 +28,9 @@ namespace KitapProject.Controllers
         public async Task<IActionResult> Index()
         {
             var productDtos = await _context.Products
-                                            .Include(p => p.Category)
-                                            .ProjectTo<ResultProductDTO>(_mapper.ConfigurationProvider)
-                                            .ToListAsync();
+                                                .Include(p => p.Category)
+                                                .ProjectTo<ResultProductDTO>(_mapper.ConfigurationProvider)
+                                                .ToListAsync();
 
             return View(productDtos);
         }
@@ -39,9 +39,9 @@ namespace KitapProject.Controllers
         public async Task<IActionResult> Detail(int id)
         {
             var productDto = await _context.Products
-                                           .Where(p => p.ProductId == id)
-                                           .ProjectTo<GetByIdProductDTO>(_mapper.ConfigurationProvider)
-                                           .FirstOrDefaultAsync();
+                                               .Where(p => p.ProductId == id)
+                                               .ProjectTo<GetByIdProductDTO>(_mapper.ConfigurationProvider)
+                                               .FirstOrDefaultAsync();
 
             if (productDto == null)
             {
@@ -84,14 +84,14 @@ namespace KitapProject.Controllers
             if (createProductDto.ImageFile != null && createProductDto.ImageFile.Length > 0)
             {
                 var imageUrl = await SaveImageAsync(createProductDto.ImageFile);
-                product.ImageURl = imageUrl;
+                product.ImageUrl = imageUrl;
             }
             else
             {
-                product.ImageURl = "/images/default_product.png"; 
+                product.ImageUrl = "/images/default_product.png";
             }
 
-            product.CreatedDate = DateTime.UtcNow; 
+            product.CreatedDate = DateTime.UtcNow;
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
@@ -112,7 +112,7 @@ namespace KitapProject.Controllers
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", product.CategoryId);
 
             var updateProductDto = _mapper.Map<UpdateProductDTO>(product);
-            updateProductDto.CurrentImageUrl = product.ImageURl;
+            updateProductDto.CurrentImageUrl = product.ImageUrl;
 
             return View(updateProductDto);
         }
@@ -129,7 +129,7 @@ namespace KitapProject.Controllers
                 ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", updateProductDto.CategoryId);
                 if (productForView != null)
                 {
-                    updateProductDto.CurrentImageUrl = productForView.ImageURl;
+                    updateProductDto.CurrentImageUrl = productForView.ImageUrl;
                 }
                 return View(updateProductDto);
             }
@@ -146,7 +146,7 @@ namespace KitapProject.Controllers
                 ModelState.AddModelError("CategoryId", "Seçilen kategori bulunamadı.");
                 // Kategori bulunamazsa, kategorileri tekrar yükle ve mevcut resim URL'sini tut
                 ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", updateProductDto.CategoryId);
-                updateProductDto.CurrentImageUrl = product.ImageURl;
+                updateProductDto.CurrentImageUrl = product.ImageUrl;
                 return View(updateProductDto);
             }
 
@@ -154,11 +154,11 @@ namespace KitapProject.Controllers
             if (updateProductDto.ImageFile != null && updateProductDto.ImageFile.Length > 0)
             {
                 // Eski resmi sil (varsayılan resim değilse)
-                await DeleteImageAsync(product.ImageURl);
+                await DeleteImageAsync(product.ImageUrl);
 
                 // Yeni resmi kaydet
                 var newImageUrl = await SaveImageAsync(updateProductDto.ImageFile);
-                product.ImageURl = newImageUrl;
+                product.ImageUrl = newImageUrl;
             }
 
             // Diğer alanları güncelle
@@ -177,41 +177,27 @@ namespace KitapProject.Controllers
             return RedirectToAction("Index");
         }
 
-        [HttpGet]
-        public async Task<IActionResult> DeleteProduct(int id)
-        {
-            var product = await _context.Products
-                                        .Include(p => p.Category)
-                                        .ProjectTo<GetByIdProductDTO>(_mapper.ConfigurationProvider)
-                                        .FirstOrDefaultAsync(p => p.ProductId == id);
-
-            if (product == null)
-            {
-                return NotFound();
-            }
-            return View(product); // Onay sayfasını gösterecek
-        }
-
-        [HttpPost, ActionName("DeleteProduct")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteProductConfirmed(int id)
+        [HttpPost]
+        public async Task<IActionResult> Delete(int id)
         {
             var product = await _context.Products.FindAsync(id);
             if (product == null)
             {
+                // Ürün bulunamazsa 404 Not Found döndür.
                 return NotFound();
             }
 
             // Resmi sil (varsayılan resim değilse)
-            await DeleteImageAsync(product.ImageURl);
+            await DeleteImageAsync(product.ImageUrl);
 
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
 
-            return RedirectToAction("Index");
+            // Başarılı olduğunu belirtmek için 200 OK döndür.
+            // Bu bir AJAX isteği olduğu için doğrudan yönlendirme yapmıyoruz.
+            // Yönlendirme, JavaScript'teki 'success' fonksiyonunda yapılacak.
+            return Ok();
         }
-
-
 
         private async Task<string> SaveImageAsync(IFormFile imageFile)
         {

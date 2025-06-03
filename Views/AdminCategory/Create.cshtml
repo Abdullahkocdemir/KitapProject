@@ -1,8 +1,235 @@
-﻿
+﻿@model KitapProject.DTO.CategoryDTO.CreateCategoryDTO
+
 @{
-    ViewData["Title"] = "Create";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+    ViewData["Title"] = "Yeni Kategori Ekle";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Admin layout'unuzu burada kullanın
 }
 
-<h1>Create</h1>
+<div class="page-header mb-4">
+    <h1 class="page-title">Yeni Kategori Ekle</h1>
+    <p class="page-subtitle text-muted">Sisteme yeni bir kategori kaydı oluşturun</p>
+</div>
 
+<div class="card shadow-sm p-4 mb-5 bg-white rounded">
+    <div class="card-body">
+        <form asp-action="Create" asp-controller="AdminCategory" method="post">
+            <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 text-center" role="alert"></div>
+
+            <div class="mb-3">
+                <label asp-for="Name" class="form-label">Kategori Adı</label>
+                <input type="text" asp-for="Name" class="form-control" placeholder="Kategori adını girin">
+                <span asp-validation-for="Name" class="text-danger mt-1 d-block"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Description" class="form-label">Açıklama</label>
+                <textarea asp-for="Description" class="form-control" rows="3" placeholder="Kategori açıklamasını girin"></textarea>
+                <span asp-validation-for="Description" class="text-danger mt-1 d-block"></span>
+            </div>
+
+            <div class="mb-3">
+                <label asp-for="Icon" class="form-label">İkon </label>
+                <input type="text" asp-for="Icon" class="form-control" placeholder="İkon giriniz.. ">
+                <span asp-validation-for="Icon" class="text-danger mt-1 d-block"></span>
+            </div>
+
+            <hr class="mb-4">
+
+            <div class="d-flex justify-content-end gap-3">
+                <a href="/AdminCategory/Index" class="btn btn-outline-secondary px-4 py-2 rounded-pill font-weight-bold">
+                    İptal
+                </a>
+                <button type="submit" class="btn btn-success px-4 py-2 rounded-pill font-weight-bold d-flex align-items-center gap-2">
+                    <i class="bi bi-save"></i> Kaydet
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+    <style>
+        /* Product/Create.cshtml'den kopyalanan stil kodlarını buraya yapıştırın. */
+        /* Kategoriye özgü olmayan genel form ve buton stillerini içeren bir CSS dosyasına taşımak daha iyi bir yaklaşımdır. */
+
+        :root {
+            --primary-color: #007bff; /* Bootstrap primary blue */
+            --success-color: #28a745; /* Bootstrap success green */
+            --danger-color: #dc3545; /* Bootstrap danger red */
+            --secondary-color: #6c757d; /* Bootstrap secondary grey */
+            --border-color: #ced4da; /* Bootstrap default border color */
+            --text-primary: #343a40; /* Dark text color */
+            --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.075) !important;
+            --shadow-md: 0 .5rem 1rem rgba(0,0,0,.15) !important;
+        }
+
+        body {
+            background-color: #f8f9fa; /* Light background for the page */
+        }
+
+        .page-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-title {
+            font-size: 2.25rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .page-subtitle {
+            font-size: 1.1rem;
+            color: #6c757d;
+        }
+
+        .card {
+            border: none;
+            border-radius: 1rem; /* More rounded corners for the card */
+            box-shadow: var(--shadow-md); /* More prominent shadow */
+        }
+
+        .card-body {
+            padding: 2rem; /* Increased padding inside the card */
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control, .form-select {
+            width: 100%;
+            border: 1px solid var(--border-color);
+            padding: 0.75rem 1rem;
+            font-size: 0.95rem;
+            font-weight: 400;
+            transition: all 0.2s ease-in-out;
+            background-color: #fff;
+            color: var(--text-primary);
+            border-radius: 0.5rem; /* Slightly rounded input fields */
+        }
+
+            .form-control:focus, .form-select:focus, .form-control-file:focus {
+                border-color: var(--primary-color);
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Bootstrap-like focus shadow */
+                outline: none;
+            }
+
+        .form-control-file {
+            padding: 0.75rem 1rem; /* Consistent padding */
+            border-radius: 0.5rem;
+        }
+
+        .text-danger {
+            font-size: 0.85rem;
+            color: var(--danger-color);
+            font-weight: 500;
+        }
+
+        .alert-danger {
+            color: #721c24;
+            background-color: #f8d7da;
+            border-color: #f5c6cb;
+            padding: 1rem 1.25rem;
+            border-radius: 0.5rem;
+            font-weight: 600;
+        }
+
+        .btn {
+            font-size: 0.95rem;
+            font-weight: 600;
+            border-radius: 0.5rem; /* Standard button border-radius */
+            transition: all 0.2s ease-in-out;
+        }
+
+        .btn-success {
+            background: linear-gradient(45deg, #28a745, #218838); /* Gradient for save button */
+            border: none;
+            color: white;
+            box-shadow: var(--shadow-sm);
+        }
+
+            .btn-success:hover {
+                background: linear-gradient(45deg, #218838, #1e7e34);
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+                color: white; /* Keep text white on hover */
+            }
+
+        .btn-outline-secondary {
+            border-color: var(--secondary-color);
+            color: var(--secondary-color);
+            background-color: transparent;
+        }
+
+            .btn-outline-secondary:hover {
+                background-color: var(--secondary-color);
+                color: white;
+                transform: translateY(-2px);
+                box-shadow: var(--shadow-md);
+            }
+
+        .d-flex.justify-content-end.gap-3 {
+            margin-top: 1.5rem;
+        }
+
+        /* Custom Switch Styling (Kategori için gerekli değil, Product'tan kalmış olabilir) */
+        .custom-switch .form-check-input {
+            width: 3.5em;
+            height: 2em;
+            margin-left: 0;
+            background-color: var(--border-color);
+            border-color: var(--border-color);
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+            cursor: pointer;
+            box-shadow: none !important;
+        }
+
+            .custom-switch .form-check-input:checked {
+                background-color: var(--success-color);
+                border-color: var(--success-color);
+            }
+
+        .custom-switch .form-check-label {
+            margin-left: 0.75rem;
+            padding-top: 0.2rem;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+
+        /* Adjustments for smaller screens */
+        @@media (max-width: 768px) {
+            .page-title {
+                font-size: 1.75rem;
+            }
+
+            .card-body {
+                padding: 1.5rem;
+            }
+
+            .btn {
+                width: 100%;
+                margin-bottom: 0.75rem;
+            }
+
+            .d-flex.justify-content-end.gap-3 {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .form-check.form-switch {
+                display: flex;
+                align-items: center;
+                justify-content: flex-start;
+            }
+        }
+    </style>
+}

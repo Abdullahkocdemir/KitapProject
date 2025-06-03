@@ -1,8 +1,86 @@
-﻿
+﻿@model List<KitapProject.DTO.CategoryDTO.ResultCategoryDTO>
+
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "Kategoriler";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
-<h1>Index</h1>
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">Kategori Yönetimi</h1>
+        <p class="page-subtitle">Tüm kategorilerinizi buradan yönetebilirsiniz</p>
+    </div>
+
+    <div class="controls-section">
+        <div class="filters-row">
+            <div class="filters-group">
+                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Kategori adına göre ara...">
+                <select id="itemsPerPage" class="form-select">
+                    <option value="5">5 öğe</option>
+                    <option value="10" selected>10 öğe</option>
+                    <option value="20">20 öğe</option>
+                    <option value="50">50 öğe</option>
+                </select>
+            </div>
+            <a href="/AdminCategory/Create" class="btn-add">
+                <i class="bi bi-plus-circle"></i>
+                Yeni Kategori Ekle
+            </a>
+        </div>
+    </div>
+
+    <div class="table-container">
+        <div class="loading" id="loading">
+            <i class="fas fa-spinner"></i>
+            <p>Yükleniyor...</p>
+        </div>
+
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Kategori ID</th>
+                    <th>Kategori Adı</th>
+                    <th >İkon</th> 
+                    <th>İşlemler</th>
+                </tr>
+            </thead>
+            <tbody>
+
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><span class="product-id">@item.CategoryId</span></td>
+                        <td><span class="product-name">@item.Name</span></td>
+                        <td>
+                            <span class="category-description">
+                                @if (!string.IsNullOrEmpty(item.Icon))
+                                {
+                                    <i class="@item.Icon"></i>
+                                }
+                                else
+                                {
+                                    <span>-</span>
+                                }
+                            </span>
+                        </td>
+                        <td>
+                            <div class="actions-group">
+                                <a href="/AdminCategory/Detail/@item.CategoryId" class="action-btn btn-view" title="Görüntüle" data-id="@item.CategoryId">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="/AdminCategory/Update/@item.CategoryId" class="action-btn btn-edit" title="Düzenle" data-id="@item.CategoryId">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="/AdminCategory/Delete/@item.CategoryId" class="action-btn btn-delete" title="Sil" data-id="@item.CategoryId" data-name="@item.Name">
+                                    <i class="fas fa-trash-alt"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+
+</div>
 

@@ -25,7 +25,7 @@ namespace KitapProject.Entities
         [Required]
         [Column(TypeName = "VarChar")]
         [StringLength(200)]
-        public string ImageURl { get; set; } = string.Empty;
+        public string ImageUrl { get; set; } = string.Empty;
 
         // Oluşturulma tarihi
         [Required]

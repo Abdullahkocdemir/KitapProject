@@ -1,0 +1,246 @@
+﻿@{
+    Layout = null;
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitap Dünyası - Sepetim</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
+    <link rel="stylesheet" href="~/css/WebSite.css" />
+        <style>
+    .cart-item {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    }
+
+    .cart-item-image {
+    width: 80px;
+    height: 100px;
+    flex-shrink: 0;
+    overflow: hidden;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    }
+
+    .cart-item-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    }
+
+    </style> 
+</head>
+<body>
+    @await Component.InvokeAsync("_DefaultHeaderPartials")
+    <main>
+        <section class="cart-section container">
+            <h2>Sepetim</h2>
+            <div id="cart-items-container" class="cart-items"></div>
+            <div id="cart-summary" class="cart-summary">
+                <div>
+                    <span>Kitapların Toplam Fiyatı:</span>
+                    <span id="books-subtotal-price">₺0.00</span>
+                </div>
+                <div>
+                    <span>KDV (%18):</span>
+                    <span id="vat-amount">₺0.00</span>
+                </div>
+                <div>
+                    <span>Kargo Ücreti:</span>
+                    <span id="shipping-fee">₺0.00</span>
+                </div>
+                <div class="total-price-final">
+                    <span>Genel Toplam:</span>
+                    <span id="final-total-price">₺0.00</span>
+                </div>
+            </div>
+            <a href="#" id="checkout-button" class="checkout-btn" style="display: none;">Siparişi Tamamla</a>
+            <p id="empty-cart-message" class="empty-cart-message">Sepetinizde henüz ürün bulunmamaktadır. Hadi kitapları keşfedin!</p>
+        </section>
+    </main>
+    @await Component.InvokeAsync("_DefaultFooterPartials")
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
+        const cartItemCountSpan = document.getElementById('cart-item-count');
+        const cartItemsContainer = document.getElementById('cart-items-container');
+        const cartSummary = document.getElementById('cart-summary');
+        const booksSubtotalPriceSpan = document.getElementById('books-subtotal-price');
+        const vatAmountSpan = document.getElementById('vat-amount');
+        const shippingFeeSpan = document.getElementById('shipping-fee');
+        const finalTotalPriceSpan = document.getElementById('final-total-price');
+        const checkoutButton = document.getElementById('checkout-button');
+        const emptyCartMessage = document.getElementById('empty-cart-message');
+
+        const VAT_RATE = 0.18;
+        const SHIPPING_FEE = 15.00;
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            if (cartItemCountSpan) {
+                cartItemCountSpan.textContent = totalItems;
+                if (totalItems > 0) {
+                    cartItemCountSpan.classList.add('bounce');
+                    setTimeout(() => {
+                        cartItemCountSpan.classList.remove('bounce');
+                    }, 500);
+                }
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
+            updateCartCount();
+            renderCartItems();
+        }
+
+        function renderCartItems() {
+            cartItemsContainer.innerHTML = '';
+            let booksSubtotal = 0;
+
+            if (cart.length === 0) {
+                emptyCartMessage.style.display = 'block';
+                cartSummary.style.display = 'none';
+                checkoutButton.style.display = 'none';
+                return;
+            }
+
+            emptyCartMessage.style.display = 'none';
+            cartSummary.style.display = 'block';
+            checkoutButton.style.display = 'block';
+
+            cart.forEach(item => {
+                const itemTotal = item.price * item.quantity;
+                booksSubtotal += itemTotal;
+
+                // ImageUrl kontrolü ve varsayılan görsel atama
+                let imageUrl = item.imageUrl || item.image || item.ImageUrl || item.Picture || '/wwwroot/Product/no-image.png'; // YENİ: Birden fazla isim kontrolü ve varsayılan yol
+
+                // Eğer imageUrl boş string ise varsayılan görseli kullan
+                if (!imageUrl || imageUrl === '' || imageUrl === 'undefined' || imageUrl === 'null') {
+                    imageUrl = '/wwwroot/Product/no-image.png'; // YENİ: Varsayılan görsel yolunu sizin belirttiğiniz gibi ayarladık
+                }
+
+                const cartItemDiv = document.createElement('div');
+                cartItemDiv.classList.add('cart-item');
+                cartItemDiv.dataset.bookId = item.id;
+
+                cartItemDiv.innerHTML = `
+                            <div class="cart-item-image">
+                                <img src="${imageUrl}" onerror="this.onerror=null;this.src='/wwwroot/Product/no-image.png';" alt="${item.name}" /> @* YENİ: onerror path'ini güncelledik *@
+                            </div>
+                            <div class="cart-item-details">
+                                <div class="cart-item-title">${item.name}</div>
+                                <div class="cart-item-price">₺${item.price.toFixed(2)}</div>
+                            </div>
+                            <div class="cart-item-quantity">
+                                <button data-action="decrease">-</button>
+                                <span>${item.quantity}</span>
+                                <button data-action="increase">+</button>
+                            </div>
+                            <button class="remove-item-btn" data-action="remove">Sil</button>
+                        `;
+                cartItemsContainer.appendChild(cartItemDiv);
+            });
+
+            const vatAmount = booksSubtotal * VAT_RATE;
+            const finalTotal = booksSubtotal + vatAmount + SHIPPING_FEE;
+
+            booksSubtotalPriceSpan.textContent = `₺${booksSubtotal.toFixed(2)}`;
+            vatAmountSpan.textContent = `₺${vatAmount.toFixed(2)}`;
+            shippingFeeSpan.textContent = `₺${SHIPPING_FEE.toFixed(2)}`;
+            finalTotalPriceSpan.textContent = `₺${finalTotal.toFixed(2)}`;
+        }
+
+        function handleCartActions(event) {
+            const target = event.target;
+            const bookId = target.closest('.cart-item')?.dataset.bookId;
+            if (!bookId) return;
+
+            const existingBookIndex = cart.findIndex(item => item.id === bookId);
+            if (existingBookIndex === -1) return;
+
+            if (target.dataset.action === 'increase') {
+                cart[existingBookIndex].quantity++;
+            } else if (target.dataset.action === 'decrease') {
+                if (cart[existingBookIndex].quantity > 1) {
+                    cart[existingBookIndex].quantity--;
+                } else {
+                    cart.splice(existingBookIndex, 1);
+                }
+            } else if (target.dataset.action === 'remove') {
+                cart.splice(existingBookIndex, 1);
+            }
+
+            saveCart();
+        }
+
+        if (cartItemsContainer) {
+            cartItemsContainer.addEventListener('click', handleCartActions);
+        }
+
+        if (checkoutButton) {
+            checkoutButton.addEventListener('click', (e) => {
+                e.preventDefault();
+                if (cart.length > 0) {
+                    alert("Siparişiniz başarıyla alındı! Teşekkür ederiz.");
+                    cart = [];
+                    saveCart();
+                } else {
+                    alert("Sepetiniz boş. Lütfen önce ürün ekleyin.");
+                }
+            });
+        }
+
+        // Geliştirilmiş sepete ekleme fonksiyonu (bu fonksiyon aslında index.cshtml'de tanımlı ama sepet sayfasında da bulunması bir hata değil)
+        function addToCart(product) {
+            console.log('Sepete eklenen ürün:', product); // Debug için
+
+            const cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
+
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.quantity++;
+            } else {
+                // Farklı image özellik isimlerini kontrol et
+                let imageUrl = product.imageUrl || product.image || product.ImageUrl || product.Picture || '/wwwroot/Product/no-image.png';
+
+                cart.push({
+                    id: product.id,
+                    name: product.name || product.title || product.Name || product.Title,
+                    price: parseFloat(product.price || product.Price || 0),
+                    quantity: 1,
+                    imageUrl: imageUrl
+                });
+            }
+
+            localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
+            console.log('Güncellenmiş sepet:', cart); // Debug için
+
+            // Sayfa sepet sayfasındaysa yeniden render et
+            if (cartItemsContainer) {
+                updateCartCount();
+                renderCartItems();
+            }
+        }
+
+        // Global olarak erişilebilir yap
+        window.addToCart = addToCart;
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+            renderCartItems();
+
+            // Debug: Mevcut sepeti konsola yazdır
+            console.log('Sayfa yüklendiğinde sepet:', cart);
+        });
+    </script>
+</body>
+</html>

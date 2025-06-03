@@ -13,7 +13,7 @@ namespace KitapProject.Mapping
                 .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category!.Name))
                 .ReverseMap();
             CreateMap<CreateProductDTO, Product>()
-                .ForMember(dest => dest.ImageURl, opt => opt.Ignore())
+                .ForMember(dest => dest.ImageUrl, opt => opt.Ignore())
                 .ReverseMap();
 
             CreateMap<Product, GetByIdProductDTO>()
@@ -21,7 +21,7 @@ namespace KitapProject.Mapping
                 .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId)); 
             CreateMap<Product, UpdateProductDTO>()
                 .ForMember(dest => dest.ImageFile, opt => opt.Ignore()) 
-                .ForMember(dest => dest.CurrentImageUrl, opt => opt.MapFrom(src => src.ImageURl)) 
+                .ForMember(dest => dest.CurrentImageUrl, opt => opt.MapFrom(src => src.ImageUrl)) 
                 .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId));
 
             CreateMap<Category, ResultCategoryDTO>();
