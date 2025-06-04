@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = null;
+    Layout = null; // Veya gerçek layout dosyanız gibi "_Layout"
 }
 
 <!DOCTYPE html>
@@ -11,6 +11,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="stylesheet" href="~/css/WebSite.css" />
     <style>
+        /* CSS'iniz olduğu gibi kalabilir */
         .cart-item {
             display: flex;
             align-items: center;
@@ -34,8 +35,9 @@
                 object-fit: cover;
                 display: block;
             }
-
     </style>
+    @* AntiForgeryToken'ı buraya ekledik. AJAX POST istekleri için gerekli *@
+    @Html.AntiForgeryToken()
 </head>
 <body>
     @await Component.InvokeAsync("_DefaultHeaderPartials")
@@ -61,16 +63,16 @@
                     <span id="final-total-price">₺0.00</span>
                 </div>
             </div>
-            <a href="#" id="checkout-button" class="checkout-btn" style="display: none;">Siparişi Tamamla</a>
+            <a href="/Order/Index/" id="checkout-button" class="checkout-btn" style="display: none;">Siparişi Tamamla</a>
             <p id="empty-cart-message" class="empty-cart-message">Sepetinizde henüz ürün bulunmamaktadır. Hadi kitapları keşfedin!</p>
         </section>
     </main>
     @await Component.InvokeAsync("_DefaultFooterPartials")
 
     <script>
-        let cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
-        const cartItemCountSpan = document.getElementById('cart-item-count');
-        const cartItemsContainer = document.getElementById('cart-items-container');
+        let cart = []; // Başlangıçta boş bırakıyoruz, sayfa yüklendiğinde server'dan çekeceğiz
+        const cartItemCountSpan = document.getElementById('cart-item-count'); // Header'daki sepet sayısı
+        const cartItemsContainer = document.getElementById('cart-items-container'); // Sepet listesini göstereceğimiz div
         const cartSummary = document.getElementById('cart-summary');
         const booksSubtotalPriceSpan = document.getElementById('books-subtotal-price');
         const vatAmountSpan = document.getElementById('vat-amount');
@@ -82,6 +84,15 @@
         const VAT_RATE = 0.18;
         const SHIPPING_FEE = 15.00;
 
+        // AntiForgeryToken'ı cookie'den almak için yardımcı fonksiyon
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
+
+        // Sepet sayısını güncelleyen fonksiyon (Header için)
         function updateCartCount() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             if (cartItemCountSpan) {
@@ -91,16 +102,20 @@
                     setTimeout(() => {
                         cartItemCountSpan.classList.remove('bounce');
                     }, 500);
+                } else {
+                    cartItemCountSpan.classList.remove('bounce');
                 }
             }
         }
 
-        function saveCart() {
+        // localStorage'ı güncelleyen ve UI'ı render eden fonksiyon
+        function saveCartAndRender() {
             localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
-            updateCartCount();
-            renderCartItems();
+            updateCartCount(); // Header'daki sepet sayısını güncelle
+            renderCartItems(); // Sepet sayfasındaki ürünleri render et
         }
 
+        // Sepet içeriğini HTML'e render eden fonksiyon
         function renderCartItems() {
             cartItemsContainer.innerHTML = '';
             let booksSubtotal = 0;
@@ -120,36 +135,31 @@
                 const itemTotal = item.price * item.quantity;
                 booksSubtotal += itemTotal;
 
-                // ImageUrl kontrolü ve varsayılan görsel atama
-                // wwwroot klasörü doğrudan URL'de kullanılmaz, bu yüzden yolu '/images/no-image.png' olarak güncelledim.
-                // Lütfen projenizin wwwroot klasörü altında 'images' adında bir klasör oluşturup
-                // 'no-image.png' dosyasını oraya koyduğunuzdan emin olun.
-                let imageUrl = item.imageUrl || item.image || item.ImageUrl || item.Picture || '/images/no-image.png';
+                let imageUrl = item.imageUrl || '/images/no-image.png';
 
-                // Eğer imageUrl boş string ise varsayılan görseli kullan
                 if (!imageUrl || imageUrl === '' || imageUrl === 'undefined' || imageUrl === 'null') {
                     imageUrl = '/images/no-image.png';
                 }
 
                 const cartItemDiv = document.createElement('div');
                 cartItemDiv.classList.add('cart-item');
-                cartItemDiv.dataset.bookId = item.id;
+                cartItemDiv.dataset.productId = item.id;
 
                 cartItemDiv.innerHTML = `
-                                        <div class="cart-item-image">
-                                            <img src="${imageUrl}" onerror="this.onerror=null;this.src='/images/no-image.png';" alt="${item.name}" />
-                                        </div>
-                                        <div class="cart-item-details">
-                                            <div class="cart-item-title">${item.name}</div>
-                                            <div class="cart-item-price">₺${item.price.toFixed(2)}</div>
-                                        </div>
-                                        <div class="cart-item-quantity">
-                                            <button data-action="decrease">-</button>
-                                            <span>${item.quantity}</span>
-                                            <button data-action="increase">+</button>
-                                        </div>
-                                        <button class="remove-item-btn" data-action="remove">Sil</button>
-                                    `;
+                    <div class="cart-item-image">
+                        <img src="${imageUrl}" onerror="this.onerror=null;this.src='/images/no-image.png';" alt="${item.name}" />
+                    </div>
+                    <div class="cart-item-details">
+                        <div class="cart-item-title">${item.name}</div>
+                        <div class="cart-item-price">₺${item.price.toFixed(2)}</div>
+                    </div>
+                    <div class="cart-item-quantity">
+                        <button data-action="decrease">-</button>
+                        <span>${item.quantity}</span>
+                        <button data-action="increase">+</button>
+                    </div>
+                    <button class="remove-item-btn" data-action="remove">Sil</button>
+                `;
                 cartItemsContainer.appendChild(cartItemDiv);
             });
 
@@ -162,27 +172,64 @@
             finalTotalPriceSpan.textContent = `₺${finalTotal.toFixed(2)}`;
         }
 
-        function handleCartActions(event) {
+        // Sepet öğelerinin miktarını güncelleme veya silme işlemleri için event handler
+        async function handleCartActions(event) {
             const target = event.target;
-            const bookId = target.closest('.cart-item')?.dataset.bookId;
-            if (!bookId) return;
+            const cartItemDiv = target.closest('.cart-item');
+            const productId = parseInt(cartItemDiv?.dataset.productId);
+            if (isNaN(productId)) return;
 
-            const existingBookIndex = cart.findIndex(item => item.id === bookId);
-            if (existingBookIndex === -1) return;
+            let change = 0;
+            let actionType = '';
 
             if (target.dataset.action === 'increase') {
-                cart[existingBookIndex].quantity++;
+                change = 1;
+                actionType = 'update';
             } else if (target.dataset.action === 'decrease') {
-                if (cart[existingBookIndex].quantity > 1) {
-                    cart[existingBookIndex].quantity--;
-                } else {
-                    cart.splice(existingBookIndex, 1);
-                }
+                change = -1;
+                actionType = 'update';
             } else if (target.dataset.action === 'remove') {
-                cart.splice(existingBookIndex, 1);
+                actionType = 'remove';
             }
 
-            saveCart();
+            try {
+                let url = '';
+                let method = 'POST';
+                let bodyData = {};
+                let contentType = 'application/json'; // Default to JSON
+
+                if (actionType === 'update') {
+                    url = '/Basket/UpdateBasketItemQuantity';
+                    bodyData = { productId: productId, change: change };
+                } else if (actionType === 'remove') {
+                    url = '/Basket/RemoveFromBasket';
+                    bodyData = { productId: productId };
+                }
+
+                const response = await fetch(url, {
+                    method: method,
+                    headers: {
+                        'Content-Type': contentType,
+                        'RequestVerificationToken': getCookie('RequestVerificationToken')
+                    },
+                    body: JSON.stringify(bodyData) // JSON body gönderiyoruz
+                });
+
+                if (response.ok) {
+                    console.log(`Server-side sepet ${actionType} başarılı.`);
+                    await fetchAndRenderServerCart(); // Server'dan güncel sepeti çekip render et
+                } else {
+                    console.error(`Server-side sepet öğesi ${actionType} edilirken hata oluştu:`, response.statusText);
+                    const errorText = await response.text();
+                    console.error('Server hata yanıtı:', errorText);
+                    alert('Sepet güncellenirken bir hata oluştu. Lütfen tekrar deneyin.');
+                    await fetchAndRenderServerCart(); // Hata durumunda da server'dan güncel durumu çek
+                }
+            } catch (error) {
+                console.error(`AJAX ${actionType} isteği gönderilirken hata:`, error);
+                alert('Ağ hatası: Sepet güncellenemedi.');
+                await fetchAndRenderServerCart();
+            }
         }
 
         if (cartItemsContainer) {
@@ -190,28 +237,23 @@
         }
 
         if (checkoutButton) {
-            checkoutButton.addEventListener('click', async (e) => { // 'async' anahtar kelimesi eklendi
-                e.preventDefault(); // Varsayılan bağlantı tıklamasını engeller
+            checkoutButton.addEventListener('click', async (e) => {
+                e.preventDefault();
 
-                // Sepet boşsa uyarı ver ve işlemi durdur
                 if (cart.length === 0) {
                     alert("Sepetiniz boş. Lütfen önce ürün ekleyin.");
                     return;
                 }
 
                 try {
-                    // Sunucudan kullanıcının login durumunu kontrol et
-                    // Endpoint'i doğru controller ve action adıyla eşleştirdiğinizden emin olun.
-                    // Örneğin: /Basket/CheckLoginStatus (eğer BasketController içinde tanımlıysa)
                     const response = await fetch('/Basket/CheckLoginStatus');
-                    const data = await response.json(); // Yanıtı JSON olarak ayrıştır
+                    const data = await response.json();
 
                     if (data.isLoggedIn) {
-                        // Kullanıcı giriş yapmışsa Order/Index'e yönlendir
-                        window.location.href = '/Order/Index'; // Sipariş tamamlama sayfasına yönlendir
+                        window.location.href = '/Order/Index';
                     } else {
-                        // Kullanıcı giriş yapmamışsa Account/Login'e yönlendir
-                        window.location.href = '/Account/Login'; // Giriş sayfasına yönlendir
+                        alert("Siparişi tamamlamak için lütfen giriş yapın.");
+                        window.location.href = '/Account/Login';
                     }
                 } catch (error) {
                     console.error('Login durumu kontrol edilirken bir hata oluştu:', error);
@@ -220,46 +262,70 @@
             });
         }
 
-        // Bu fonksiyon sepet dışından ürün eklemek için kullanılır.
-        // Eğer index.cshtml gibi başka bir sayfada da kullanılıyorsa, burada tekrar tanımlanması bir sorun değildir.
-        function addToCart(product) {
+        // Bu fonksiyon, Default/Index sayfasından çağrıldığında çalışır.
+        // Product bilgilerini alarak server-side sepete ekleme isteği gönderir.
+        window.addToCart = async function(product) {
             console.log('Sepete eklenen ürün:', product);
 
-            const cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
+            try {
+                const formData = new URLSearchParams();
+                formData.append('productId', product.id);
+                formData.append('quantity', 1);
 
-            const existing = cart.find(item => item.id === product.id);
-            if (existing) {
-                existing.quantity++;
-            } else {
-                let imageUrl = product.imageUrl || product.image || product.ImageUrl || product.Picture || '/images/no-image.png';
-
-                cart.push({
-                    id: product.id,
-                    name: product.name || product.title || product.Name || product.Title,
-                    price: parseFloat(product.price || product.Price || 0),
-                    quantity: 1,
-                    imageUrl: imageUrl
+                const response = await fetch('/Basket/AddToBasket', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'RequestVerificationToken': getCookie('RequestVerificationToken')
+                    },
+                    body: formData.toString()
                 });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Ürün server-side sepete başarıyla eklendi:', data);
+                    await fetchAndRenderServerCart(); // Server'dan güncel sepeti çek ve UI'ı güncelle
+                } else {
+                    console.error('Server-side sepete ürün eklenirken hata:', response.statusText);
+                    const errorText = await response.text();
+                    console.error('Server hata yanıtı:', errorText);
+                    alert('Ürün sepete eklenirken bir hata oluştu. Lütfen tekrar deneyin.');
+                }
+            } catch (error) {
+                console.error('AJAX add-to-basket isteği gönderilirken hata:', error);
+                alert('Ağ hatası: Ürün sepete eklenemedi.');
             }
+        };
 
-            localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
-            console.log('Güncellenmiş sepet:', cart);
 
-            // Sayfa sepet sayfasıysa, sepeti yeniden render et
-            if (cartItemsContainer) {
-                updateCartCount();
-                renderCartItems();
+        // Sayfa yüklendiğinde ilk olarak server'dan sepeti çekip render eden fonksiyon
+        async function fetchAndRenderServerCart() {
+            try {
+                const response = await fetch('/Basket/GetBasketItems');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (data.success) {
+                        cart = data.items; // Server'dan gelen verilerle client sepetini güncelle
+                        saveCartAndRender(); // localStorage'ı ve UI'ı güncelle
+                        console.log('Client-side sepet server verisi ile senkronize edildi.');
+                    } else {
+                        // Eğer success false dönerse (örneğin kullanıcı giriş yapmamışsa)
+                        cart = []; // Sepeti boşalt
+                        saveCartAndRender();
+                        console.log('Kullanıcı giriş yapmamış veya sepet boş, sepet sıfırlandı.');
+                    }
+                } else {
+                    console.error('Server sepeti çekilirken hata:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Server sepetini çekme hatası:', error);
             }
         }
 
-        // Bu fonksiyonu global olarak erişilebilir yapıyoruz
-        window.addToCart = addToCart;
 
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCartCount();
-            renderCartItems();
-
-            console.log('Sayfa yüklendiğinde sepet:', cart);
+        // Sayfa yüklendiğinde ilk olarak server'dan sepeti çek
+        document.addEventListener('DOMContentLoaded', async () => {
+            await fetchAndRenderServerCart();
         });
     </script>
 </body>

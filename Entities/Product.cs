@@ -27,30 +27,24 @@ namespace KitapProject.Entities
         [StringLength(200)]
         public string ImageUrl { get; set; } = string.Empty;
 
-        // Oluşturulma tarihi
+        // DateTime.Now yerine DateTime.UtcNow
         [Required]
-        public DateTime CreatedDate { get; set; } = DateTime.Now;
+        public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
-        // Güncellenme tarihi (opsiyonel)
         public DateTime? UpdatedDate { get; set; }
-
 
         public bool Status { get; set; } = true;
 
         public bool PopulerProduct { get; set; }
 
-
         [Required]
         [Column(TypeName = "Decimal(18,2)")]
         public decimal Price { get; set; }
 
-        // Kategori Id'si, zorunlu, foreign key olarak tanımlanır
         [Required]
         [ForeignKey("Category")]
         public int CategoryId { get; set; }
 
-        // Kategori nesnesi
         public virtual Category? Category { get; set; }
-
     }
 }

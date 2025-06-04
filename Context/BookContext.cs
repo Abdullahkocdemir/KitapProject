@@ -19,6 +19,7 @@ namespace KitapProject.Context
         public DbSet<Order> Orders { get; set; }
         public DbSet<Invoice> Invoices { get; set; }
         public DbSet<OrderDetail> OrderDetails { get; set; }
+        public DbSet<UserPaymentInfo> UserPaymentInfos { get; set; }
 
         // Identity için tablolar
         public DbSet<AppUser> AppUsers { get; set; }
@@ -27,7 +28,25 @@ namespace KitapProject.Context
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.Entity<AppUser>()
+                .HasMany(u => u.UserPaymentInfos)
+                .WithOne(upi => upi.AppUser)
+                .HasForeignKey(upi => upi.AppUserId)
+                .OnDelete(DeleteBehavior.Cascade); // Kullanıcı silindiğinde ödeme bilgileri de silinsin
 
+            // Tüm DateTime property'lerini UTC olarak ayarla
+            foreach (var entityType in modelBuilder.Model.GetEntityTypes())
+            {
+                foreach (var property in entityType.GetProperties())
+                {
+                    if (property.ClrType == typeof(DateTime) || property.ClrType == typeof(DateTime?))
+                    {
+                        property.SetValueConverter(new Microsoft.EntityFrameworkCore.Storage.ValueConversion.ValueConverter<DateTime, DateTime>(
+                            v => v.ToUniversalTime(),
+                            v => DateTime.SpecifyKind(v, DateTimeKind.Utc)));
+                    }
+                }
+            }
         }
     }
 }

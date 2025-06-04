@@ -2,12 +2,13 @@
 @model List<Product>
 
 @{
-    Layout = null; // Or your actual layout file like "_Layout"
+    Layout = null; // Veya gerçek layout dosyanız gibi "_Layout"
 }
 
 <!DOCTYPE html>
 <html lang="tr">
 <head>
+    @Html.AntiForgeryToken()
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitap Dünyası - Kitaplarımızı Keşfet</title>
@@ -16,6 +17,7 @@
 </head>
 
 <body>
+
     @await Component.InvokeAsync("_DefaultHeaderPartials")
 
     <main>
@@ -101,12 +103,12 @@
 
         <section id="kitaplar" class="dynamic-section container">
             <h2 class="section-title">Öne Çıkan Kitaplar</h2>
-            <div class="books-grid" id="featured-books-grid"> @* Added ID for potential future JS use cases *@
+            <div class="books-grid" id="featured-books-grid">
                 @if (Model != null && Model.Any())
                 {
                     @foreach (var item in Model)
                     {
-                        <div class="book-card" data-book-id="@item.ProductId"> @* Added data-book-id for JavaScript *@
+                        <div class="book-card" data-book-id="@item.ProductId">
                             <div class="book-image">
                                 @if (!string.IsNullOrEmpty(item.ImageUrl))
                                 {
@@ -120,13 +122,13 @@
                             <div class="book-content">
                                 <h3 class="book-title">@item.Name</h3>
                                 <p class="book-author">@item.Author</p>
-                                <div class="book-price">₺@item.Price.ToString("F2")</div> @* Formatted price *@
+                                <div class="book-price">₺@item.Price.ToString("F2")</div>
                                 <div class="book-actions">
-                                    <button class="btn-book-action btn-primary-book-action" 
+                                    <button class="btn-book-action btn-primary-book-action"
                                             data-book-id="@item.ProductId"
                                             data-book-name="@item.Name"
                                             data-book-price="@item.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
-                                            data-book-imageurl="@item.ImageUrl"> @* YENİ: ImageUrl'ı data özelliği olarak ekledik *@
+                                            data-book-imageurl="@item.ImageUrl">
                                         <i class="fas fa-shopping-cart"></i> Sepete Ekle
                                     </button>
                                     <button class="btn-book-action btn-secondary-book-action" data-book-id="@item.ProductId">
@@ -196,7 +198,7 @@
             <h2 class="section-title">Günün İlham Veren Satırları</h2>
             <div class="quote-display">
                 <p class="quote-content" id="daily-quote">
-                    "Okumak, bilginin en derin kuyularından kana kana içmek gibidir. Her yeni sayfa, yeni bir dünyaya açılan kapıdır."
+                    "Okumak, bilginin en derin kuyularından kana kana içmek gibidir. Her yeni sayfa, yeni bir dünyaya açılan kapısıdır."
                 </p>
                 <div class="quote-author" id="quote-author">- Mevlana</div>
             </div>
@@ -213,82 +215,40 @@
     @await Component.InvokeAsync("_DefaultFooterPartials")
 
     <script>
+        // Sepet verilerini client tarafında tutan dizi (başlangıçta localStorage'dan yükle)
         let cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
         const cartItemCountSpan = document.getElementById('cart-item-count');
 
-        document.addEventListener('DOMContentLoaded', () => {
-            updateCartCount();
-            attachGlobalEventListeners();
-            displayQuote();
-            observeSectionsForAnimations();
-        });
+        // --- Yardımcı Fonksiyonlar ---
 
-        function attachGlobalEventListeners() {
-            const searchBtn = document.getElementById('search-btn');
-            const searchInput = document.getElementById('search-input');
-            if (searchBtn && searchInput) {
-                searchBtn.addEventListener('click', () => {
-                    const searchTerm = searchInput.value.trim();
-                    alert(`"${searchTerm}" için arama yapılıyor... (Bu bir demo özelliğidir)`);
-                });
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        searchBtn.click();
-                    }
-                });
+        // AntiForgeryToken'ı doğru şekilde almak için yardımcı fonksiyon
+        function getAntiForgeryToken() {
+            // Önce hidden input'tan almaya çalış
+            const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
+            if (tokenInput) {
+                return tokenInput.value;
             }
-
-            const cartContainer = document.getElementById('cart-container');
-            if (cartContainer) {
-                cartContainer.addEventListener('click', () => {
-                    // Sepet sayfasına yönlendirme yapabiliriz.
-                    window.location.href = '/Basket/Index';
-                });
+            // Alternatif olarak meta tag'den almaya çalış (eğer projenizde kullanılıyorsa)
+            const tokenMeta = document.querySelector('meta[name="__RequestVerificationToken"]');
+            if (tokenMeta) {
+                return tokenMeta.getAttribute('content');
             }
-
-            // "Sepete Ekle" butonları için dinleyici
-            document.querySelectorAll('.book-card .btn-primary-book-action').forEach(button => {
-                button.addEventListener('click', function() {
-                    const bookId = this.dataset.bookId;
-                    const bookName = this.dataset.bookName;
-                    const bookPrice = parseFloat(this.dataset.bookPrice); // Fiyatı sayıya dönüştür
-                    const bookImageUrl = this.dataset.bookImageurl; // YENİ: ImageUrl'ı aldık
-
-                    const bookToAdd = {
-                        id: bookId,
-                        name: bookName,
-                        price: bookPrice,
-                        imageUrl: bookImageUrl // YENİ: imageUrl'ı objeye ekledik
-                    };
-                    addToCart(bookToAdd);
-                    alert(`${bookName} sepete eklendi!`);
-                });
-            });
-
-            // "Oku" butonları için dinleyici
-            document.querySelectorAll('.book-card .btn-secondary-book-action').forEach(button => {
-                button.addEventListener('click', function() {
-                    const bookTitle = this.closest('.book-content').querySelector('.book-title').textContent;
-                    const bookId = this.dataset.bookId; // data-book-id attribute'undan ID'yi al
-                    alert(`${bookTitle} (ID: ${bookId}) şimdi okunuyor... (Bu bir demo özelliğidir)`);
-                });
-            });
-
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
+            // Son çare olarak cookie'den almaya çalış
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; __RequestVerificationToken=`);
+            if (parts.length === 2) {
+                return parts.pop().split(';').shift();
+            }
+            return null;
         }
 
+        // Sepeti localStorage'a kaydeden fonksiyon (ve UI'daki sepet sayısını güncelleyen)
+        function saveCartToLocalStorage() {
+            localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
+            updateCartCount(); // Header'daki sepet sayısını güncelle
+        }
+
+        // Sepet sayısını güncelleyen fonksiyon (hem localStorage hem de server verisiyle kullanılabilir)
         function updateCartCount() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             if (cartItemCountSpan) {
@@ -298,53 +258,130 @@
                     setTimeout(() => {
                         cartItemCountSpan.classList.remove('bounce');
                     }, 500);
+                } else {
+                    cartItemCountSpan.classList.remove('bounce');
                 }
             }
         }
 
-        // addToCart fonksiyonunu buraya taşıdık ki index.cshtml'de de kullanılabilsin
-        function addToCart(book) { 
-            const existingBook = cart.find(item => item.id === book.id);
-            if (existingBook) {
-                existingBook.quantity++;
-            } else {
-                // YENİ: imageUrl bilgisini de kaydediyoruz
-                cart.push({ ...book, quantity: 1, imageUrl: book.imageUrl }); 
+        // Sepet sayısını server'dan çekip güncelleyen fonksiyon (Header için)
+        async function fetchCartItemCountFromServer() {
+            try {
+                const response = await fetch('/Basket/GetCartItemCount');
+                if (response.ok) {
+                    const data = await response.json();
+                    if (cartItemCountSpan) {
+                        cartItemCountSpan.textContent = data.count;
+                    }
+                } else {
+                    console.error('Server sepet sayısını çekerken hata:', response.statusText);
+                }
+            } catch (error) {
+                console.error('Ağ hatası: Sepet sayısı alınamadı.', error);
             }
-            saveCart();
         }
 
-        function saveCart() {
-            localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
-            updateCartCount();
-            // Not: index sayfasında renderCartItems'ı çağırmaya gerek yok, bu sadece sepet sayfasında.
+        // Ürünü hem localStorage'a ekleyen hem de server'a gönderen ana fonksiyon
+        async function addProductToCartAndServer(product) {
+            console.log('Ürün sepete ekleniyor (Client Side Önce):', product);
+
+            // 1. Client-side (localStorage) sepeti hemen güncelle (anında geri bildirim)
+            const existing = cart.find(item => item.id === product.id);
+            if (existing) {
+                existing.quantity++;
+            } else {
+                let imageUrl = product.imageUrl || '/images/no-image.png';
+                if (!imageUrl || imageUrl === '' || imageUrl === 'undefined' || imageUrl === 'null') {
+                    imageUrl = '/images/no-image.png';
+                }
+                cart.push({ ...product, quantity: 1, imageUrl: imageUrl });
+            }
+            saveCartToLocalStorage(); // LocalStorage'ı güncelledi ve updateCartCount'u tetikledi
+
+            // 2. Server'a AJAX isteği gönder
+            try {
+                const token = getAntiForgeryToken();
+                console.log('CSRF Token (gönderilen):', token); // Debug için
+
+                const formData = new URLSearchParams();
+                formData.append('productId', product.id);
+                formData.append('quantity', 1);
+                
+                // CSRF token'ı form data'ya ekle
+                if (token) {
+                    formData.append('__RequestVerificationToken', token);
+                }
+
+                const response = await fetch('/Basket/AddToBasket', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        // Eğer X-CSRF-TOKEN başlığı gerekiyorsa ekleyebilirsiniz, ancak form-urlencoded için genellikle formData yeterli
+                        // ...(token && { 'X-CSRF-TOKEN': token }) 
+                    },
+                    body: formData.toString()
+                });
+
+                console.log('Server yanıt durumu:', response.status); // Debug için
+                console.log('Server yanıt başlıkları:', response.headers); // Debug için
+
+                if (response.ok) {
+                    const data = await response.json();
+                    console.log('Server-side sepete ürün başarıyla eklendi. Server yanıtı:', data);
+                    
+                    if (data.success) {
+                        // Server'dan güncel sepet sayısını tekrar çek
+                        await fetchCartItemCountFromServer();
+                        return true;
+                    } else {
+                        // Server tarafından 'success: false' dönmüşse
+                        throw new Error(data.message || 'Sunucu tarafında işlem başarısız oldu.');
+                    }
+                } else {
+                    // HTTP hatası (400, 500 vb.) durumunda
+                    const errorText = await response.text(); // Hata mesajını daha detaylı görmek için
+                    console.error('Server yanıt hatası:', response.status, errorText);
+
+                    // Client-side sepeti geri al
+                    if (existing) {
+                        existing.quantity--;
+                        if (existing.quantity === 0) {
+                            cart = cart.filter(item => item.id !== product.id);
+                        }
+                    } else {
+                        cart = cart.filter(item => item.id !== product.id);
+                    }
+                    saveCartToLocalStorage(); // LocalStorage'ı geri al ve UI'ı güncelle
+                    await fetchCartItemCountFromServer(); // Sepet sayısını da geri al
+
+                    throw new Error(`Ürün sepete eklenirken bir sunucu hatası oluştu: [HTTP ${response.status}] ${errorText}`);
+                }
+            } catch (error) {
+                console.error('AJAX isteği gönderilirken ağ hatası:', error);
+                
+                // Ağ hatasında client-side sepeti geri al
+                if (existing) {
+                    existing.quantity--;
+                    if (existing.quantity === 0) {
+                        cart = cart.filter(item => item.id !== product.id);
+                    }
+                } else {
+                    cart = cart.filter(item => item.id !== product.id);
+                }
+                saveCartToLocalStorage();
+                await fetchCartItemCountFromServer();
+
+                throw new Error(`Ağ hatası: Ürün sepete eklenemedi. Detay: ${error.message}`);
+            }
         }
 
         const quotes = [
-            {
-                quote: "Okumak, bilginin en derin kuyularından kana kana içmek gibidir. Her yeni sayfa, yeni bir dünyaya açılan kapıdır.",
-                author: "Mevlana"
-            },
-            {
-                quote: "İnsan ruhunun gıdası kitaplardır. Okudukça büyür, gelişimini sürdürür ve hayatı daha derinden anlar.",
-                author: "Fyodor Dostoyevski"
-            },
-            {
-                quote: "Bir kitap, uykusuz bir gecenin ve sonsuz bir düşüncenin ürünüdür.",
-                author: "George Orwell"
-            },
-            {
-                quote: "En iyi arkadaşım, bana okumadığım bir kitabı veren kişidir.",
-                author: "Abraham Lincoln"
-            },
-            {
-                quote: "Kitaplar, hiç kapanmayan pencerelerdir.",
-                author: "Nazım Hikmet"
-            },
-            {
-                quote: "Okumadan geçen bir gün, kaybolmuş bir gündür.",
-                author: "Anonim"
-            }
+            { quote: "Okumak, bilginin en derin kuyularından kana kana içmek gibidir. Her yeni sayfa, yeni bir dünyaya açılan kapısıdır.", author: "Mevlana" },
+            { quote: "İnsan ruhunun gıdası kitaplardır. Okudukça büyür, gelişimini sürdürür ve hayatı daha derinden anlar.", author: "Fyodor Dostoyevski" },
+            { quote: "Bir kitap, uykusuz bir gecenin ve sonsuz bir düşüncenin ürünüdür.", author: "George Orwell" },
+            { quote: "En iyi arkadaşım, bana okumadığım bir kitabı veren kişidir.", author: "Abraham Lincoln" },
+            { quote: "Kitaplar, hiç kapanmayan pencerelerdir.", author: "Nazım Hikmet" },
+            { quote: "Okumadan geçen bir gün, kaybolmuş bir gündür.", author: "Anonim" }
         ];
 
         let currentQuoteIndex = 0;
@@ -377,10 +414,6 @@
             currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
         }
 
-        if (newQuoteButton) {
-            newQuoteButton.addEventListener('click', displayQuote);
-        }
-
         const observerOptions = {
             threshold: 0.1,
             rootMargin: '0px 0px -50px 0px'
@@ -405,11 +438,105 @@
             });
         }
 
+        // --- Event Listener'lar ve İlk Çalıştırma ---
+
         document.addEventListener('DOMContentLoaded', () => {
+            // Sayfa yüklendiğinde sepet sayısını server'dan çek
+            fetchCartItemCountFromServer();
+
+            // Genel event listener'ları ata
+            attachGlobalEventListeners();
+            
+            // Günün alıntısını göster
+            displayQuote();
+            if (newQuoteButton) {
+                newQuoteButton.addEventListener('click', displayQuote);
+            }
+
+            // Animasyonlar için bölümleri gözlemle
+            observeSectionsForAnimations();
+
+            // Hero bölümü animasyonlarını başlat
             document.querySelector('.hero-section h1').style.animationPlayState = 'running';
             document.querySelector('.hero-section p').style.animationPlayState = 'running';
             document.querySelector('.cta-buttons').style.animationPlayState = 'running';
         });
+
+        function attachGlobalEventListeners() {
+            const searchBtn = document.getElementById('search-btn');
+            const searchInput = document.getElementById('search-input');
+            if (searchBtn && searchInput) {
+                searchBtn.addEventListener('click', () => {
+                    const searchTerm = searchInput.value.trim();
+                    alert(`"${searchTerm}" için arama yapılıyor... (Bu bir demo özelliğidir)`);
+                });
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        searchBtn.click();
+                    }
+                });
+            }
+
+            const cartContainer = document.getElementById('cart-container');
+            if (cartContainer) {
+                cartContainer.addEventListener('click', () => {
+                    window.location.href = '/Basket/Index';
+                });
+            }
+
+            // "Sepete Ekle" butonları için dinleyici
+            document.querySelectorAll('.book-card .btn-primary-book-action').forEach(button => {
+                button.addEventListener('click', async function() {
+                    // **Sepete ekleme öncesi kullanıcı girişini kontrol et**
+                    const loginStatusResponse = await fetch('/Basket/CheckLoginStatus');
+                    const loginStatusData = await loginStatusResponse.json();
+
+                    if (!loginStatusData.isLoggedIn) {
+                        alert("Sepete ürün eklemek için lütfen giriş yapın.");
+                        window.location.href = '/Account/Login'; // Giriş sayfasına yönlendir
+                        return; // İşlemi burada durdur
+                    }
+
+                    const bookToAdd = {
+                        id: parseInt(this.dataset.bookId),
+                        name: this.dataset.bookName,
+                        price: parseFloat(this.dataset.bookPrice),
+                        imageUrl: this.dataset.bookImageurl
+                    };
+
+                    try {
+                        await addProductToCartAndServer(bookToAdd);
+                        alert(`${bookToAdd.name} sepete eklendi!`);
+                    } catch (error) {
+                        console.error("Sepete ekleme işlemi başarısız:", error);
+                        alert("Ürün sepete eklenirken bir hata oluştu: " + error.message);
+                    }
+                });
+            });
+
+            // "Oku" butonları için dinleyici
+            document.querySelectorAll('.book-card .btn-secondary-book-action').forEach(button => {
+                button.addEventListener('click', function() {
+                    const bookTitle = this.closest('.book-content').querySelector('.book-title').textContent;
+                    const bookId = this.dataset.bookId;
+                    alert(`${bookTitle} (ID: ${bookId}) şimdi okunuyor... (Bu bir demo özelliğidir)`);
+                });
+            });
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
     </script>
 </body>
 </html>

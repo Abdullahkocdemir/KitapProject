@@ -1,6 +1,9 @@
-﻿using KitapProject.Context;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Authorization; // Oturum açma durumunu kontrol etmek için bu kütüphaneyi ekleyin
+﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Authorization;
+using System.Security.Claims;
+using Microsoft.EntityFrameworkCore;
+using KitapProject.Entities;
+using KitapProject.Context;
 
 namespace KitapProject.Controllers
 {
@@ -13,29 +16,233 @@ namespace KitapProject.Controllers
             _context = context;
         }
 
-        public IActionResult Index()
+        [Authorize] // Sadece oturum açmış kullanıcılar sepete erişebilir
+        public async Task<IActionResult> Index()
         {
-            return View();
+
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Kullanıcı ID'sini al
+
+            // Kullanıcının sepetini ve içindeki ürünleri çek
+            var basket = await _context.Baskets
+                .Include(b => b.CartItems)
+                .ThenInclude(bi => bi.Product)
+                .FirstOrDefaultAsync(b => b.AppUserId == userId);
+
+            // Eğer kullanıcının sepeti yoksa yeni bir sepet oluştur ve kaydet
+            if (basket == null)
+            {
+                basket = new Basket { AppUserId = userId, CreatedDate = DateTime.UtcNow, TotalPrice = 0 };
+                _context.Baskets.Add(basket);
+                await _context.SaveChangesAsync(); // Yeni sepetin ID'sinin oluşması için kaydet
+            }
+
+            // Sepet içeriğini view'a gönder
+            return View(basket);
         }
 
-        /// <summary>
-        /// Kullanıcının oturum açmış olup olmadığını kontrol eder ve JSON olarak yanıt döner.
-        /// </summary>
-        [HttpGet] // Bu action'a HTTP GET isteği ile erişilecek
+        [HttpPost]
+        [Authorize]
+        public IActionResult ConfirmBasket()
+        {
+            // Sepet onaylandığında Order/Index sayfasına yönlendir
+            return RedirectToAction("Index", "Order");
+        }
+
+        [HttpPost]
+        [Authorize] // Bu satırı ekleyin veya kontrol edin
+        [ValidateAntiForgeryToken] // CSRF koruması için
+        public async Task<IActionResult> AddToBasket(int productId, int quantity = 1)
+        {
+            // Debug için
+            Console.WriteLine($"AddToBasket çağrıldı: ProductId={productId}, Quantity={quantity}");
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var product = await _context.Products.FindAsync(productId);
+
+            if (string.IsNullOrEmpty(userId))
+            {
+                // Kullanıcı giriş yapmamışsa, bu hata zaten [Authorize] ile yakalanır,
+                // ama ekstra bir güvenlik katmanı olarak veya debug için eklenebilir.
+                return Json(new { success = false, message = "Sepete ürün eklemek için giriş yapmalısınız." });
+            }
+            if (product == null)
+            {
+                return Json(new { success = false, message = "Ürün bulunamadı." }); // JSON yanıt döndür
+            }
+
+            var basket = await _context.Baskets
+                .Include(b => b.CartItems)
+                .FirstOrDefaultAsync(b => b.AppUserId == userId);
+
+            if (basket == null)
+            {
+                basket = new Basket { AppUserId = userId, CreatedDate = DateTime.UtcNow, TotalPrice = 0 };
+                _context.Baskets.Add(basket);
+                await _context.SaveChangesAsync();
+            }
+
+            var basketItem = basket.CartItems.FirstOrDefault(bi => bi.ProductId == productId);
+
+            if (basketItem != null)
+            {
+                basketItem.Quantity += quantity;
+                basketItem.UnitPrice = product.Price;
+            }
+            else
+            {
+                basketItem = new BasketItem
+                {
+                    ProductId = productId,
+                    Quantity = quantity,
+                    UnitPrice = product.Price,
+                    BasketId = basket.BasketId
+                };
+                basket.CartItems.Add(basketItem);
+            }
+
+            basket.TotalPrice = basket.CartItems.Sum(bi => bi.ItemTotalPrice);
+            basket.UpdatedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            // Başarılı bir eklemeden sonra sepetin güncel toplam miktarını döndürelim
+            var currentBasketItemCount = basket.CartItems.Sum(bi => bi.Quantity);
+            return Json(new { success = true, message = "Ürün sepete eklendi.", newTotal = basket.TotalPrice, itemCount = currentBasketItemCount });
+        }
+
+        [HttpGet]
         public IActionResult CheckLoginStatus()
         {
-            // User.Identity.IsAuthenticated, ASP.NET Core'da kullanıcının oturum açıp açmadığını kontrol eder.
-            // Bu, ASP.NET Core Identity veya başka bir kimlik doğrulama sistemi kullanıyorsanız çalışır.
-            bool isLoggedIn = User.Identity.IsAuthenticated;
-
-            // JSON formatında bir yanıt döndürüyoruz.
+            bool isLoggedIn = User.Identity?.IsAuthenticated ?? false;
             return Json(new { isLoggedIn = isLoggedIn });
         }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> UpdateBasketItemQuantity([FromBody] UpdateQuantityModel model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var basket = await _context.Baskets
+                .Include(b => b.CartItems)
+                .FirstOrDefaultAsync(b => b.AppUserId == userId);
+
+            if (basket == null)
+            {
+                return Json(new { success = false, message = "Sepet bulunamadı." });
+            }
+
+            var basketItem = basket.CartItems.FirstOrDefault(bi => bi.ProductId == model.ProductId);
+
+            if (basketItem == null)
+            {
+                return Json(new { success = false, message = "Ürün sepette bulunamadı." });
+            }
+
+            basketItem.Quantity += model.Change;
+
+            if (basketItem.Quantity <= 0)
+            {
+                _context.BasketItems.Remove(basketItem);
+            }
+            else
+            {
+                _context.BasketItems.Update(basketItem);
+            }
+
+            // Sepetin toplam fiyatını güncelle
+            basket.TotalPrice = basket.CartItems.Sum(bi => bi.ItemTotalPrice);
+            basket.UpdatedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, newQuantity = basketItem.Quantity, newTotalPrice = basket.TotalPrice });
+        }
+
+        [HttpPost]
+        [Authorize]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> RemoveFromBasket([FromBody] RemoveItemModel model)
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var basket = await _context.Baskets
+                .Include(b => b.CartItems)
+                .FirstOrDefaultAsync(b => b.AppUserId == userId);
+
+            if (basket == null)
+            {
+                return Json(new { success = false, message = "Sepet bulunamadı." });
+            }
+
+            var basketItem = basket.CartItems.FirstOrDefault(bi => bi.ProductId == model.ProductId);
+
+            if (basketItem == null)
+            {
+                return Json(new { success = false, message = "Ürün sepette bulunamadı." });
+            }
+
+            _context.BasketItems.Remove(basketItem);
+
+            basket.TotalPrice = basket.CartItems.Sum(bi => bi.ItemTotalPrice);
+            basket.UpdatedDate = DateTime.UtcNow;
+
+            await _context.SaveChangesAsync();
+
+            return Json(new { success = true, message = "Ürün sepetten silindi.", newTotalPrice = basket.TotalPrice });
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> GetCartItemCount()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (string.IsNullOrEmpty(userId))
+            {
+                return Json(new { count = 0 });
+            }
+
+            var basket = await _context.Baskets
+                                       .Include(b => b.CartItems)
+                                       .FirstOrDefaultAsync(b => b.AppUserId == userId);
+
+            var itemCount = basket?.CartItems.Sum(bi => bi.Quantity) ?? 0;
+            return Json(new { count = itemCount });
+        }
+
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> GetBasketItems()
+        {
+            var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var basket = await _context.Baskets
+                .Include(b => b.CartItems)
+                .ThenInclude(bi => bi.Product)
+                .FirstOrDefaultAsync(b => b.AppUserId == userId);
+
+            if (basket == null)
+            {
+                return Json(new { success = true, items = new List<object>(), total = 0.0m });
+            }
+
+            var items = basket.CartItems.Select(bi => new
+            {
+                id = bi.ProductId,
+                name = bi.Product.Name,
+                price = bi.UnitPrice,
+                quantity = bi.Quantity,
+                imageUrl = bi.Product.ImageUrl
+            }).ToList();
+
+            return Json(new { success = true, items = items, total = basket.TotalPrice });
+        }
+
+        public class UpdateQuantityModel
+        {
+            public int ProductId { get; set; }
+            public int Change { get; set; }
+        }
+
+        public class RemoveItemModel
+        {
+            public int ProductId { get; set; }
+        }
     }
-
-    // --- Aşağıdaki kısımlar, Order/Index ve Account/Login sayfalarınızın bulunduğu Controller'lar için örnektir.
-    // --- Eğer bu controller'lar projenizde zaten varsa, bu kodları eklemenize gerek yoktur.
-
-    // Örnek: Sipariş sayfanızın bulunduğu Controller
-
 }

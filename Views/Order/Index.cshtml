@@ -1,0 +1,773 @@
+﻿@model KitapProject.Models.OrderCreateViewModel
+@{
+    Layout = null; // Layout kullanıyorsanız kaldırın veya uygun layout'u ayarlayın
+}
+
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sipariş Tamamla - Kitap Mağazası</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Mevcut CSS kodlarınız buraya gelecek */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            width: 100%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 25px 45px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: slideIn 0.8s ease-out;
+        }
+
+        @@keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 30px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+            animation: rotate 20s linear infinite;
+        }
+
+        @@keyframes rotate {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            position: relative;
+            z-index: 1;
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            position: relative;
+            z-index: 1;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 0;
+            min-height: 600px;
+        }
+
+        .form-section {
+            padding: 40px;
+            background: white;
+        }
+
+        .order-summary {
+            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+            padding: 40px;
+            border-left: 1px solid #dee2e6;
+        }
+
+        .section-title {
+            font-size: 1.5rem;
+            margin-bottom: 25px;
+            color: #333;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title i {
+            color: #667eea;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-group.full-width {
+            grid-column: 1 / -1;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea,
+        select { /* select elementi için de stil ekledim */
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #e1e5e9;
+            border-radius: 12px;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            background: white;
+        }
+
+        input[type="text"]:focus,
+        input[type="email"]:focus,
+        textarea:focus,
+        select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .card-form {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 30px;
+        }
+
+        .card-form label {
+            color: white;
+        }
+
+        .card-form input,
+        .card-form select { /* select elementi için de stil ekledim */
+            background: rgba(255, 255, 255, 0.9);
+        }
+
+        .card-form input:focus,
+        .card-form select:focus {
+            background: white;
+        }
+
+        .card-row {
+            display: grid;
+            grid-template-columns: 1fr 120px;
+            gap: 15px;
+        }
+
+        .basket-item {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease;
+        }
+
+        .basket-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .item-image {
+            width: 60px;
+            height: 80px;
+            /* background: linear-gradient(135deg, #667eea, #764ba2); */
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 1.5rem;
+            margin-right: 15px;
+            overflow: hidden; /* Resim sığmazsa taşmasını engeller */
+        }
+        .item-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+
+        .item-details {
+            flex: 1;
+        }
+
+        .item-name {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        .item-price {
+            color: #667eea;
+            font-weight: 500;
+        }
+
+        .quantity-badge {
+            background: #667eea;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 500;
+        }
+
+        .total-section {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            margin-top: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .total-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            padding: 5px 0;
+        }
+
+        .total-row.final {
+            border-top: 2px solid #667eea;
+            padding-top: 15px;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: #667eea;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            border: none;
+            border-radius: 15px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 30px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+        }
+
+        .submit-btn:active {
+            transform: translateY(-1px);
+        }
+
+        .submit-btn::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            transition: width 0.3s ease, height 0.3s ease;
+        }
+
+        .submit-btn:hover::before {
+            width: 300px;
+            height: 300px;
+        }
+
+        .progress-steps {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 30px;
+            gap: 20px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .step-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .step-line {
+            width: 50px;
+            height: 2px;
+            background: #667eea;
+        }
+
+        .security-badge {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #28a745;
+            color: white;
+            padding: 10px 15px;
+            border-radius: 25px;
+            font-size: 0.9rem;
+            margin-top: 15px;
+        }
+
+        @@media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .card-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .form-section,
+            .order-summary {
+                padding: 20px;
+            }
+        }
+
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .loading-content {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            text-align: center;
+            animation: pulse 1.5s infinite;
+        }
+
+        @@keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+
+        .validation-summary-errors ul {
+            list-style: none;
+            padding: 0;
+            margin-bottom: 20px;
+            background-color: #ffe6e6;
+            border: 1px solid #ffcccc;
+            border-radius: 8px;
+            padding: 15px;
+            color: #cc0000;
+            font-weight: 500;
+        }
+
+        .validation-summary-errors li {
+            margin-bottom: 5px;
+        }
+
+        .field-validation-error {
+            color: #cc0000;
+            font-size: 0.85em;
+            margin-top: 5px;
+            display: block;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1><i class="fas fa-shopping-cart"></i> Sipariş Tamamla</h1>
+            <p>Güvenli ödeme ile alışverişinizi tamamlayın</p>
+        </div>
+
+        <div class="progress-steps">
+            <div class="step">
+                <div class="step-circle">1</div>
+                <span>Sepet</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+                <div class="step-circle" style="background: #5cb85c;">2</div> <span>Ödeme</span>
+            </div>
+            <div class="step-line"></div>
+            <div class="step">
+                <div class="step-circle">3</div>
+                <span>Onay</span>
+            </div>
+        </div>
+
+        <form method="post" asp-action="CompleteOrder" asp-controller="Order" id="orderForm">
+            @Html.AntiForgeryToken()
+            <div class="main-content">
+                <div class="form-section">
+                    <div class="section-title">
+                        <i class="fas fa-shipping-fast"></i>
+                        Teslimat Bilgileri
+                    </div>
+
+                    @if (ViewData.ModelState.Any(x => x.Value?.Errors.Any() == true))
+                    {
+                        <div class="validation-summary-errors">
+                            <ul>
+                                @foreach (var modelState in ViewData.ModelState.Values)
+                                {
+                                    @foreach (var error in modelState.Errors)
+                                    {
+                                        <li>@error.ErrorMessage</li>
+                                    }
+                                }
+                            </ul>
+                        </div>
+                    }
+
+                    <div class="form-row">
+                        <div class="form-group full-width">
+                            <label for="ShippingAddress">Gönderim Adresi *</label>
+                            <textarea id="ShippingAddress" name="ShippingAddress" rows="3" placeholder="Adresinizi giriniz" required>@Model.ShippingAddress</textarea>
+                            <span asp-validation-for="ShippingAddress" class="field-validation-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="City">Şehir *</label>
+                            <input type="text" id="City" name="City" placeholder="Şehir" value="@Model.City" required>
+                            <span asp-validation-for="City" class="field-validation-error"></span>
+                        </div>
+                        <div class="form-group">
+                            <label for="Country">Ülke *</label>
+                            <input type="text" id="Country" name="Country" placeholder="Ülke" value="@Model.Country" required>
+                            <span asp-validation-for="Country" class="field-validation-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label for="PostalCode">Posta Kodu *</label>
+                            <input type="text" id="PostalCode" name="PostalCode" placeholder="Posta Kodu" value="@Model.PostalCode" required>
+                            <span asp-validation-for="PostalCode" class="field-validation-error"></span>
+                        </div>
+                    </div>
+
+                    <div class="card-form">
+                        <div class="section-title" style="color: white;">
+                            <i class="fas fa-credit-card"></i>
+                            Ödeme Bilgileri
+                        </div>
+
+                        @if (Model.SavedPaymentInfos != null && Model.SavedPaymentInfos.Any())
+                        {
+                            <div class="form-group">
+                                <label for="SelectedPaymentInfoId">Kayıtlı Kartlarım</label>
+                                <select id="SelectedPaymentInfoId" name="SelectedPaymentInfoId" class="form-control">
+                                    <option value="">Yeni Kart Kullan</option>
+                                    @foreach (var card in Model.SavedPaymentInfos)
+                                    {
+                                        <option value="@card.PaymentInfoId">**** **** **** @card.CardNumberLastFour (@card.CardHolderName)</option>
+                                    }
+                                </select>
+                            </div>
+                            <p style="color:white; font-size:0.9em; margin-bottom:15px;">Veya aşağıdaki alanları doldurarak yeni bir kart kullanın.</p>
+                        }
+
+
+                        <div id="newCardFields">
+                            <div class="form-group">
+                                <label for="CardHolderName">Kart Sahibi Adı *</label>
+                                <input type="text" id="CardHolderName" name="CardHolderName" placeholder="Ad Soyad" value="@Model.CardHolderName">
+                                <span asp-validation-for="CardHolderName" class="field-validation-error"></span>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="CardNumber">Kart Numarası *</label>
+                                <input type="text" id="CardNumber" name="CardNumber" placeholder="1234 5678 9012 3456" maxlength="19" value="@Model.CardNumber">
+                                <span asp-validation-for="CardNumber" class="field-validation-error"></span>
+                            </div>
+
+                            <div class="card-row">
+                                <div class="form-group">
+                                    <label for="ExpirationDate">Son Kullanma Tarihi *</label>
+                                    <input type="text" id="ExpirationDate" name="ExpirationDate" placeholder="AA/YY" maxlength="5" value="@Model.ExpirationDate">
+                                    <span asp-validation-for="ExpirationDate" class="field-validation-error"></span>
+                                </div>
+                                <div class="form-group">
+                                    <label for="CVV">CVV *</label>
+                                    <input type="text" id="CVV" name="CVV" placeholder="123" maxlength="4" value="@Model.CVV">
+                                    <span asp-validation-for="CVV" class="field-validation-error"></span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="security-badge">
+                            <i class="fas fa-shield-alt"></i>
+                            SSL ile güvenli ödeme
+                        </div>
+                    </div>
+                </div>
+
+                <div class="order-summary">
+                    <div class="section-title">
+                        <i class="fas fa-receipt"></i>
+                        Sipariş Özeti
+                    </div>
+
+                    <div id="basketItems">
+                        @if (Model.BasketItems != null && Model.BasketItems.Any())
+                        {
+                            @foreach (var item in Model.BasketItems)
+                            {
+                                <div class="basket-item">
+                                    <div class="item-image">
+                                        <img src="@(string.IsNullOrEmpty(item.Product.ImageUrl) ? "/images/no-image.png" : item.Product.ImageUrl)"
+                                             onerror="this.onerror=null;this.src='/images/no-image.png';" alt="@item.Product.Name" />
+                                    </div>
+                                    <div class="item-details">
+                                        <div class="item-name">@item.Product.Name</div>
+                                        <div class="item-price">₺@item.UnitPrice.ToString("N2")</div>
+                                    </div>
+                                    <div class="quantity-badge">@item.Quantity x</div>
+                                </div>
+                            }
+                        }
+                        else
+                        {
+                            <p>Sepetiniz boş.</p>
+                        }
+                    </div>
+
+                    <div class="total-section">
+                        <div class="total-row">
+                            <span>Ara Toplam:</span>
+                            <span>₺@((Model.TotalAmount - Model.VATAmount - Model.ShippingFee).ToString("N2"))</span>
+                        </div>
+                        <div class="total-row">
+                            <span>KDV:</span>
+                            <span>₺@Model.VATAmount.ToString("N2")</span>
+                        </div>
+                        <div class="total-row">
+                            <span>Kargo:</span>
+                            <span>₺@Model.ShippingFee.ToString("N2")</span>
+                        </div>
+                        <div class="total-row final">
+                            <span>Toplam:</span>
+                            <span>₺@Model.TotalAmount.ToString("N2")</span>
+                        </div>
+                    </div>
+
+                    <button type="submit" class="submit-btn">
+                        <i class="fas fa-lock"></i>
+                        Güvenli Ödeme Yap
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-content">
+            <i class="fas fa-spinner fa-spin fa-3x" style="color: #667eea; margin-bottom: 20px;"></i>
+            <h3>Ödemeniz İşleniyor...</h3>
+            <p>Lütfen bekleyiniz</p>
+        </div>
+    </div>
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validate/1.19.2/jquery.validate.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
+
+    <script>
+        // Kart numarası formatlaması
+        document.getElementById('CardNumber').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\s/g, '');
+            let formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
+            if (formattedValue.length <= 19) {
+                e.target.value = formattedValue;
+            }
+        });
+
+        // Son kullanma tarihi formatlaması
+        document.getElementById('ExpirationDate').addEventListener('input', function(e) {
+            let value = e.target.value.replace(/\D/g, '');
+            if (value.length >= 2) {
+                value = value.substring(0, 2) + '/' + value.substring(2, 4);
+            }
+            e.target.value = value;
+        });
+
+        // CVV sadece rakam
+        document.getElementById('CVV').addEventListener('input', function(e) {
+            e.target.value = e.target.value.replace(/\D/g, '');
+        });
+
+        // Form gönderimi
+        document.getElementById('orderForm').addEventListener('submit', function(e) {
+            // Client tarafı validasyonu geçmezse submit'i durdur
+            if (!$(this).valid()) {
+                return;
+            }
+
+            e.preventDefault(); // Varsayılan formu göndermeyi engeller
+
+            // Loading overlay göster
+            document.getElementById('loadingOverlay').style.display = 'flex';
+
+            // Formu asenkron olarak gönder
+            const form = e.target;
+            const formData = new FormData(form);
+
+            fetch(form.action, {
+                method: form.method,
+                body: formData,
+                headers: {
+                    'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
+                }
+            })
+            .then(response => {
+                // Sunucudan gelen yanıtı JSON olarak veya text olarak al
+                if (response.ok && response.redirected) {
+                    window.location.href = response.url; // Yönlendirmeyi takip et
+                } else if (response.ok) {
+                    return response.text().then(text => { // Yanıtı text olarak al
+                        try {
+                            return JSON.parse(text); // JSON ise parse et
+                        } catch (error) {
+                            return text; // JSON değilse text olarak bırak
+                        }
+                    });
+                } else {
+                    return response.text().then(text => { throw new Error(text) });
+                }
+            })
+            .then(data => {
+                // Eğer sunucudan bir hata mesajı gelirse veya model geçerli değilse
+                if (typeof data === 'string' && data.includes("validation-summary-errors")) {
+                     // Hata HTML'i döndüyse, mevcut sayfayı bu HTML ile güncelle
+                    document.documentElement.innerHTML = data;
+                }
+                else {
+                    // Yükleniyor ekranını gizle (yönlendirme olmazsa)
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                    if (data && data.success === false) { // Örnek olarak hata durumu
+                        alert(data.message || "Sipariş işlenirken bir hata oluştu.");
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Sipariş gönderilirken hata oluştu:', error);
+                alert('Bir hata oluştu: ' + error.message);
+                document.getElementById('loadingOverlay').style.display = 'none'; // Hata durumunda gizle
+            });
+        });
+
+        // Kayıtlı kart seçimi değiştiğinde yeni kart alanlarını gizle/göster
+        document.addEventListener('DOMContentLoaded', function() {
+            const selectedPaymentInfoId = document.getElementById('SelectedPaymentInfoId');
+            const newCardFields = document.getElementById('newCardFields');
+            const cardHolderNameInput = document.getElementById('CardHolderName');
+            const cardNumberInput = document.getElementById('CardNumber');
+            const expirationDateInput = document.getElementById('ExpirationDate');
+            const cvvInput = document.getElementById('CVV');
+
+            function toggleNewCardFields() {
+                if (selectedPaymentInfoId && selectedPaymentInfoId.value !== "") {
+                    newCardFields.style.display = 'none';
+                    // Yeni kart alanlarını zorunlu olmaktan çıkar
+                    cardHolderNameInput.removeAttribute('required');
+                    cardNumberInput.removeAttribute('required');
+                    expirationDateInput.removeAttribute('required');
+                    cvvInput.removeAttribute('required');
+                } else {
+                    newCardFields.style.display = 'block';
+                    // Yeni kart alanlarını zorunlu yap
+                    cardHolderNameInput.setAttribute('required', 'required');
+                    cardNumberInput.setAttribute('required', 'required');
+                    expirationDateInput.setAttribute('required', 'required');
+                    cvvInput.setAttribute('required', 'required');
+                }
+            }
+
+            if (selectedPaymentInfoId) {
+                selectedPaymentInfoId.addEventListener('change', toggleNewCardFields);
+                toggleNewCardFields(); // Sayfa yüklendiğinde başlangıç durumunu ayarla
+            }
+
+            // Animasyonlar için
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.animation = 'slideIn 0.6s ease-out';
+                    }
+                });
+            });
+
+            document.querySelectorAll('.basket-item').forEach(item => {
+                observer.observe(item);
+            });
+        });
+    </script>
+</body>
+</html>

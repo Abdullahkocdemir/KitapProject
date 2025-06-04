@@ -3,6 +3,7 @@ using System;
 using KitapProject.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace KitapProject.Migrations
 {
     [DbContext(typeof(BookContext))]
-    partial class BookContextModelSnapshot : ModelSnapshot
+    [Migration("20250604003846_Mig_add_Carddd")]
+    partial class Mig_add_Carddd
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -438,51 +441,6 @@ namespace KitapProject.Migrations
                     b.ToTable("Testimonials");
                 });
 
-            modelBuilder.Entity("KitapProject.Entities.UserPaymentInfo", b =>
-                {
-                    b.Property<int>("PaymentInfoId")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("PaymentInfoId"));
-
-                    b.Property<string>("AppUserId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("CVV")
-                        .IsRequired()
-                        .HasMaxLength(4)
-                        .HasColumnType("character varying(4)");
-
-                    b.Property<string>("CardHolderName")
-                        .IsRequired()
-                        .HasMaxLength(100)
-                        .HasColumnType("character varying(100)");
-
-                    b.Property<string>("CardNumberLastFour")
-                        .IsRequired()
-                        .HasMaxLength(19)
-                        .HasColumnType("character varying(19)");
-
-                    b.Property<DateTime>("CreatedDate")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("ExpirationDate")
-                        .IsRequired()
-                        .HasMaxLength(5)
-                        .HasColumnType("character varying(5)");
-
-                    b.Property<bool>("IsDefault")
-                        .HasColumnType("boolean");
-
-                    b.HasKey("PaymentInfoId");
-
-                    b.HasIndex("AppUserId");
-
-                    b.ToTable("UserPaymentInfos");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.Property<int>("Id")
@@ -681,17 +639,6 @@ namespace KitapProject.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("KitapProject.Entities.UserPaymentInfo", b =>
-                {
-                    b.HasOne("KitapProject.Entities.AppUser", "AppUser")
-                        .WithMany("UserPaymentInfos")
-                        .HasForeignKey("AppUserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("AppUser");
-                });
-
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
                 {
                     b.HasOne("KitapProject.Entities.AppRole", null)
@@ -758,8 +705,6 @@ namespace KitapProject.Migrations
 
             modelBuilder.Entity("KitapProject.Entities.AppUser", b =>
                 {
-                    b.Navigation("UserPaymentInfos");
-
                     b.Navigation("UserRoles");
                 });
 
