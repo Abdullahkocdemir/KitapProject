@@ -34,7 +34,7 @@ namespace KitapProject.Controllers
                                             .ProjectTo<ResultProductDTO>(_mapper.ConfigurationProvider)
                                             .ToListAsync();
 
-            return View(productDtos); // Sending List<ResultProductDTO>
+            return View(productDtos); 
         }
 
         [HttpGet]
@@ -56,7 +56,6 @@ namespace KitapProject.Controllers
         [HttpGet]
         public async Task<IActionResult> Create()
         {
-            // Kategorileri veritabanından çek ve ViewBag'e List<SelectListItem> olarak ata
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
             return View();
         }
@@ -67,7 +66,6 @@ namespace KitapProject.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // ModelState geçerli değilse, kategorileri tekrar yükle
                 ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
                 return View(createProductDto);
             }
@@ -76,7 +74,6 @@ namespace KitapProject.Controllers
             if (!categoryExists)
             {
                 ModelState.AddModelError("CategoryId", "Seçilen kategori bulunamadı.");
-                // Kategori bulunamazsa, kategorileri tekrar yükle
                 ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
                 return View(createProductDto);
             }
@@ -110,7 +107,6 @@ namespace KitapProject.Controllers
                 return NotFound();
             }
 
-            // Kategorileri veritabanından çek ve ViewBag'e List<SelectListItem> olarak ata
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", product.CategoryId);
 
             var updateProductDto = _mapper.Map<UpdateProductDTO>(product);
@@ -125,8 +121,6 @@ namespace KitapProject.Controllers
         {
             if (!ModelState.IsValid)
             {
-                // ModelState geçerli değilse, kategorileri tekrar yükle ve mevcut resim URL'sini tut
-                // AsNoTracking kullanmak, mevcut Product nesnesinin takip edilmesini engeller, bu sayede View'e gönderilen DTO'nun performansı artar.
                 var productForView = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.ProductId == updateProductDto.ProductId);
                 ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", updateProductDto.CategoryId);
                 if (productForView != null)
@@ -146,24 +140,19 @@ namespace KitapProject.Controllers
             if (!categoryExists)
             {
                 ModelState.AddModelError("CategoryId", "Seçilen kategori bulunamadı.");
-                // Kategori bulunamazsa, kategorileri tekrar yükle ve mevcut resim URL'sini tut
                 ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", updateProductDto.CategoryId);
                 updateProductDto.CurrentImageUrl = product.ImageUrl;
                 return View(updateProductDto);
             }
 
-            // Yeni resim yüklendiyse
             if (updateProductDto.ImageFile != null && updateProductDto.ImageFile.Length > 0)
             {
-                // Eski resmi sil (varsayılan resim değilse)
                 await DeleteImageAsync(product.ImageUrl);
 
-                // Yeni resmi kaydet
                 var newImageUrl = await SaveImageAsync(updateProductDto.ImageFile);
                 product.ImageUrl = newImageUrl;
             }
 
-            // Diğer alanları güncelle
             product.Name = updateProductDto.Name;
             product.Author = updateProductDto.Author;
             product.Description = updateProductDto.Description;
@@ -171,7 +160,7 @@ namespace KitapProject.Controllers
             product.Status = updateProductDto.Status;
             product.PopulerProduct = updateProductDto.PopulerProduct;
             product.CategoryId = updateProductDto.CategoryId;
-            product.UpdatedDate = DateTime.UtcNow; // Evrensel saat kullanılıyor
+            product.UpdatedDate = DateTime.UtcNow; 
 
             _context.Products.Update(product);
             await _context.SaveChangesAsync();
@@ -198,7 +187,6 @@ namespace KitapProject.Controllers
 
         private async Task<string> SaveImageAsync(IFormFile imageFile)
         {
-            // Dosyayı wwwroot/Product klasörüne kaydet
             string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "Product");
             if (!Directory.Exists(uploadsFolder))
             {
@@ -213,20 +201,16 @@ namespace KitapProject.Controllers
                 await imageFile.CopyToAsync(fileStream);
             }
 
-            // Veritabanına kaydedilecek göreceli yolu döndür
             return "/Product/" + uniqueFileName;
         }
 
         private async Task DeleteImageAsync(string? imageUrl)
         {
-            // Varsayılan resim değilse ve URL boş değilse resmi sil
             if (!string.IsNullOrEmpty(imageUrl) && imageUrl != "/images/default_product.png")
             {
-                // `_webHostEnvironment.WebRootPath` kullanarak fiziksel yolu oluştur
                 string filePath = Path.Combine(_webHostEnvironment.WebRootPath, imageUrl.TrimStart('/'));
                 if (System.IO.File.Exists(filePath))
                 {
-                    // Dosyayı asenkron olarak sil
                     await Task.Run(() => System.IO.File.Delete(filePath));
                 }
             }

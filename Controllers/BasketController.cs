@@ -90,7 +90,6 @@ namespace KitapProject.Controllers
                 basket.CartItems.Add(basketItem);
             }
 
-            // Toplam fiyatı yeniden hesapla
             basket.TotalPrice = basket.CartItems.Sum(bi => bi.ItemTotalPrice);
             basket.UpdatedDate = DateTime.UtcNow;
 
@@ -130,17 +129,14 @@ namespace KitapProject.Controllers
                     return Json(new { success = false, message = "Ürün sepette bulunamadı." });
                 }
 
-                // Miktar güncelleme
                 basketItem.Quantity += model.Change;
 
                 if (basketItem.Quantity <= 0)
                 {
-                    // Öğeyi sepetten kaldır
                     basket.CartItems.Remove(basketItem);
                     _context.BasketItems.Remove(basketItem);
                 }
 
-                // Toplam fiyatı yeniden hesapla (silinen öğeler hariç)
                 basket.TotalPrice = basket.CartItems.Where(bi => bi.Quantity > 0).Sum(bi => bi.ItemTotalPrice);
                 basket.UpdatedDate = DateTime.UtcNow;
 
@@ -184,7 +180,6 @@ namespace KitapProject.Controllers
                     return Json(new { success = false, message = "Ürün sepette bulunamadı." });
                 }
 
-                // Öğeyi sepetten ve koleksiyondan kaldır
                 basket.CartItems.Remove(basketItem);
                 _context.BasketItems.Remove(basketItem);
 

@@ -5,7 +5,6 @@ namespace KitapProject.Models
 {
     public class OrderCreateViewModel
     {
-        // Teslimat Bilgileri
         [Required(ErrorMessage = "Gönderim adresi gereklidir.")]
         [StringLength(250, ErrorMessage = "Gönderim adresi en fazla 250 karakter olabilir.")]
         [Display(Name = "Gönderim Adresi")]

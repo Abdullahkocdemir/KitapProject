@@ -1,0 +1,41 @@
+﻿<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        setupSidebarToggle();
+        setActiveSidebarLink(); // Sayfa yüklendiğinde aktif linki belirle
+    });
+
+    // Sidebar açma/kapama işlevselliği
+    function setupSidebarToggle() {
+        const sidebar = document.getElementById('adminSidebar');
+        const toggleButton = document.getElementById('sidebarToggle');
+
+        if (sidebar && toggleButton) {
+            toggleButton.addEventListener('click', () => {
+                sidebar.classList.toggle('collapsed'); // 'collapsed' sınıfını ekle/kaldır
+            });
+        }
+    }
+
+    // Mevcut URL'ye göre sidebar linkini aktif etme fonksiyonu
+    function setActiveSidebarLink() {
+        const currentPath = window.location.pathname.toLowerCase(); // Mevcut URL yolunu al ve küçük harfe çevir
+        const sidebarLinks = document.querySelectorAll('.sidebar .category-btn'); // Tüm sidebar linklerini seç
+
+        sidebarLinks.forEach(link => {
+            const linkHref = link.getAttribute('href').toLowerCase(); // Linkin href'ini al ve küçük harfe çevir
+
+            // Linkin href'i mevcut URL yolunu içeriyorsa (örneğin /AdminProduct/Index ve link /adminproduct/index)
+            // ve boş bir link değilse (ana dizini hariç tutmak için)
+            if (currentPath.includes(linkHref) && linkHref !== "/") {
+                link.classList.add('active'); // Aktif sınıfını ekle
+            }
+            // Eğer ana sayfadaysak ve dashboard linkiyse, dashboard'ı aktif yap
+            else if (currentPath === '/' && linkHref === '/admin/dashboard') {
+                link.classList.add('active');
+            }
+            else {
+                link.classList.remove('active'); // Diğerlerinden aktif sınıfını kaldır
+            }
+        });
+    }
+</script>

@@ -10,7 +10,6 @@ namespace KitapProject.Context
         {
         }
 
-        // DbSet'ler (tablolar)
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Testimonial> Testimonials { get; set; }
@@ -21,7 +20,6 @@ namespace KitapProject.Context
         public DbSet<OrderDetail> OrderDetails { get; set; }
         public DbSet<UserPaymentInfo> UserPaymentInfos { get; set; }
 
-        // Identity için tablolar
         public DbSet<AppUser> AppUsers { get; set; }
         public DbSet<AppRole> AppRoles { get; set; }
 
@@ -32,9 +30,8 @@ namespace KitapProject.Context
                 .HasMany(u => u.UserPaymentInfos)
                 .WithOne(upi => upi.AppUser)
                 .HasForeignKey(upi => upi.AppUserId)
-                .OnDelete(DeleteBehavior.Cascade); // Kullanıcı silindiğinde ödeme bilgileri de silinsin
+                .OnDelete(DeleteBehavior.Cascade); 
 
-            // Tüm DateTime property'lerini UTC olarak ayarla
             foreach (var entityType in modelBuilder.Model.GetEntityTypes())
             {
                 foreach (var property in entityType.GetProperties())

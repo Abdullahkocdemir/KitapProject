@@ -1,5 +1,5 @@
 ﻿@{
-    Layout = null; // Bu layout'un kendisi başka bir layout kullanmıyor
+    Layout = null;
 }
 <!DOCTYPE html>
 <html lang="tr">
@@ -12,14 +12,13 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
-
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="~/css/WebSite.css">
     <link rel="stylesheet" href="~/css/StyleSheet.css" />
     <link rel="stylesheet" href="~/css/site.css" />
 
     <style>
-
-        /* Existing category-btn styles */
         .category-btn, a.category-btn {
             background: none;
             border: none;
@@ -35,10 +34,10 @@
             overflow: hidden;
             width: 100%;
             text-decoration: none;
-            display: flex; /* Changed to flex for icon-text alignment */
+            display: flex;
             align-items: center;
-            gap: 10px; /* Space between icon and text */
-            white-space: nowrap; /* Prevent text wrapping */
+            gap: 10px;
+            white-space: nowrap;
         }
 
             .category-btn::before, a.category-btn::before {
@@ -62,44 +61,41 @@
                 transform: translateX(10px);
             }
 
-            /* Aktif sidebar linki için stil */
             .category-btn.active, a.category-btn.active {
                 background: linear-gradient(135deg, var(--primary), var(--secondary));
                 color: white;
                 box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
             }
 
-        /* Yeni eklenecek stil */
         .user-greeting {
             color: white;
             font-weight: 600;
             margin-right: 15px;
         }
 
-        /* --- Collapsible Sidebar Styles --- */
         .content-wrapper {
             display: flex;
-            min-height: calc(100vh - var(--header-height) - var(--footer-height)); /* Ensure wrapper takes full height */
-            width: 100%; /* Kapsayıcının tam genişliği kaplamasını sağlar */
+            min-height: calc(100vh - var(--header-height) - var(--footer-height));
+            width: 100%;
         }
 
         .sidebar {
-            width: 250px; /* Varsayılan genişlik (açık) */
-            transition: width 0.3s ease, padding 0.3s ease; /* Genişlik ve dolgu için yumuşak geçiş */
-            background-color: #333; /* Kenar çubuğu arka planı */
+            width: 250px;
+            transition: width 0.3s ease, padding 0.3s ease;
+            background-color: #333;
             color: white;
             padding: 20px;
             box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
-            flex-shrink: 0; /* İçerik genişlese bile kenar çubuğunun küçülmesini engeller */
-            overflow: hidden; /* Gizlenen öğeleri gizler */
-            position: sticky; /* Sayfa kaydırıldığında sabit kalmasını sağlar */
-            top: 0; /* Üstten hizalama */
-            height: 100vh; /* Tam yükseklik */
+            flex-shrink: 0;
+            overflow: hidden;
+            position: sticky;
+            top: 0;
+            height: 100vh;
         }
 
             .sidebar.collapsed {
-                width: 60px; /* Daraltılmış genişlik */
-                padding: 20px 0; /* Daraltıldığında dolguyu ayarla */
+                width: 60px;
+                padding: 20px 0;
             }
 
             .sidebar .sidebar-header {
@@ -107,21 +103,21 @@
                 justify-content: space-between;
                 align-items: center;
                 margin-bottom: 20px;
-                padding: 0 10px; /* Header içeriği için biraz padding */
+                padding: 0 10px;
             }
 
                 .sidebar .sidebar-header h3 {
                     margin: 0;
                     font-size: 1.2rem;
-                    white-space: nowrap; /* Metnin satır atlamasını engeller */
-                    overflow: hidden; /* Taşmayı gizler */
-                    transition: opacity 0.3s ease, width 0.3s ease; /* Metin için yumuşak geçiş */
-                    width: 100%; /* Başlangıçta tam genişlik */
+                    white-space: nowrap;
+                    overflow: hidden;
+                    transition: opacity 0.3s ease, width 0.3s ease;
+                    width: 100%;
                 }
 
             .sidebar.collapsed .sidebar-header h3 {
-                opacity: 0; /* Daraltıldığında metni gizle */
-                width: 0; /* Metnin genişliğini sıfırla */
+                opacity: 0;
+                width: 0;
             }
 
             .sidebar .toggle-btn {
@@ -131,11 +127,11 @@
                 font-size: 1.5rem;
                 cursor: pointer;
                 padding: 5px;
-                transition: transform 0.3s ease; /* Dönüşüm için yumuşak geçiş */
+                transition: transform 0.3s ease;
             }
 
             .sidebar.collapsed .toggle-btn {
-                transform: rotate(180deg); /* Daraltıldığında ikonu döndür */
+                transform: rotate(180deg);
             }
 
             .sidebar .category-list {
@@ -150,30 +146,25 @@
 
             .sidebar .category-btn i {
                 font-size: 1.2rem;
-                flex-shrink: 0; /* İkonun küçülmesini engeller */
+                flex-shrink: 0;
             }
 
             .sidebar .category-btn span {
-                transition: opacity 0.3s ease; /* Metin için yumuşak geçiş */
+                transition: opacity 0.3s ease;
             }
 
             .sidebar.collapsed .category-btn span {
-                opacity: 0; /* Daraltıldığında metni gizle */
-                width: 0; /* Metnin genişliğini sıfırla */
+                opacity: 0;
+                width: 0;
             }
 
         .main-content-area {
-            flex-grow: 1; /* Ana içeriğin kalan alanı kaplamasını sağlar */
+            flex-grow: 1;
             padding: 20px;
-            background-color: var(--light-bg); /* Açık bir arka plan */
-            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05); /* Hafif iç gölge */
-            min-height: 100%; /* İçeriğin dikeyde en az %100 olmasını sağlar */
+            background-color: var(--light-bg);
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05);
+            min-height: 100%;
         }
-
-        /* Artık statik .account-content-section'ları gizlemene gerek yok */
-        /* Çünkü RenderBody doğrudan içeriği buraya basacak */
-        /* .account-content-section { display: none; } */
-        /* .account-content-section.active-content { display: block; } */
     </style>
 
 </head>
@@ -181,84 +172,14 @@
 <body>
     @await Component.InvokeAsync("_DefaultHeaderPartials")
 
-    <main>
-        <div class="content-wrapper">
-            <aside class="sidebar" id="adminSidebar">
-                <div class="sidebar-header">
-                    <h3>Yönetim Paneli</h3>
-                    <button id="sidebarToggle" class="toggle-btn" title="Menüyü Daralt/Genişlet">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                </div>
-                <ul class="category-list">
-                    <li><a class="category-btn" href="/AdminDashboard/Index"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
-                    <li><a class="category-btn" href="/AdminProduct/Index"><i class="fas fa-box-open"></i> <span>Ürünler</span></a></li>
-                    <li><a class="category-btn" href="/AdminCategory/Index"><i class="fas fa-folder-open"></i> <span>Kategoriler</span></a></li>
-                    <li><a class="category-btn" href="/Admin/Index"><i class="fas fa-users"></i> <span>Müşteriler</span></a></li>
-                    <li><a class="category-btn" href="/AdminSale/Index"><i class="fas fa-receipt"></i> <span>Siparişler</span></a></li>
-                    <li><a class="category-btn" href="/AdminInvoice/Index"><i class="fas fa-file-invoice-dollar"></i> <span>Faturalar</span></a></li>
-                    <li><a class="category-btn" href="/Admin/Index"><i class="fas fa-user-circle"></i> <span>Hesap Yönetimi</span></a></li>
-                    @if (User.Identity.IsAuthenticated)
-                    {
-                        <li><a class="category-btn" href="/Account/Logout"><i class="fas fa-sign-out-alt"></i> <span>Çıkış Yap</span></a></li>
-                    }
-                </ul>
-            </aside>
-
-            <div class="main-content-area">
-                @RenderBody()
-
-            </div>
-        </div>
-    </main>
+    @await Component.InvokeAsync("_AdminSideBarPartials")
 
     @await Component.InvokeAsync("_DefaultFooterPartials")
 
     @RenderSection("Scripts", required: false)
 
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            setupSidebarToggle();
-            setActiveSidebarLink(); // Sayfa yüklendiğinde aktif linki belirle
-        });
 
-        // Sidebar açma/kapama işlevselliği
-        function setupSidebarToggle() {
-            const sidebar = document.getElementById('adminSidebar');
-            const toggleButton = document.getElementById('sidebarToggle');
-
-            if (sidebar && toggleButton) {
-                toggleButton.addEventListener('click', () => {
-                    sidebar.classList.toggle('collapsed'); // 'collapsed' sınıfını ekle/kaldır
-                });
-            }
-        }
-
-        // Mevcut URL'ye göre sidebar linkini aktif etme fonksiyonu
-        function setActiveSidebarLink() {
-            const currentPath = window.location.pathname.toLowerCase(); // Mevcut URL yolunu al ve küçük harfe çevir
-            const sidebarLinks = document.querySelectorAll('.sidebar .category-btn'); // Tüm sidebar linklerini seç
-
-            sidebarLinks.forEach(link => {
-                const linkHref = link.getAttribute('href').toLowerCase(); // Linkin href'ini al ve küçük harfe çevir
-
-                // Linkin href'i mevcut URL yolunu içeriyorsa (örneğin /AdminProduct/Index ve link /adminproduct/index)
-                // ve boş bir link değilse (ana dizini hariç tutmak için)
-                if (currentPath.includes(linkHref) && linkHref !== "/") {
-                    link.classList.add('active'); // Aktif sınıfını ekle
-                }
-                // Eğer ana sayfadaysak ve dashboard linkiyse, dashboard'ı aktif yap
-                else if (currentPath === '/' && linkHref === '/admin/dashboard') {
-                    link.classList.add('active');
-                }
-                else {
-                    link.classList.remove('active'); // Diğerlerinden aktif sınıfını kaldır
-                }
-            });
-        }
-    </script>
+    @await Component.InvokeAsync("_AdminScriptPartials")
 </body>
 </html>

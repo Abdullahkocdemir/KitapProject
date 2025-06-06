@@ -23,29 +23,24 @@ namespace KitapProject.Controllers
         {
             try
             {
-                // Project directly to ResultCategoryDTO using AutoMapper for efficiency
                 var categoryDtos = await _context.Categories
                                                  .ProjectTo<ResultCategoryDTO>(_mapper.ConfigurationProvider)
                                                  .ToListAsync();
 
-                // Console logging for debugging (optional, remove in production)
                 Console.WriteLine($"Mapping sonrası {categoryDtos.Count} DTO oluştu");
                 if (categoryDtos.Any())
                 {
                     var first = categoryDtos.First();
                     Console.WriteLine($"İlk kategori: ID={first.CategoryId}, Name={first.Name}, Description={first.Description}, Icon={first.Icon}");
                 }
-                // End Console logging
 
                 return View(categoryDtos);
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Hata: {ex.Message}");
-                // You might want to log the full exception (ex) in a real application
-                // Optionally add a user-friendly error message to TempData
                 TempData["ErrorMessage"] = "Kategoriler yüklenirken bir hata oluştu.";
-                return View(new List<ResultCategoryDTO>()); // Return an empty list on error
+                return View(new List<ResultCategoryDTO>()); 
             }
         }
 
@@ -56,7 +51,7 @@ namespace KitapProject.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] // CSRF koruması için önemli
+        [ValidateAntiForgeryToken] 
         public async Task<IActionResult> Create(CreateCategoryDTO model)
         {
             if (ModelState.IsValid)
@@ -66,36 +61,32 @@ namespace KitapProject.Controllers
                 _context.Categories.Add(category);
                 await _context.SaveChangesAsync();
 
-                TempData["SuccessMessage"] = "Kategori başarıyla eklendi!"; // Add success message for redirect
+                TempData["SuccessMessage"] = "Kategori başarıyla eklendi!"; 
                 return RedirectToAction(nameof(Index));
             }
             return View(model);
         }
 
-        [HttpPost] // AJAX silme işlemi için POST
+        [HttpPost] 
         public async Task<IActionResult> Delete(int id)
         {
             var category = await _context.Categories.FindAsync(id);
             if (category == null)
             {
-                // AJAX isteğine uygun olarak 404 Not Found döndür.
-                Response.StatusCode = 404; // Set HTTP status code
-                return Content("Kategori bulunamadı."); // Return plain text error message
+                Response.StatusCode = 404; 
+                return Content("Kategori bulunamadı."); 
             }
 
-            // Kategoriye bağlı ürün var mı kontrolü
             var hasProducts = await _context.Products.AnyAsync(p => p.CategoryId == id);
             if (hasProducts)
             {
-                // Eğer bağlı ürünler varsa, silmeye izin verme ve hata mesajı döndür.
-                Response.StatusCode = 400; // Set HTTP status code for Bad Request
-                return Content("Bu kategoriye bağlı ürünler olduğu için silinemez."); // Return plain text error message
+                Response.StatusCode = 400; 
+                return Content("Bu kategoriye bağlı ürünler olduğu için silinemez."); 
             }
 
             _context.Categories.Remove(category);
             await _context.SaveChangesAsync();
 
-            // Başarılı olduğunu belirtmek için 200 OK döndür.
             return Ok("Kategori başarıyla silindi.");
         }
 
@@ -125,11 +116,7 @@ namespace KitapProject.Controllers
                     TempData["ErrorMessage"] = "Güncellenecek kategori bulunamadı.";
                     return RedirectToAction(nameof(Index));
                 }
-                // Map properties from DTO to entity
                 _mapper.Map(model, category);
-
-                // No need to explicitly call Update if entity is tracked and modified
-                // _context.Categories.Update(category); 
                 await _context.SaveChangesAsync();
 
                 TempData["SuccessMessage"] = "Kategori başarıyla güncellendi!";
@@ -148,8 +135,8 @@ namespace KitapProject.Controllers
 
             if (categoryDto == null)
             {
-                TempData["ErrorMessage"] = "Kategori detayı bulunamadı."; // Add message for not found
-                return RedirectToAction(nameof(Index)); // Redirect to index if not found
+                TempData["ErrorMessage"] = "Kategori detayı bulunamadı."; 
+                return RedirectToAction(nameof(Index)); 
             }
             return View(categoryDto);
         }

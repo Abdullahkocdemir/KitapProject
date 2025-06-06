@@ -1,5 +1,4 @@
-﻿// KitapProject.Controllers/AdminSaleController.cs
-using KitapProject.Context;
+﻿using KitapProject.Context;
 using KitapProject.Entities;
 using KitapProject.Models;
 using Microsoft.AspNetCore.Mvc;
