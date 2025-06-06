@@ -21,152 +21,13 @@
     @await Component.InvokeAsync("_DefaultHeaderPartials")
 
     <main>
-        <section class="hero-section">
-            <h1 class="hero-title">Kitap Dünyasına Hoş Geldiniz</h1>
-            <p class="hero-subtitle">Binlerce kitap arasından favorilerinizi keşfedin</p>
-            <div class="cta-buttons">
-                <a href="#kitaplar" class="btn btn-primary">Kitapları Keşfet</a>
-                <a href="#paylas" class="btn btn-secondary">Kitap Paylaş</a>
-            </div>
-        </section>
+        @await Component.InvokeAsync("_DefaultBannerPartials")
 
-        <div class="search-container">
-            <div class="search-bar">
-                <input type="text" id="search-input" placeholder="Kitap veya yazar ara...">
-                <button class="search-btn" id="search-btn">
-                    <i class="fas fa-search"></i> Ara
-                </button>
-            </div>
-        </div>
+        @await Component.InvokeAsync("_DefaultPopulerCategoryPartials")
 
-        <section id="kategoriler-section" class="dynamic-section container">
-            <h2 class="section-title">Popüler Kategoriler</h2>
-            <div class="category-grid">
-                <div class="category-card" data-category="roman">
-                    <div class="category-icon">
-                        <i class="fas fa-book-open"></i>
-                    </div>
-                    <h3>Roman</h3>
-                    <p>Edebiyatın büyülü dünyasında kaybolun.</p>
-                </div>
-                <div class="category-card" data-category="bilim">
-                    <div class="category-icon">
-                        <i class="fas fa-flask"></i>
-                    </div>
-                    <h3>Bilim</h3>
-                    <p>Bilimin sırlarını çözmeye başlayın.</p>
-                </div>
-                <div class="category-card" data-category="sanat">
-                    <div class="category-icon">
-                        <i class="fas fa-paint-brush"></i>
-                    </div>
-                    <h3>Sanat</h3>
-                    <p>Yaratıcılığınızı geliştirin.</p>
-                </div>
-                <div class="category-card" data-category="is-kariyer">
-                    <div class="category-icon">
-                        <i class="fas fa-briefcase"></i>
-                    </div>
-                    <h3>İş & Kariyer</h3>
-                    <p>Profesyonel gelişiminizi destekleyin.</p>
-                </div>
-                <div class="category-card" data-category="tarih">
-                    <div class="category-icon">
-                        <i class="fas fa-landmark"></i>
-                    </div>
-                    <h3>Tarih</h3>
-                    <p>Geçmişin izlerini sürün.</p>
-                </div>
-                <div class="category-card" data-category="cocuk">
-                    <div class="category-icon">
-                        <i class="fas fa-child"></i>
-                    </div>
-                    <h3>Çocuk Kitapları</h3>
-                    <p>Minik okurlar için eğlenceli dünyalar.</p>
-                </div>
-                <div class="category-card" data-category="seyahat">
-                    <div class="category-icon">
-                        <i class="fas fa-plane"></i>
-                    </div>
-                    <h3>Seyahat</h3>
-                    <p>Yeni yerler keşfedin, dünyayı dolaşın.</p>
-                </div>
-                <div class="category-card" data-category="yemek">
-                    <div class="category-icon">
-                        <i class="fas fa-utensils"></i>
-                    </div>
-                    <h3>Yemek</h3>
-                    <p>Mutfakta yeni lezzetler deneyin.</p>
-                </div>
-            </div>
-        </section>
+        @await Component.InvokeAsync("_DefaultPopulerProductPartials")
 
-        <section id="kitaplar" class="dynamic-section container">
-            <h2 class="section-title">Öne Çıkan Kitaplar</h2>
-            <div class="books-grid" id="featured-books-grid">
-                @if (Model != null && Model.Any())
-                {
-                    @foreach (var item in Model)
-                    {
-                        <div class="book-card" data-book-id="@item.ProductId">
-                            <div class="book-image">
-                                @if (!string.IsNullOrEmpty(item.ImageUrl))
-                                {
-                                    <img src="@item.ImageUrl" alt="@item.Name" />
-                                }
-                                else
-                                {
-                                    <span>Resim Yok<br>@item.Name</span>
-                                }
-                            </div>
-                            <div class="book-content">
-                                <h3 class="book-title">@item.Name</h3>
-                                <p class="book-author">@item.Author</p>
-                                <div class="book-price">₺@item.Price.ToString("F2")</div>
-                                <div class="book-actions">
-                                    <button class="btn-book-action btn-primary-book-action"
-                                            data-book-id="@item.ProductId"
-                                            data-book-name="@item.Name"
-                                            data-book-price="@item.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
-                                            data-book-imageurl="@item.ImageUrl">
-                                        <i class="fas fa-shopping-cart"></i> Sepete Ekle
-                                    </button>
-                                    <button class="btn-book-action btn-secondary-book-action" data-book-id="@item.ProductId">
-                                        <i class="fas fa-book-open"></i> Oku
-                                    </button>
-                                </div>
-                            </div>
-                        </div>
-                    }
-                }
-                else
-                {
-                    <p>Şu anda öne çıkan kitap bulunmamaktadır.</p>
-                }
-            </div>
-        </section>
-
-        <section class="stats-section container">
-            <h2 class="section-title">Platformumuz Rakamlarla</h2>
-            <div class="stats-grid">
-                <div class="stat-item">
-                    <div class="stat-number">50,000+</div>
-                    <div class="stat-label">Kitap</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">100,000+</div>
-                    <div class="stat-label">Aktif Kullanıcı</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">1M+</div>
-                    <div class="stat-label">Okunan Sayfa</div>
-                </div>
-                <div class="stat-item">
-                    <div class="stat-number">25,000+</div>
-                    <div class="stat-label">Paylaşılan Kitap</div>
-                </div>
-            </div>
-        </section>
+        @await Component.InvokeAsync("_DefaultCountNumberPartials")
 
         <section id="okur-yorumlari" class="testimonials-section container">
             <h2 class="section-title">Okurlarımız Ne Diyor?</h2>
@@ -194,46 +55,25 @@
             </div>
         </section>
 
-        <section id="gunun-alintisi" class="quote-of-the-day-section container">
-            <h2 class="section-title">Günün İlham Veren Satırları</h2>
-            <div class="quote-display">
-                <p class="quote-content" id="daily-quote">
-                    "Okumak, bilginin en derin kuyularından kana kana içmek gibidir. Her yeni sayfa, yeni bir dünyaya açılan kapısıdır."
-                </p>
-                <div class="quote-author" id="quote-author">- Mevlana</div>
-            </div>
-            <button class="btn-book-action btn-secondary-book-action" id="new-quote-btn" style="margin-top: 2rem;">Yeni Bir Alıntı Göster</button>
-        </section>
+        @await Component.InvokeAsync("_DefaultInspiringLinesoftheDayPartials")
 
-        <section class="call-to-action-section container">
-            <h2>Siz de Kitap Dünyası'na Katılın!</h2>
-            <p>Okuma serüveninizi bir üst seviyeye taşıyın. Binlerce kitaba erişin, kendi yorumlarınızı paylaşın ve yeni okuma arkadaşları edinin.</p>
-            <a href="#kayit-ol" class="btn auth-btn-primary">Hemen Ücretsiz Katıl</a>
-        </section>
+        @await Component.InvokeAsync("_DefaultMembershipPartials")
     </main>
 
     @await Component.InvokeAsync("_DefaultFooterPartials")
 
     <script>
-        // Sepet verilerini client tarafında tutan dizi (başlangıçta localStorage'dan yükle)
         let cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
         const cartItemCountSpan = document.getElementById('cart-item-count');
-
-        // --- Yardımcı Fonksiyonlar ---
-
-        // AntiForgeryToken'ı doğru şekilde almak için yardımcı fonksiyon
         function getAntiForgeryToken() {
-            // Önce hidden input'tan almaya çalış
             const tokenInput = document.querySelector('input[name="__RequestVerificationToken"]');
             if (tokenInput) {
                 return tokenInput.value;
             }
-            // Alternatif olarak meta tag'den almaya çalış (eğer projenizde kullanılıyorsa)
             const tokenMeta = document.querySelector('meta[name="__RequestVerificationToken"]');
             if (tokenMeta) {
                 return tokenMeta.getAttribute('content');
             }
-            // Son çare olarak cookie'den almaya çalış
             const value = `; ${document.cookie}`;
             const parts = value.split(`; __RequestVerificationToken=`);
             if (parts.length === 2) {
@@ -242,13 +82,11 @@
             return null;
         }
 
-        // Sepeti localStorage'a kaydeden fonksiyon (ve UI'daki sepet sayısını güncelleyen)
         function saveCartToLocalStorage() {
             localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
-            updateCartCount(); // Header'daki sepet sayısını güncelle
+            updateCartCount(); 
         }
 
-        // Sepet sayısını güncelleyen fonksiyon (hem localStorage hem de server verisiyle kullanılabilir)
         function updateCartCount() {
             const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
             if (cartItemCountSpan) {
@@ -264,7 +102,6 @@
             }
         }
 
-        // Sepet sayısını server'dan çekip güncelleyen fonksiyon (Header için)
         async function fetchCartItemCountFromServer() {
             try {
                 const response = await fetch('/Basket/GetCartItemCount');
@@ -281,11 +118,9 @@
             }
         }
 
-        // Ürünü hem localStorage'a ekleyen hem de server'a gönderen ana fonksiyon
         async function addProductToCartAndServer(product) {
             console.log('Ürün sepete ekleniyor (Client Side Önce):', product);
 
-            // 1. Client-side (localStorage) sepeti hemen güncelle (anında geri bildirim)
             const existing = cart.find(item => item.id === product.id);
             if (existing) {
                 existing.quantity++;
@@ -296,18 +131,16 @@
                 }
                 cart.push({ ...product, quantity: 1, imageUrl: imageUrl });
             }
-            saveCartToLocalStorage(); // LocalStorage'ı güncelledi ve updateCartCount'u tetikledi
+            saveCartToLocalStorage(); 
 
-            // 2. Server'a AJAX isteği gönder
             try {
                 const token = getAntiForgeryToken();
-                console.log('CSRF Token (gönderilen):', token); // Debug için
+                console.log('CSRF Token (gönderilen):', token); 
 
                 const formData = new URLSearchParams();
                 formData.append('productId', product.id);
                 formData.append('quantity', 1);
                 
-                // CSRF token'ı form data'ya ekle
                 if (token) {
                     formData.append('__RequestVerificationToken', token);
                 }
@@ -316,33 +149,27 @@
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                        // Eğer X-CSRF-TOKEN başlığı gerekiyorsa ekleyebilirsiniz, ancak form-urlencoded için genellikle formData yeterli
-                        // ...(token && { 'X-CSRF-TOKEN': token }) 
                     },
                     body: formData.toString()
                 });
 
-                console.log('Server yanıt durumu:', response.status); // Debug için
-                console.log('Server yanıt başlıkları:', response.headers); // Debug için
+                console.log('Server yanıt durumu:', response.status); 
+                console.log('Server yanıt başlıkları:', response.headers); 
 
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Server-side sepete ürün başarıyla eklendi. Server yanıtı:', data);
                     
                     if (data.success) {
-                        // Server'dan güncel sepet sayısını tekrar çek
                         await fetchCartItemCountFromServer();
                         return true;
                     } else {
-                        // Server tarafından 'success: false' dönmüşse
                         throw new Error(data.message || 'Sunucu tarafında işlem başarısız oldu.');
                     }
                 } else {
-                    // HTTP hatası (400, 500 vb.) durumunda
-                    const errorText = await response.text(); // Hata mesajını daha detaylı görmek için
+                    const errorText = await response.text(); 
                     console.error('Server yanıt hatası:', response.status, errorText);
 
-                    // Client-side sepeti geri al
                     if (existing) {
                         existing.quantity--;
                         if (existing.quantity === 0) {
@@ -351,15 +178,14 @@
                     } else {
                         cart = cart.filter(item => item.id !== product.id);
                     }
-                    saveCartToLocalStorage(); // LocalStorage'ı geri al ve UI'ı güncelle
-                    await fetchCartItemCountFromServer(); // Sepet sayısını da geri al
+                    saveCartToLocalStorage(); 
+                    await fetchCartItemCountFromServer(); 
 
                     throw new Error(`Ürün sepete eklenirken bir sunucu hatası oluştu: [HTTP ${response.status}] ${errorText}`);
                 }
             } catch (error) {
                 console.error('AJAX isteği gönderilirken ağ hatası:', error);
                 
-                // Ağ hatasında client-side sepeti geri al
                 if (existing) {
                     existing.quantity--;
                     if (existing.quantity === 0) {
@@ -438,25 +264,19 @@
             });
         }
 
-        // --- Event Listener'lar ve İlk Çalıştırma ---
 
         document.addEventListener('DOMContentLoaded', () => {
-            // Sayfa yüklendiğinde sepet sayısını server'dan çek
             fetchCartItemCountFromServer();
 
-            // Genel event listener'ları ata
             attachGlobalEventListeners();
             
-            // Günün alıntısını göster
             displayQuote();
             if (newQuoteButton) {
                 newQuoteButton.addEventListener('click', displayQuote);
             }
 
-            // Animasyonlar için bölümleri gözlemle
             observeSectionsForAnimations();
 
-            // Hero bölümü animasyonlarını başlat
             document.querySelector('.hero-section h1').style.animationPlayState = 'running';
             document.querySelector('.hero-section p').style.animationPlayState = 'running';
             document.querySelector('.cta-buttons').style.animationPlayState = 'running';
@@ -484,17 +304,15 @@
                 });
             }
 
-            // "Sepete Ekle" butonları için dinleyici
             document.querySelectorAll('.book-card .btn-primary-book-action').forEach(button => {
                 button.addEventListener('click', async function() {
-                    // **Sepete ekleme öncesi kullanıcı girişini kontrol et**
                     const loginStatusResponse = await fetch('/Basket/CheckLoginStatus');
                     const loginStatusData = await loginStatusResponse.json();
 
                     if (!loginStatusData.isLoggedIn) {
                         alert("Sepete ürün eklemek için lütfen giriş yapın.");
-                        window.location.href = '/Account/Login'; // Giriş sayfasına yönlendir
-                        return; // İşlemi burada durdur
+                        window.location.href = '/Account/Login'; 
+                        return; 
                     }
 
                     const bookToAdd = {
@@ -514,7 +332,6 @@
                 });
             });
 
-            // "Oku" butonları için dinleyici
             document.querySelectorAll('.book-card .btn-secondary-book-action').forEach(button => {
                 button.addEventListener('click', function() {
                     const bookTitle = this.closest('.book-content').querySelector('.book-title').textContent;
@@ -523,7 +340,6 @@
                 });
             });
 
-            // Smooth scrolling for navigation links
             document.querySelectorAll('a[href^="#"]').forEach(anchor => {
                 anchor.addEventListener('click', function (e) {
                     e.preventDefault();

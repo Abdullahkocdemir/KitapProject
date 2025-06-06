@@ -8,380 +8,78 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kitap Mağazası</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="~/css/Product.css" />
+@*     <link rel="stylesheet" href="~/css/WebSite.css" />
+ *@    @* CSRF Token için HEAD içine ekledik *@
+    @Html.AntiForgeryToken()
     <style>
-        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-
-        :root {
-            --primary: #6366f1;
-            --primary-dark: #4f46e5;
-            --secondary: #ec4899;
-            --accent: #f59e0b;
-            --success: #10b981;
-            --dark: #0f172a;
-            --light: #f8fafc;
-            --glass: rgba(255, 255, 255, 0.1);
-            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
-            --glow: 0 0 50px rgba(99, 102, 241, 0.5);
-        }
-
-        body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
-            min-height: 100vh;
-            color: white;
-            overflow-x: hidden;
-        }
-
-            body::before {
-                content: '';
-                position: fixed;
-                top: 0;
-                left: 0;
-                width: 100%;
-                height: 100%;
-                background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
-                animation: floating 20s ease-in-out infinite;
-                pointer-events: none;
-                z-index: -1;
+                /* Responsive Ayarlamalar */
+        @@media (max-width: 992px) {
+            .nav-menu {
+                gap: 15px;
             }
-
-        @@keyframes floating {
-            0%, 100% {
-                transform: scale(1) rotate(0deg);
-            }
-
-            50% {
-                transform: scale(1.1) rotate(180deg);
+            .header-actions {
+                gap: 10px;
             }
         }
-
-        header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            z-index: 1000;
-            backdrop-filter: blur(20px);
-            background: rgba(15, 23, 42, 0.8);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-        }
-
-        nav {
-            padding: 1rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            max-width: 1400px;
-            margin: 0 auto;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-            text-decoration: none;
-        }
-
-        .nav-menu {
-            display: flex;
-            list-style: none;
-            gap: 2rem;
-            align-items: center;
-        }
-
-            .nav-menu a {
-                color: rgba(255, 255, 255, 0.8);
-                text-decoration: none;
-                font-weight: 500;
-                padding: 0.5rem 1rem;
-                border-radius: 50px;
-                transition: all 0.3s ease;
-            }
-
-                .nav-menu a:hover {
-                    color: white;
-                    background: rgba(99, 102, 241, 0.2);
-                }
-
-        .search-container {
-            display: flex;
-            justify-content: center;
-            margin: 120px auto 2rem;
-            padding: 0 2rem;
-        }
-
-        .search-bar {
-            display: flex;
-            align-items: center;
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 60px;
-            padding: 1rem 2rem;
-            width: 100%;
-            max-width: 600px;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-        }
-
-            .search-bar input {
-                background: none;
-                border: none;
-                outline: none;
-                color: white;
-                font-size: 1.1rem;
-                width: 100%;
-                padding: 0.5rem;
-            }
-
-                .search-bar input::placeholder {
-                    color: rgba(255, 255, 255, 0.6);
-                }
-
-        .content-wrapper {
-            display: grid;
-            grid-template-columns: 300px 1fr;
-            gap: 3rem;
-            max-width: 1400px;
-            margin: 0 auto 4rem;
-            padding: 0 2rem;
-        }
-
-        .sidebar {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            padding: 2rem;
-            height: fit-content;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            position: sticky;
-            top: 120px;
-        }
-
-            .sidebar h3 {
-                font-size: 1.5rem;
-                font-weight: 700;
-                margin-bottom: 2rem;
-                color: white;
-                text-align: center;
-            }
-
-        .category-list {
-            list-style: none;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-
-        .category-btn {
-            background: none;
-            border: none;
-            color: rgba(255, 255, 255, 0.8);
-            padding: 1rem 1.5rem;
-            border-radius: 15px;
-            cursor: pointer;
-            font-size: 1rem;
+                .user-greeting {
+            color: var(--text-light);
             font-weight: 500;
-            transition: all 0.3s ease;
-            text-align: left;
-            width: 100%;
-            display: flex; 
-            align-items: center;
-            gap: 0.75rem; 
+            font-size: 1rem;
         }
-
-            .category-btn i {
-                width: 20px; 
-                text-align: center;
-            }
-
-            .category-btn:hover {
-                background: rgba(255, 255, 255, 0.1);
-                color: white;
-                transform: translateX(10px);
-            }
-
-            .category-btn.active {
-                background: linear-gradient(135deg, var(--primary), var(--secondary));
-                color: white;
-                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
-            }
-
-        .main-content {
-            background: rgba(255, 255, 255, 0.05);
-            border-radius: 25px;
-            padding: 3rem 2rem;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            box-shadow: var(--shadow);
-        }
-
-        .section-title {
-            font-size: 2.5rem;
-            margin-bottom: 3rem;
-            color: white;
-            font-weight: 800;
-            text-align: center;
-        }
-
-        .books-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 2rem;
-        }
-
-        .book-card {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(20px);
-            border-radius: 25px;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-
-            .book-card:hover {
-                transform: translateY(-20px) scale(1.02);
-                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
-            }
-
-        .book-image {
-            height: 200px;
+        .header-actions {
             display: flex;
             align-items: center;
-            justify-content: center;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: white;
-            text-align: center;
-            padding: 2rem;
-            background-size: cover;
-            background-position: center;
-            background-repeat: no-repeat;
-        }
-
-        .book-content {
-            padding: 2rem;
-        }
-
-        .book-title {
+            gap: 15px; 
+                    .cart-container {
+            position: relative;
+            color: var(--text-dark);
+            text-decoration: none;
             font-size: 1.3rem;
-            font-weight: 700;
-            color: white;
-            margin-bottom: 0.5rem;
-        }
-
-        .book-author {
-            color: rgba(255, 255, 255, 0.7);
-            margin-bottom: 1rem;
-        }
-
-        .book-price {
-            font-size: 1.8rem;
-            font-weight: 800;
-            color: var(--accent);
-            margin-bottom: 1.5rem;
-        }
-
-        .book-actions {
             display: flex;
-            gap: 1rem;
-        }
-
-        .btn {
-            padding: 0.75rem 1.5rem;
-            border-radius: 50px;
-            border: none;
-            cursor: pointer;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            flex: 1;
-        }
-
-        .btn-primary {
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: white;
-        }
-
-            .btn-primary:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
-            }
-
-        .btn-secondary {
-            background: rgba(255, 255, 255, 0.1);
-            color: white;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-        }
-
-            .btn-secondary:hover {
-                background: rgba(255, 255, 255, 0.2);
-                transform: translateY(-2px);
-            }
-
-        /* Loading */
-        .loading {
-            display: flex;
-            justify-content: center;
             align-items: center;
-            height: 200px;
+            padding: 5px;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+                .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 15px; /* Aksiyon öğeleri arasında boşluk */
         }
 
-        .loading-spinner {
-            width: 50px;
-            height: 50px;
-            border: 3px solid rgba(255, 255, 255, 0.3);
-            border-top: 3px solid white;
+        .cart-container:hover {
+            background-color: rgba(255, 255, 255, 0.1);
+        }
+
+        .cart-icon {
+            margin-right: 5px;
+        }
+
+        .cart-count {
+            background-color: #FF6347; /* Domates kırmızısı */
+            color: white;
+            font-size: 0.8rem;
+            font-weight: bold;
             border-radius: 50%;
-            animation: spin 1s linear infinite;
+            padding: 3px 7px;
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            min-width: 20px;
+            text-align: center;
+            line-height: 1;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
-
-        @@keyframes spin {
-            0% {
-                transform: rotate(0deg);
-            }
-
-            100% {
-                transform: rotate(360deg);
-            }
-        }
-
-        @@media (max-width: 768px) {
-            .content-wrapper {
-                grid-template-columns: 1fr;
-                gap: 2rem;
-            }
-
-            .sidebar {
-                position: static;
-            }
-
-            .books-grid {
-                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-            }
+                .user-greeting {
+            color: var(--text-light);
+            font-weight: 500;
+            font-size: 1rem;
         }
     </style>
 </head>
 <body>
-    <header>
-        <nav>
-            <a href="#" class="logo">
-                <i class="fas fa-book"></i>
-                KitapDünyası
-            </a>
-            <ul class="nav-menu">
-                <li><a href="#home">Ana Sayfa</a></li>
-                <li><a href="#books">Kitaplar</a></li>
-                <li><a href="#authors">Yazarlar</a></li>
-                <li><a href="#contact">İletişim</a></li>
-            </ul>
-        </nav>
-    </header>
+    @await Component.InvokeAsync("_DefaultHeaderPartials")
 
     <div class="search-container">
         <div class="search-bar">
@@ -418,8 +116,16 @@
         const searchInput = document.getElementById('searchInput');
         const loadingSpinner = document.getElementById('loadingSpinner');
 
-        let currentFilteredBooks = []; 
-        let activeCategory = 'all'; 
+        let currentFilteredBooks = [];
+        let activeCategory = 'all';
+
+        // CSRF Token için cookie okuma fonksiyonu
+        function getCookie(name) {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; ${name}=`);
+            if (parts.length === 2) return parts.pop().split(';').shift();
+            return null;
+        }
 
         async function fetchAndRenderCategories() {
             try {
@@ -428,7 +134,7 @@
                     throw new Error(`HTTP error! status: ${response.status}`);
                 }
                 const categories = await response.json();
-                categoryList.innerHTML = ''; 
+                categoryList.innerHTML = '';
 
                 categories.forEach(category => {
                     const listItem = document.createElement('li');
@@ -464,11 +170,11 @@
         function renderBooks(booksToRender) {
             if (booksToRender.length === 0) {
                 booksGrid.innerHTML = `
-                            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
-                                <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; color: rgba(255, 255, 255, 0.3);"></i>
-                                <p>Aradığınız kriterlere uygun kitap bulunamadı.</p>
-                            </div>
-                        `;
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
+                            <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; color: rgba(255, 255, 255, 0.3);"></i>
+                            <p>Aradığınız kriterlere uygun kitap bulunamadı.</p>
+                        </div>
+                    `;
                 return;
             }
 
@@ -511,14 +217,22 @@
                 const response = await fetch(url);
 
                 if (!response.ok) {
-                    const errorData = await response.json();
-                    if (response.status === 404) {
-                        renderBooks([]);
-                        categoryTitle.textContent = categoryTitles[category] || 'Kitaplar';
-                        hideLoading();
-                        return;
+                    // response.json() hata fırlatabilir, bu yüzden try-catch bloğunda ele al
+                    try {
+                        const errorData = await response.json();
+                        if (response.status === 404) {
+                            renderBooks([]);
+                            categoryTitle.textContent = categoryTitles[category] || 'Kitaplar';
+                            hideLoading();
+                            return;
+                        }
+                        throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
+                    } catch (jsonError) {
+                        // Yanıt JSON değilse veya parse hatası verirse
+                        const errorText = await response.text();
+                        console.error('API yanıtı JSON değil:', errorText);
+                        throw new Error(`HTTP error! status: ${response.status} - Beklenmedik yanıt formatı.`);
                     }
-                    throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
                 }
 
                 const books = await response.json();
@@ -528,11 +242,11 @@
             } catch (error) {
                 console.error("Kitaplar yüklenirken hata oluştu:", error);
                 booksGrid.innerHTML = `
-                            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
-                                <p>Kitaplar yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
-                                <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">Hata: ${error.message}</p>
-                            </div>
-                        `;
+                        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
+                            <p>Kitaplar yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+                            <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">Hata: ${error.message}</p>
+                        </div>
+                    `;
             } finally {
                 hideLoading();
             }
@@ -545,7 +259,7 @@
         const categoryTitles = {
             'all': 'Tüm Kitaplar',
             'roman': 'Roman Kitapları',
-            'bilim-kurgu': 'Bilim Kurgu Kitapları',
+            'bilim-kurg': 'Bilim Kurgu Kitapları',
             'tarih': 'Tarih Kitapları',
             'biyografi': 'Biyografi Kitapları',
             'felsefe': 'Felsefe Kitapları',
@@ -562,24 +276,49 @@
             }
 
             try {
-                const response = await fetch('/Product/AddToCart', {
+                // Sepete eklemeden önce kullanıcının giriş yapmış olup olmadığını kontrol et
+                const loginStatusResponse = await fetch('/Basket/CheckLoginStatus');
+                const loginStatusData = await loginStatusResponse.json();
+
+                if (!loginStatusData.isLoggedIn) {
+                    alert("Sepete ürün eklemek için lütfen giriş yapmalısınız.");
+                    window.location.href = '/Account/Login'; // Kullanıcıyı login sayfasına yönlendir
+                    return; // Fonksiyonu burada durdur
+                }
+
+                const formData = new URLSearchParams();
+                formData.append('productId', bookId);
+                formData.append('quantity', 1);
+
+                const response = await fetch('/Basket/AddToBasket', { // Doğru endpoint
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
+                        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+                        'RequestVerificationToken': getCookie('RequestVerificationToken') // CSRF token ekledik
                     },
-                    body: JSON.stringify({ productId: bookId, quantity: 1 }) 
+                    body: formData.toString()
                 });
 
-                const result = await response.json();
-
                 if (response.ok) {
-                    alert(result.message); 
+                    const data = await response.json();
+                    alert(data.message);
+                    // Başarılı olursa, sepetin global sayacını güncellemek için bir event tetikleyebilirsin
+                    // veya ana layout'tan cart count'u çeken bir fonksiyon çağırabilirsin.
+                    // Örneğin: window.dispatchEvent(new Event('cartUpdated'));
                 } else {
-                    alert(`Sepete eklenirken hata oluştu: ${result.message || 'Bilinmeyen Hata'}`);
+                    // Sunucudan dönen yanıtın içeriğini daha detaylı inceleyelim
+                    const errorText = await response.text(); // JSON değilse bile metin olarak al
+                    console.error('Server-side sepete ürün eklenirken hata:', response.status, response.statusText, errorText);
+                    try {
+                        const errorData = JSON.parse(errorText); // JSON parse etmeye çalış
+                        alert(`Sepete eklenirken hata oluştu: ${errorData.message || 'Bilinmeyen Hata'}`);
+                    } catch (e) {
+                        alert(`Sepete eklenirken beklenmedik bir hata oluştu. Lütfen tekrar deneyin. (Sunucu yanıtı: ${errorText.substring(0, 100)}...)`);
+                    }
                 }
             } catch (error) {
-                console.error("Sepete ekleme hatası:", error);
-                alert('Sepete eklenirken bir ağ hatası oluştu. Lütfen tekrar deneyin.');
+                console.error('AJAX add-to-basket isteği gönderilirken hata:', error);
+                alert('Ağ hatası: Ürün sepete eklenemedi. Lütfen internet bağlantınızı kontrol edin.');
             }
         }
 
@@ -587,13 +326,13 @@
             const book = currentFilteredBooks.find(b => b.id === bookId);
             if (book) {
                 alert(`"${book.title}" detay sayfası açılacak. (ID: ${book.id})`);
-
+                // window.location.href = `/Product/Details/${book.id}`; // Detay sayfasına yönlendirme örneği
             }
         }
 
         document.addEventListener('DOMContentLoaded', () => {
             fetchAndRenderCategories();
-            fetchAndRenderBooks(); 
+            fetchAndRenderBooks();
         });
     </script>
 </body>

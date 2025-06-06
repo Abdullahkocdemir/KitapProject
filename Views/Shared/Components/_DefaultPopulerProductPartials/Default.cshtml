@@ -1,0 +1,46 @@
+﻿@using KitapProject.Entities
+@model List<Product>
+<section id="kitaplar" class="dynamic-section container">
+    <h2 class="section-title">Öne Çıkan Kitaplar</h2>
+    <div class="books-grid" id="featured-books-grid">
+        @if (Model != null && Model.Any())
+        {
+            @foreach (var item in Model)
+            {
+                <div class="book-card" data-book-id="@item.ProductId">
+                    <div class="book-image">
+                        @if (!string.IsNullOrEmpty(item.ImageUrl))
+                        {
+                            <img src="@item.ImageUrl" alt="@item.Name" />
+                        }
+                        else
+                        {
+                            <span>Resim Yok<br>@item.Name</span>
+                        }
+                    </div>
+                    <div class="book-content">
+                        <h3 class="book-title">@item.Name</h3>
+                        <p class="book-author">@item.Author</p>
+                        <div class="book-price">₺@item.Price.ToString("F2")</div>
+                        <div class="book-actions">
+                            <button class="btn-book-action btn-primary-book-action"
+                                    data-book-id="@item.ProductId"
+                                    data-book-name="@item.Name"
+                                    data-book-price="@item.Price.ToString(System.Globalization.CultureInfo.InvariantCulture)"
+                                    data-book-imageurl="@item.ImageUrl">
+                                <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                            </button>
+                            <button class="btn-book-action btn-secondary-book-action" data-book-id="@item.ProductId">
+                                <i class="fas fa-book-open"></i> Oku
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        }
+        else
+        {
+            <p>Şu anda öne çıkan kitap bulunmamaktadır.</p>
+        }
+    </div>
+</section>

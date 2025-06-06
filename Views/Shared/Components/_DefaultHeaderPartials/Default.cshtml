@@ -18,18 +18,18 @@
             {
                 <span class="user-greeting">
                     @{
-                        var fullName = User.FindFirst("FullName")?.Value; 
+                        var fullName = User.FindFirst("FullName")?.Value;
                         if (string.IsNullOrEmpty(fullName))
                         {
-                            var firstName = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value; 
-                            var lastName = User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value;  
+                            var firstName = User.FindFirst(System.Security.Claims.ClaimTypes.GivenName)?.Value;
+                            var lastName = User.FindFirst(System.Security.Claims.ClaimTypes.Surname)?.Value;
                             if (!string.IsNullOrEmpty(firstName) && !string.IsNullOrEmpty(lastName))
                             {
-                                fullName = $"{firstName} {lastName}"; 
+                                fullName = $"{firstName} {lastName}";
                             }
                             else
                             {
-                                fullName = User.Identity.Name; 
+                                fullName = User.Identity.Name;
                             }
                         }
                     }

@@ -1,0 +1,16 @@
+﻿@model List<KitapProject.Entities.Category>
+<section id="kategoriler-section" class="dynamic-section container">
+    <h2 class="section-title">Popüler Kategoriler</h2>
+    <div class="category-grid">
+        @foreach (var item in Model)
+        {
+            <div class="category-card">
+                <div class="category-icon">
+                    <i class="@item.Icon"></i>
+                </div>
+                <h3>@item.Name</h3>
+                <p>@item.Description</p>
+            </div>
+        }
+    </div>
+</section>

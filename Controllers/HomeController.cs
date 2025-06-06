@@ -32,7 +32,7 @@ namespace KitapProject.Controllers
         public async Task<List<AppUser>> GetAllUsersFromRedisCache()
         {
             var users = new List<AppUser>();
-            var server = _redisDb.Multiplexer.GetServer(_redisDb.IdentifyEndpoint());
+            var server = _redisDb.Multiplexer.GetServer(_redisDb.IdentifyEndpoint()!);
 
             // HATA DÜZELTÝLDÝ: 'await foreach' yerine SADECE 'foreach' kullanýldý.
             // 'server.Keys()' metodu IAsyncEnumerable döndürmediði için await foreach uygun deðil.

@@ -17,13 +17,7 @@ namespace KitapProject.Controllers
 
         public IActionResult Index()
         {
-            var popularProducts = _context.Products
-                                          .Where(p => p.PopulerProduct && p.Status)
-                                          .Include(p => p.Category)
-                                          .Where(y => y.PopulerProduct == true) // Bu ikinci Where koşulu ilkini tekrar ediyor, istersen kaldırabilirsin.
-                                          .ToList();
-
-            return View(popularProducts);
+            return View();
         }
     }
 }

@@ -22,7 +22,7 @@ namespace KitapProject.Entities
 
         [Required]
         [StringLength(50)]
-        public string OrderStatus { get; set; } = "Beklemede"; // Bu property string olarak kalacak
+        public string OrderStatus { get; set; } = "Beklemede"; 
 
         [Required]
         [StringLength(250)]
@@ -60,10 +60,8 @@ namespace KitapProject.Entities
         İptalEdildi = 4
     }
 
-    // Enum Display Name uzantı metotları
     public static class EnumExtensions
     {
-        // Enum tipini alan orijinal GetDisplayName metodu
         public static string GetDisplayName(this Enum enumValue)
         {
             return enumValue.GetType()
@@ -74,23 +72,18 @@ namespace KitapProject.Entities
                 ?.GetName() ?? enumValue.ToString();
         }
 
-        // String tipini ve enum tipini alan yeni aşırı yüklenmiş GetDisplayName metodu
         public static string GetDisplayName(this string enumStringValue, Type enumType)
         {
-            // Eğer verilen tip bir enum değilse veya null ise hata fırlat
             if (enumType == null || !enumType.IsEnum)
             {
                 throw new ArgumentException("enumType bir enum tipi olmalıdır.", nameof(enumType));
             }
 
-            // String değeri enum'a dönüştürmeye çalış
-            if (Enum.TryParse(enumType, enumStringValue, true, out object parsedEnum)!)
+            if (Enum.TryParse(enumType, enumStringValue, true, out object parsedEnum))
             {
-                // Başarılı olursa, Enum tipini alan metodu çağır
                 return ((Enum)parsedEnum).GetDisplayName();
             }
 
-            // Parse edilemezse orijinal string değeri döndür
             return enumStringValue;
         }
     }
