@@ -17,7 +17,6 @@ namespace KitapProject.Entities
         [StringLength(50)]
         public string InvoiceNumber { get; set; } = Guid.NewGuid().ToString();
 
-        // DateTime.Now yerine DateTime.UtcNow
         public DateTime InvoiceDate { get; set; } = DateTime.UtcNow;
 
         [Required]

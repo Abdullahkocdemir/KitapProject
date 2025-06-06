@@ -16,10 +16,9 @@ namespace KitapProject.Controllers
             _context = context;
         }
 
-        [Authorize] // Sadece oturum açmış kullanıcılar sepete erişebilir
+        [Authorize] 
         public async Task<IActionResult> Index()
         {
-
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier); // Kullanıcı ID'sini al
 
             // Kullanıcının sepetini ve içindeki ürünleri çek
@@ -28,15 +27,13 @@ namespace KitapProject.Controllers
                 .ThenInclude(bi => bi.Product)
                 .FirstOrDefaultAsync(b => b.AppUserId == userId);
 
-            // Eğer kullanıcının sepeti yoksa yeni bir sepet oluştur ve kaydet
             if (basket == null)
             {
-                basket = new Basket { AppUserId = userId, CreatedDate = DateTime.UtcNow, TotalPrice = 0 };
+                basket = new Basket { AppUserId = userId!, CreatedDate = DateTime.UtcNow, TotalPrice = 0 };
                 _context.Baskets.Add(basket);
-                await _context.SaveChangesAsync(); // Yeni sepetin ID'sinin oluşması için kaydet
+                await _context.SaveChangesAsync(); 
             }
 
-            // Sepet içeriğini view'a gönder
             return View(basket);
         }
 
@@ -44,13 +41,12 @@ namespace KitapProject.Controllers
         [Authorize]
         public IActionResult ConfirmBasket()
         {
-            // Sepet onaylandığında Order/Index sayfasına yönlendir
             return RedirectToAction("Index", "Order");
         }
 
         [HttpPost]
-        [Authorize] // Bu satırı ekleyin veya kontrol edin
-        [ValidateAntiForgeryToken] // CSRF koruması için
+        [Authorize] 
+        [ValidateAntiForgeryToken] // CSRF koruması 
         public async Task<IActionResult> AddToBasket(int productId, int quantity = 1)
         {
             // Debug için
@@ -60,13 +56,11 @@ namespace KitapProject.Controllers
 
             if (string.IsNullOrEmpty(userId))
             {
-                // Kullanıcı giriş yapmamışsa, bu hata zaten [Authorize] ile yakalanır,
-                // ama ekstra bir güvenlik katmanı olarak veya debug için eklenebilir.
                 return Json(new { success = false, message = "Sepete ürün eklemek için giriş yapmalısınız." });
             }
             if (product == null)
             {
-                return Json(new { success = false, message = "Ürün bulunamadı." }); // JSON yanıt döndür
+                return Json(new { success = false, message = "Ürün bulunamadı." }); 
             }
 
             var basket = await _context.Baskets
@@ -104,7 +98,6 @@ namespace KitapProject.Controllers
 
             await _context.SaveChangesAsync();
 
-            // Başarılı bir eklemeden sonra sepetin güncel toplam miktarını döndürelim
             var currentBasketItemCount = basket.CartItems.Sum(bi => bi.Quantity);
             return Json(new { success = true, message = "Ürün sepete eklendi.", newTotal = basket.TotalPrice, itemCount = currentBasketItemCount });
         }
@@ -149,7 +142,7 @@ namespace KitapProject.Controllers
                 _context.BasketItems.Update(basketItem);
             }
 
-            // Sepetin toplam fiyatını güncelle
+            // Sepetin toplam fiyatını güncelleme
             basket.TotalPrice = basket.CartItems.Sum(bi => bi.ItemTotalPrice);
             basket.UpdatedDate = DateTime.UtcNow;
 

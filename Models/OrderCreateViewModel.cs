@@ -1,5 +1,4 @@
-﻿// KitapProject.Models/OrderCreateViewModel.cs
-using KitapProject.Entities;
+﻿using KitapProject.Entities;
 using System.ComponentModel.DataAnnotations;
 
 namespace KitapProject.Models

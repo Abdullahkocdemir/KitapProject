@@ -1,21 +1,25 @@
 ﻿@{
-    Layout = null;
+    Layout = null; // Bu layout'un kendisi başka bir layout kullanmıyor
 }
 <!DOCTYPE html>
 <html lang="tr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kitap Dünyası</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <title>Kitap Dünyası - Admin Paneli</title>
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+
     <link rel="stylesheet" href="~/css/WebSite.css">
     <link rel="stylesheet" href="~/css/StyleSheet.css" />
     <link rel="stylesheet" href="~/css/site.css" />
+
     <style>
+
+        /* Existing category-btn styles */
         .category-btn, a.category-btn {
             background: none;
             border: none;
@@ -30,10 +34,11 @@
             position: relative;
             overflow: hidden;
             width: 100%;
-            /* Linkler için varsayılan alt çizgiyi kaldırın */
             text-decoration: none;
-            /* A etiketinin button gibi davranması için */
-            display: block;
+            display: flex; /* Changed to flex for icon-text alignment */
+            align-items: center;
+            gap: 10px; /* Space between icon and text */
+            white-space: nowrap; /* Prevent text wrapping */
         }
 
             .category-btn::before, a.category-btn::before {
@@ -57,6 +62,7 @@
                 transform: translateX(10px);
             }
 
+            /* Aktif sidebar linki için stil */
             .category-btn.active, a.category-btn.active {
                 background: linear-gradient(135deg, var(--primary), var(--secondary));
                 color: white;
@@ -69,359 +75,189 @@
             font-weight: 600;
             margin-right: 15px;
         }
+
+        /* --- Collapsible Sidebar Styles --- */
+        .content-wrapper {
+            display: flex;
+            min-height: calc(100vh - var(--header-height) - var(--footer-height)); /* Ensure wrapper takes full height */
+            width: 100%; /* Kapsayıcının tam genişliği kaplamasını sağlar */
+        }
+
+        .sidebar {
+            width: 250px; /* Varsayılan genişlik (açık) */
+            transition: width 0.3s ease, padding 0.3s ease; /* Genişlik ve dolgu için yumuşak geçiş */
+            background-color: #333; /* Kenar çubuğu arka planı */
+            color: white;
+            padding: 20px;
+            box-shadow: 2px 0 5px rgba(0, 0, 0, 0.2);
+            flex-shrink: 0; /* İçerik genişlese bile kenar çubuğunun küçülmesini engeller */
+            overflow: hidden; /* Gizlenen öğeleri gizler */
+            position: sticky; /* Sayfa kaydırıldığında sabit kalmasını sağlar */
+            top: 0; /* Üstten hizalama */
+            height: 100vh; /* Tam yükseklik */
+        }
+
+            .sidebar.collapsed {
+                width: 60px; /* Daraltılmış genişlik */
+                padding: 20px 0; /* Daraltıldığında dolguyu ayarla */
+            }
+
+            .sidebar .sidebar-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                margin-bottom: 20px;
+                padding: 0 10px; /* Header içeriği için biraz padding */
+            }
+
+                .sidebar .sidebar-header h3 {
+                    margin: 0;
+                    font-size: 1.2rem;
+                    white-space: nowrap; /* Metnin satır atlamasını engeller */
+                    overflow: hidden; /* Taşmayı gizler */
+                    transition: opacity 0.3s ease, width 0.3s ease; /* Metin için yumuşak geçiş */
+                    width: 100%; /* Başlangıçta tam genişlik */
+                }
+
+            .sidebar.collapsed .sidebar-header h3 {
+                opacity: 0; /* Daraltıldığında metni gizle */
+                width: 0; /* Metnin genişliğini sıfırla */
+            }
+
+            .sidebar .toggle-btn {
+                background: none;
+                border: none;
+                color: white;
+                font-size: 1.5rem;
+                cursor: pointer;
+                padding: 5px;
+                transition: transform 0.3s ease; /* Dönüşüm için yumuşak geçiş */
+            }
+
+            .sidebar.collapsed .toggle-btn {
+                transform: rotate(180deg); /* Daraltıldığında ikonu döndür */
+            }
+
+            .sidebar .category-list {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+                .sidebar .category-list li {
+                    margin-bottom: 5px;
+                }
+
+            .sidebar .category-btn i {
+                font-size: 1.2rem;
+                flex-shrink: 0; /* İkonun küçülmesini engeller */
+            }
+
+            .sidebar .category-btn span {
+                transition: opacity 0.3s ease; /* Metin için yumuşak geçiş */
+            }
+
+            .sidebar.collapsed .category-btn span {
+                opacity: 0; /* Daraltıldığında metni gizle */
+                width: 0; /* Metnin genişliğini sıfırla */
+            }
+
+        .main-content-area {
+            flex-grow: 1; /* Ana içeriğin kalan alanı kaplamasını sağlar */
+            padding: 20px;
+            background-color: var(--light-bg); /* Açık bir arka plan */
+            box-shadow: inset 0 0 10px rgba(0, 0, 0, 0.05); /* Hafif iç gölge */
+            min-height: 100%; /* İçeriğin dikeyde en az %100 olmasını sağlar */
+        }
+
+        /* Artık statik .account-content-section'ları gizlemene gerek yok */
+        /* Çünkü RenderBody doğrudan içeriği buraya basacak */
+        /* .account-content-section { display: none; } */
+        /* .account-content-section.active-content { display: block; } */
     </style>
 
 </head>
 
 <body>
-    @await Component.InvokeAsync("_DefaultHeaderPartial")
+    @await Component.InvokeAsync("_DefaultHeaderPartials")
 
     <main>
         <div class="content-wrapper">
-            <aside class="sidebar">
-                <h3>Hesap Yönetimi</h3>
+            <aside class="sidebar" id="adminSidebar">
+                <div class="sidebar-header">
+                    <h3>Yönetim Paneli</h3>
+                    <button id="sidebarToggle" class="toggle-btn" title="Menüyü Daralt/Genişlet">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                </div>
                 <ul class="category-list">
-                    <li><a class="category-btn" href="/Admin/Dashboard"><i class="fas fa-home"></i> Dashboard</a></li>
-                    <li><a class="category-btn" href="/Product/Index/"><i class="fas fa-box-open"></i> Ürünler</a></li>
-                    <li><a class="category-btn" href="/Admin/Categories"><i class="fas fa-folder-open"></i> Kategoriler</a></li>
-                    <li><a class="category-btn" href="/Admin/Customers"><i class="fas fa-users"></i> Müşteriler</a></li>
-                    <li><a class="category-btn" href="/Admin/Orders"><i class="fas fa-receipt"></i> Siparişler</a></li>
-                    <li><a class="category-btn" href="/Admin/Invoices"><i class="fas fa-file-invoice-dollar"></i> Faturalar</a></li>
-                    <li><a class="category-btn" href="/Admin/AccountManagement"><i class="fas fa-user-circle"></i> Hesap Yönetimi</a></li>
+                    <li><a class="category-btn" href="/Admin/Dashboard"><i class="fas fa-home"></i> <span>Dashboard</span></a></li>
+                    <li><a class="category-btn" href="/AdminProduct/Index"><i class="fas fa-box-open"></i> <span>Ürünler</span></a></li>
+                    <li><a class="category-btn" href="/AdminCategory/Index"><i class="fas fa-folder-open"></i> <span>Kategoriler</span></a></li>
+                    <li><a class="category-btn" href="/Admin/Index"><i class="fas fa-users"></i> <span>Müşteriler</span></a></li>
+                    <li><a class="category-btn" href="/AdminOrder/Index"><i class="fas fa-receipt"></i> <span>Siparişler</span></a></li>
+                    <li><a class="category-btn" href="/AdminInvoice/Index"><i class="fas fa-file-invoice-dollar"></i> <span>Faturalar</span></a></li>
+                    <li><a class="category-btn" href="/AdminAccount/AccountManagement"><i class="fas fa-user-circle"></i> <span>Hesap Yönetimi</span></a></li>
                     @if (User.Identity.IsAuthenticated)
                     {
-                        <li><a class="category-btn" href="/Account/Logout"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</a></li>
+                        <li><a class="category-btn" href="/Account/Logout"><i class="fas fa-sign-out-alt"></i> <span>Çıkış Yap</span></a></li>
                     }
                 </ul>
             </aside>
 
-
             <div class="main-content-area">
-                <section id="siparislerim-content" class="account-content-section active-content">
-                    @RenderBody()
-
-                </section>
+                @RenderBody()
 
             </div>
         </div>
     </main>
 
     @await Component.InvokeAsync("_DefaultFooterPartials")
+
     @RenderSection("Scripts", required: false)
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
     <script>
-        let cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
-        const cartItemCountSpan = document.getElementById('cart-item-count');
-
-        // Book data (for category filtering and general use, although books are static in HTML)
-        const books = [
-            { id: '1', title: 'Suç ve Ceza', author: 'Fyodor Dostoyevski', price: 35.99, category: 'roman' },
-            { id: '2', title: '1984', author: 'George Orwell', price: 29.99, category: 'roman' },
-            { id: '3', title: 'Simyacı', author: 'Paulo Coelho', price: 24.99, category: 'roman' },
-            { id: '4', title: 'Sapiens', author: 'Yuval Noah Harari', price: 42.99, category: 'bilim' },
-            { id: '5', title: 'Kürk Mantolu Madonna', author: 'Sabahattin Ali', price: 19.99, category: 'roman' },
-            { id: '6', title: 'İnsan Nasıl Yaşar', author: 'Lev Tolstoy', price: 27.99, category: 'kisisel-gelisim' },
-            { id: '7', title: 'Evrenin Kısa Tarihi', author: 'Stephen Hawking', price: 39.50, category: 'bilim' },
-            { id: '8', title: 'Sanatın Öyküsü', author: 'E. H. Gombrich', price: 55.00, category: 'sanat' },
-            { id: '9', title: 'Etkili İnsanların 7 Alışkanlığı', author: 'Stephen Covey', price: 32.00, category: 'is-kariyer' },
-            { id: '10', title: 'Nutuk', author: 'Mustafa Kemal Atatürk', price: 45.00, category: 'tarih' },
-            { id: '11', title: 'Küçük Prens', author: 'Antoine de Saint-Exupéry', price: 18.50, category: 'cocuk' },
-            { id: '12', title: 'Hobbit', author: 'J.R.R. Tolkien', price: 30.00, category: 'fantastik' },
-            { id: '13', title: 'Psikolojinin Temelleri', author: 'Carole Wade', price: 60.00, category: 'bilim' },
-            { id: '14', title: 'Sıfırıncı Gün', author: 'Sabahattin Zaim', price: 22.00, category: 'is-kariyer' },
-            { id: '15', title: 'Dönüşüm', author: 'Franz Kafka', price: 15.00, category: 'roman' }
-        ];
-
         document.addEventListener('DOMContentLoaded', () => {
-            updateCartCount();
-            attachGlobalEventListeners();
-            displayQuote(); // Initial quote display
-            observeSectionsForAnimations(); // Re-attach observer for dynamic sections
-            setupAccountActions(); // Setup account actions for sidebar
+            setupSidebarToggle();
+            setActiveSidebarLink(); // Sayfa yüklendiğinde aktif linki belirle
         });
 
-        function attachGlobalEventListeners() {
-            const searchBtn = document.getElementById('search-btn');
-            const searchInput = document.getElementById('search-input');
-            if (searchBtn && searchInput) {
-                searchBtn.addEventListener('click', () => {
-                    const searchTerm = searchInput.value.trim().toLowerCase();
-                    filterBooks(searchTerm);
-                });
-                searchInput.addEventListener('keypress', (e) => {
-                    if (e.key === 'Enter') {
-                        searchBtn.click();
-                    }
+        // Sidebar açma/kapama işlevselliği
+        function setupSidebarToggle() {
+            const sidebar = document.getElementById('adminSidebar');
+            const toggleButton = document.getElementById('sidebarToggle');
+
+            if (sidebar && toggleButton) {
+                toggleButton.addEventListener('click', () => {
+                    sidebar.classList.toggle('collapsed'); // 'collapsed' sınıfını ekle/kaldır
                 });
             }
-
-            const cartContainer = document.getElementById('cart-container');
-            if (cartContainer) {
-                cartContainer.addEventListener('click', () => {
-                    alert(`Sepetinizde ${cart.reduce((sum, item) => sum + item.quantity, 0)} ürün var. (Bu bir demo özelliğidir)`);
-                });
-            }
-
-            // Add to Cart / Read buttons for static books
-            document.querySelectorAll('.book-card .btn-primary-book-action').forEach(button => {
-                button.addEventListener('click', function () {
-                    const bookTitle = this.closest('.book-content').querySelector('.book-title').textContent;
-                    // Simulate adding to cart with an alert
-                    alert(`${bookTitle} sepete eklendi!`);
-                });
-            });
-
-            document.querySelectorAll('.book-card .btn-secondary-book-action').forEach(button => {
-                button.addEventListener('click', function () {
-                    const bookTitle = this.closest('.book-content').querySelector('.book-title').textContent;
-                    alert(`${bookTitle} şimdi okunuyor... (Bu bir demo özelliğidir)`);
-                });
-            });
-
-            // Smooth scrolling for navigation links
-            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
-                anchor.addEventListener('click', function (e) {
-                    e.preventDefault();
-                    const target = document.querySelector(this.getAttribute('href'));
-                    if (target) {
-                        target.scrollIntoView({
-                            behavior: 'smooth',
-                            block: 'start'
-                        });
-                    }
-                });
-            });
         }
 
-        function updateCartCount() {
-            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-            if (cartItemCountSpan) {
-                cartItemCountSpan.textContent = totalItems;
-                if (totalItems > 0) {
-                    cartItemCountSpan.classList.add('bounce');
-                    setTimeout(() => {
-                        cartItemCountSpan.classList.remove('bounce');
-                    }, 500);
+        // Mevcut URL'ye göre sidebar linkini aktif etme fonksiyonu
+        function setActiveSidebarLink() {
+            const currentPath = window.location.pathname.toLowerCase(); // Mevcut URL yolunu al ve küçük harfe çevir
+            const sidebarLinks = document.querySelectorAll('.sidebar .category-btn'); // Tüm sidebar linklerini seç
+
+            sidebarLinks.forEach(link => {
+                const linkHref = link.getAttribute('href').toLowerCase(); // Linkin href'ini al ve küçük harfe çevir
+
+                // Linkin href'i mevcut URL yolunu içeriyorsa (örneğin /AdminProduct/Index ve link /adminproduct/index)
+                // ve boş bir link değilse (ana dizini hariç tutmak için)
+                if (currentPath.includes(linkHref) && linkHref !== "/") {
+                    link.classList.add('active'); // Aktif sınıfını ekle
                 }
-            }
-        }
-
-        function saveCart() {
-            localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
-            updateCartCount();
-        }
-
-        // --- Günün Alıntısı Dinamikleştirme ---
-        const quotes = [
-            {
-                quote: "Okumak, bilginin en derin kuyularından kana kana içmek gibidir. Her yeni sayfa, yeni bir dünyaya açılan kapıdır.",
-                author: "Mevlana"
-            },
-            {
-                quote: "İnsan ruhunun gıdası kitaplardır. Okudukça büyür, gelişimini sürdürür ve hayatı daha derinden anlar.",
-                author: "Fyodor Dostoyevski"
-            },
-            {
-                quote: "Bir kitap, uykusuz bir gecenin ve sonsuz bir düşüncenin ürünüdür.",
-                author: "George Orwell"
-            },
-            {
-                quote: "En iyi arkadaşım, bana okumadığım bir kitabı veren kişidir.",
-                author: "Abraham Lincoln"
-            },
-            {
-                quote: "Kitaplar, hiç kapanmayan pencerelerdir.",
-                author: "Nazım Hikmet"
-            },
-            {
-                quote: "Okumadan geçen bir gün, kaybolmuş bir gündür.",
-                author: "Anonim"
-            }
-        ];
-
-        let currentQuoteIndex = 0;
-        const dailyQuoteElement = document.getElementById('daily-quote');
-        const quoteAuthorElement = document.getElementById('quote-author');
-        const newQuoteButton = document.getElementById('new-quote-btn');
-
-        function displayQuote() {
-            if (!dailyQuoteElement || !quoteAuthorElement) return;
-
-            dailyQuoteElement.classList.add('fade-out');
-            quoteAuthorElement.classList.add('fade-out');
-
-            setTimeout(() => {
-                const quote = quotes[currentQuoteIndex];
-                dailyQuoteElement.textContent = `"${quote.quote}"`;
-                quoteAuthorElement.textContent = `- ${quote.author}`;
-
-                dailyQuoteElement.classList.remove('fade-out');
-                dailyQuoteElement.classList.add('fade-in-quote');
-                quoteAuthorElement.classList.remove('fade-out'); // Ensure author also fades in
-                quoteAuthorElement.classList.add('fade-in-quote');
-
-                setTimeout(() => {
-                    dailyQuoteElement.classList.remove('fade-in-quote');
-                    quoteAuthorElement.classList.remove('fade-in-quote');
-                }, 1000);
-            }, 300);
-
-            currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
-        }
-
-        if (newQuoteButton) {
-            newQuoteButton.addEventListener('click', displayQuote);
-        }
-
-        // Intersection Observer for animations
-        const observerOptions = {
-            threshold: 0.1,
-            rootMargin: '0px 0px -50px 0px'
-        };
-
-        const observer = new IntersectionObserver((entries) => {
-            entries.forEach(entry => {
-                if (entry.isIntersecting) {
-                    entry.target.style.opacity = '1';
-                    entry.target.style.transform = 'translateY(0)';
-                    observer.unobserve(entry.target);
+                // Eğer ana sayfadaysak ve dashboard linkiyse, dashboard'ı aktif yap
+                else if (currentPath === '/' && linkHref === '/admin/dashboard') {
+                    link.classList.add('active');
+                }
+                else {
+                    link.classList.remove('active'); // Diğerlerinden aktif sınıfını kaldır
                 }
             });
-        }, observerOptions);
-
-        function observeSectionsForAnimations() {
-            document.querySelectorAll('.dynamic-section, .stats-section, .testimonials-section, .quote-of-the-day-section, .call-to-action-section').forEach(el => {
-                el.style.opacity = '0';
-                el.style.transform = 'translateY(20px)';
-                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
-                observer.observe(el);
-            });
-        }
-
-        // Special animation for hero section elements on load
-        document.addEventListener('DOMContentLoaded', () => {
-            // Check if these elements exist before trying to animate them
-            const heroTitle = document.querySelector('.hero-section h1');
-            const heroSubtitle = document.querySelector('.hero-section p');
-            const ctaButtons = document.querySelector('.cta-buttons');
-
-            if (heroTitle) heroTitle.style.animationPlayState = 'running';
-            if (heroSubtitle) heroSubtitle.style.animationPlayState = 'running';
-            if (ctaButtons) ctaButtons.style.animationPlayState = 'running';
-        });
-
-        // --- Book Filtering by Search Term ---
-        function filterBooks(searchTerm) {
-            const allBookCards = document.querySelectorAll('.book-card');
-            let foundResults = false;
-
-            allBookCards.forEach(card => {
-                const bookTitle = card.querySelector('.book-title').textContent.toLowerCase();
-                const bookAuthor = card.querySelector('.book-author').textContent.toLowerCase();
-
-                if (bookTitle.includes(searchTerm) || bookAuthor.includes(searchTerm)) {
-                    card.style.display = 'block';
-                    foundResults = true;
-                } else {
-                    card.style.display = 'none';
-                }
-            });
-
-            const booksSection = document.getElementById('kitaplar');
-            let noResultsMessage = booksSection ? booksSection.querySelector('.no-results') : null;
-            if (!noResultsMessage && booksSection) {
-                noResultsMessage = document.createElement('div');
-                noResultsMessage.classList.add('no-results');
-                noResultsMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i><p>Aradığınız kriterlere uygun kitap bulunamadı.</p>`;
-                booksSection.appendChild(noResultsMessage);
-            }
-
-            if (foundResults) {
-                if (noResultsMessage) noResultsMessage.style.display = 'none';
-            } else {
-                if (noResultsMessage) noResultsMessage.style.display = 'block';
-            }
-        }
-
-        // --- Hesap Yönetimi Aksiyonları ---
-        function setupAccountActions() {
-            const accountActionButtons = document.querySelectorAll('.sidebar .category-btn'); // Corrected selector to target the anchors
-            const accountContentSections = document.querySelectorAll('.account-content-section');
-
-            // Function to hide all content sections
-            function hideAllAccountContent() {
-                accountContentSections.forEach(section => {
-                    section.style.display = 'none';
-                    section.classList.remove('active-content'); // Remove active class as well
-                });
-            }
-
-            accountActionButtons.forEach(button => {
-                button.addEventListener('click', function (e) {
-                    // Prevent default link behavior if it's not a logout link
-                    if (this.getAttribute('href') !== '/Account/Logout') {
-                        e.preventDefault();
-                    }
-
-                    // Remove 'active' class from all sidebar buttons
-                    accountActionButtons.forEach(btn => btn.classList.remove('active'));
-                    // Add 'active' class to the clicked button
-                    this.classList.add('active');
-
-                    // Handle content display based on the link's href
-                    const href = this.getAttribute('href');
-                    let targetContentId = '';
-
-                    // Map hrefs to content section IDs
-                    if (href === '/Admin/Dashboard') targetContentId = 'dashboard-content';
-                    else if (href === '/Product/Index/') targetContentId = 'urunler-content';
-                    else if (href === '/Admin/Categories') targetContentId = 'kategoriler-content';
-                    else if (href === '/Admin/Customers') targetContentId = 'musteriler-content';
-                    else if (href === '/Admin/Orders') targetContentId = 'siparisler-content'; // Assuming this will lead to a specific section for orders
-                    else if (href === '/Admin/Invoices') targetContentId = 'faturalar-content';
-                    else if (href === '/Admin/AccountManagement') targetContentId = 'hesap-yonetimi-content';
-                    // No need to hide/show for logout, it's a navigation
-                    else if (href === '/Account/Logout') return; // Let the link navigate
-
-                    if (targetContentId) {
-                        hideAllAccountContent();
-                        const targetContent = document.getElementById(targetContentId);
-                        if (targetContent) {
-                            targetContent.style.display = 'block';
-                            targetContent.classList.add('active-content');
-                        } else {
-                            // If a specific content div doesn't exist, you might want to load it dynamically or show a default.
-                            console.warn(`Content section with ID '${targetContentId}' not found.`);
-                            // Optionally, redirect if it's a page navigation rather than section toggle
-                            if (href.startsWith('/Admin/') || href.startsWith('/Product/')) {
-                                window.location.href = href;
-                            }
-                        }
-                    } else if (href.startsWith('/Admin/') || href.startsWith('/Product/')) {
-                        // For links that are meant to navigate to entirely new pages
-                        window.location.href = href;
-                    }
-                });
-            });
-
-            // Set default active state for the "Siparişlerim" link in the sidebar
-            // This part runs once on DOMContentLoaded.
-            // We need to ensure the correct content section is visible on initial load.
-            const defaultButton = document.querySelector('.sidebar .category-btn[href="/Admin/Orders"]'); // Assuming Orders is the default
-            if (defaultButton) {
-                defaultButton.classList.add('active');
-                const defaultContent = document.getElementById('siparislerim-content'); // Assuming 'siparislerim-content' is the default section
-                if (defaultContent) {
-                    defaultContent.style.display = 'block';
-                    defaultContent.classList.add('active-content');
-                }
-            } else {
-                // Fallback if 'siparislerim' is not the default or its link isn't found
-                // Ensure at least one content section is visible if no specific default is set or found.
-                const firstActiveContent = document.querySelector('.account-content-section.active-content');
-                if (firstActiveContent) {
-                    firstActiveContent.style.display = 'block';
-                }
-            }
         }
     </script>
 </body>

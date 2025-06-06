@@ -12,7 +12,7 @@
 
 <div class="card shadow-sm p-4 mb-5 bg-white rounded">
     <div class="card-body">
-        <form asp-action="Create" asp-controller="Product" method="post" enctype="multipart/form-data">
+        <form asp-action="Create" asp-controller="AdminProduct" method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="alert alert-danger mb-4 text-center" role="alert"></div>
 
             <div class="row">
@@ -78,7 +78,7 @@
             <hr class="mb-4">
 
             <div class="d-flex justify-content-end gap-3">
-                <a href="/Product/Index" class="btn btn-outline-secondary px-4 py-2 rounded-pill font-weight-bold">
+                <a href="/AdminProduct/Index" class="btn btn-outline-secondary px-4 py-2 rounded-pill font-weight-bold">
                     İptal
                 </a>
                 <button type="submit" class="btn btn-success px-4 py-2 rounded-pill font-weight-bold d-flex align-items-center gap-2">

@@ -28,7 +28,7 @@ namespace KitapProject.Mapping
 
             CreateMap<CreateCategoryDTO, Category>();
 
-            CreateMap<UpdateCategoryDTO, Category>().ReverseMap(); // ReverseMap allows mapping from Category to UpdateCategoryDTO as well
+            CreateMap<UpdateCategoryDTO, Category>().ReverseMap(); 
 
             CreateMap<Category, GetByIdCategoryDTO>();
         }

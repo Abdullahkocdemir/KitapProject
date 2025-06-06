@@ -1,5 +1,4 @@
-﻿// KitapProject.Entities/AppUser.cs
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using System.ComponentModel.DataAnnotations;
 
 namespace KitapProject.Entities
@@ -52,7 +51,6 @@ namespace KitapProject.Entities
 
         public virtual ICollection<IdentityUserRole<string>> UserRoles { get; set; } = new List<IdentityUserRole<string>>();
 
-        // Yeni eklenen kısım: Kullanıcının kayıtlı ödeme bilgileri
         public virtual ICollection<UserPaymentInfo> UserPaymentInfos { get; set; } = new List<UserPaymentInfo>();
     }
 }

@@ -1,0 +1,313 @@
+﻿@model KitapProject.Entities.Order
+
+@{
+    ViewData["Title"] = "Sipariş Detayları";
+    Layout = "~/Views/Shared/_DefaultLayout.cshtml";
+}
+
+<section class="order-details-section">
+    <div class="order-header">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h2 class="section-title" style="color:red">Sipariş Detayları</h2>
+            <a href="@Url.Action("Index", "Sale")" class="btn btn-secondary">
+                <i class="fas fa-arrow-left me-2"></i> Siparişlerime Dön
+            </a>
+        </div>
+
+        <div class="order-info-card">
+            <div class="row">
+                <div class="col-md-6">
+                    <h4>Sipariş Bilgileri</h4>
+                   
+                    <p><strong>Sipariş Tarihi:</strong> @Model.OrderDate.ToString("dd MMMM yyyy, HH:mm", new System.Globalization.CultureInfo("tr-TR"))</p>
+                    <p>
+                        <strong>Durum:</strong>
+                        <span class="status-badge @GetStatusClass(Model.OrderStatus)">
+                            @Model.OrderStatus
+                        </span>
+                    </p>
+                    <p>
+                        <strong>Toplam Tutar:</strong>
+                        <strong class="total-amount">@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</strong> @* Using OrderTotal *@
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h4>Teslimat Bilgileri</h4>
+                    @* These shipping details would typically come from the AppUser or a dedicated ShippingAddress entity linked to the Order.
+                    Assuming for now they are directly on the Order model for simplicity, as indicated by your view. *@
+                    <p><strong>Adres:</strong> @Model.ShippingAddress</p>
+                    <p><strong>Şehir:</strong> @Model.City</p>
+                    <p><strong>Ülke:</strong> @Model.Country</p>
+                    <p><strong>Posta Kodu:</strong> @Model.PostalCode</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="order-items">
+        <h4 class="mb-3">Sipariş Ürünleri</h4>
+        <div class="table-responsive">
+            <table class="table order-items-table">
+                <thead>
+                    <tr>
+                        <th>Ürün</th>
+                        <th>Birim Fiyat</th>
+                        <th>Adet</th>
+                        <th>Toplam</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.OrderDetails != null && Model.OrderDetails.Any())
+                    {
+                        @foreach (var item in Model.OrderDetails)
+                        {
+                            <tr>
+                                <td>
+                                    <div class="product-info">
+                                        <strong>@(item.Product?.Name ?? "Ürün Bilgisi Yok")</strong> @* Accessing Product.ProductName *@
+                                    </div>
+                                </td>
+                                <td>@item.UnitPrice.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</td>
+                                <td>@item.Quantity</td>
+                                <td><strong>@item.ItemTotal.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</strong></td>
+                            </tr>
+                        }
+                    }
+                    else
+                    {
+                        <tr>
+                            <td colspan="4">Bu siparişte ürün bulunmamaktadır.</td>
+                        </tr>
+                    }
+                </tbody>
+                <tfoot>
+                    <tr class="total-row">
+                        <td colspan="3"><strong>Genel Toplam:</strong></td>
+                        <td><strong class="total-amount">@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</strong></td> @* Using OrderTotal *@
+                    </tr>
+                </tfoot>
+            </table>
+        </div>
+    </div>
+</section>
+
+@functions {
+    string GetStatusClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "teslim edildi" => "delivered",
+            "kargoda" => "shipped",
+            "hazırlanıyor" => "processing",
+            "beklemede" => "pending",
+            "iptal edildi" => "cancelled",
+            _ => "pending" // Default for unknown statuses
+        };
+    }
+}
+
+<style>
+    /* General Section Styling */
+    .order-details-section {
+        padding: 30px;
+        background-color: #f0f2f5; /* Light background for the whole section */
+        border-radius: 10px;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    }
+
+    /* Header and Title */
+    .order-header {
+        margin-bottom: 30px;
+    }
+
+    .section-title {
+        color: red;
+        font-size: 2rem;
+        font-weight: 700;
+        margin-bottom: 0; /* Adjust margin to align with button */
+    }
+
+    /* Back Button */
+    .btn-secondary {
+        background-color: #6c757d;
+        color: white;
+        border: 1px solid #6c757d;
+        display: flex; /* For icon alignment */
+        align-items: center;
+        gap: 8px; /* Space between icon and text */
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+
+        .btn-secondary:hover {
+            background-color: #5a6268;
+            border-color: #545b62;
+        }
+
+    /* Order Info Card */
+    .order-info-card {
+        background: #ffffff;
+        padding: 25px;
+        border-radius: 10px;
+        border: 1px solid #e9ecef;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    }
+
+        .order-info-card h4 {
+            color: #007bff; /* Primary blue for headings */
+            margin-bottom: 20px;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+        .order-info-card p {
+            margin-bottom: 8px;
+            color: #495057;
+            line-height: 1.6;
+        }
+
+            .order-info-card p strong {
+                color: #343a40;
+            }
+
+    /* Status Badges */
+    .status-badge {
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 0.85em;
+        font-weight: 600;
+        text-transform: capitalize; /* More natural capitalization */
+        display: inline-block; /* For better padding control */
+        margin-left: 5px;
+    }
+
+        .status-badge.delivered {
+            background-color: #e6ffed; /* Lighter green */
+            color: #007b3e; /* Darker green */
+        }
+
+        .status-badge.shipped {
+            background-color: #e0f2fe; /* Lighter blue */
+            color: #0d6efd; /* Deeper blue */
+        }
+
+        .status-badge.processing {
+            background-color: #fff8e1; /* Lighter yellow */
+            color: #ffc107; /* Orange-yellow */
+        }
+
+        .status-badge.pending {
+            background-color: #e9ecef; /* Light gray */
+            color: #6c757d; /* Darker gray */
+        }
+
+        .status-badge.cancelled {
+            background-color: #ffebee; /* Lighter red */
+            color: #dc3545; /* Darker red */
+        }
+
+    .total-amount {
+        color: #28a745; /* Green for total */
+        font-size: 1.25em;
+        font-weight: 700;
+    }
+
+    /* Order Items Table */
+    .order-items {
+        margin-top: 40px;
+    }
+
+        .order-items h4 {
+            color: #007bff;
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 8px;
+            margin-bottom: 20px;
+            font-weight: 600;
+            font-size: 1.3rem;
+        }
+
+    .order-items-table {
+        background: white;
+        border-radius: 10px;
+        overflow: hidden; /* Ensures rounded corners are visible */
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
+        width: 100%; /* Ensure table takes full width */
+        border-collapse: collapse; /* For cleaner borders */
+    }
+
+        .order-items-table thead {
+            background-color: #007bff;
+            color: white;
+        }
+
+        .order-items-table th {
+            padding: 15px 20px;
+            font-weight: 600;
+            text-align: left;
+            border: none;
+        }
+
+        .order-items-table tbody tr:nth-child(even) {
+            background-color: #f8f9fa; /* Zebra striping for readability */
+        }
+
+        .order-items-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #e9ecef;
+            color: #343a40;
+        }
+
+        .order-items-table tbody tr:last-child td {
+            border-bottom: none; /* No border for the last row */
+        }
+
+    .product-info strong {
+        color: #343a40;
+        font-size: 1.05em;
+    }
+
+    /* Table Footer Total */
+    .total-row {
+        background-color: #e9f5ff; /* Light blue background for total row */
+        font-size: 1.2em;
+        font-weight: 700;
+    }
+
+        .total-row td {
+            border-top: 2px solid #007bff;
+            padding-top: 15px;
+            padding-bottom: 15px;
+        }
+
+        .total-row strong.total-amount {
+            font-size: 1.3em; /* Slightly larger for emphasis */
+        }
+
+    /* Utilities (if not using Bootstrap CSS directly) */
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-between {
+        justify-content: space-between;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+
+    .mb-3 {
+        margin-bottom: 1rem;
+    }
+
+    .mb-4 {
+        margin-bottom: 1.5rem;
+    }
+
+    .me-2 { /* For spacing with icon */
+        margin-right: 0.5rem;
+    }
+</style>

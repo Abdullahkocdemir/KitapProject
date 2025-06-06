@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace KitapProject.Models // Veya projenizin ViewModels klasörü varsa ViewModels
+namespace KitapProject.Models 
 {
     public class LoginViewModel
     {

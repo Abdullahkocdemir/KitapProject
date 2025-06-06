@@ -27,7 +27,6 @@ namespace KitapProject.Entities
         [StringLength(200)]
         public string ImageUrl { get; set; } = string.Empty;
 
-        // DateTime.Now yerine DateTime.UtcNow
         [Required]
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 

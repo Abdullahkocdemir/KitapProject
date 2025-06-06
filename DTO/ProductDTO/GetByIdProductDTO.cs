@@ -13,6 +13,6 @@
         public bool PopulerProduct { get; set; }
         public decimal Price { get; set; }
         public int CategoryId { get; set; }
-        public string CategoryName { get; set; } = string.Empty;// Bu, kategorinin adı olacak
+        public string CategoryName { get; set; } = string.Empty;
     }
 }

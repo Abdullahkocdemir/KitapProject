@@ -1,4 +1,364 @@
-﻿
-@*
-    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
-*@
+﻿@{
+    Layout = null;
+}
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitap Dünyası</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="~/css/WebSite.css">
+</head>
+
+<body>
+    @await Component.InvokeAsync("_DefaultHeaderPartials")
+
+    <main>
+        <div class="content-wrapper">
+            <aside class="sidebar">
+                <h3>Hesap Yönetimi</h3>
+                <ul class="category-list">
+                    <li><button class="category-btn" data-action="siparislerim"><i class="fas fa-box"></i> Siparişlerim</button></li>
+                    <li><button class="category-btn" data-action="favori-ilanlarim"><i class="fas fa-heart"></i> Favori İlanlarım</button></li>
+                    <li><button class="category-btn" data-action="kargolarim"><i class="fas fa-truck"></i> Kargolarım</button></li>
+                    <li><button class="category-btn" data-action="indirim-kodlarim"><i class="fas fa-tags"></i> İndirim Kodlarım</button></li>
+                    <li><button class="category-btn" data-action="hesap-bilgilerim"><i class="fas fa-user-cog"></i> Hesap Bilgilerim</button></li>
+                    <li><button class="category-btn" data-action="cikis-yap"><i class="fas fa-sign-out-alt"></i> Çıkış Yap</button></li>
+                </ul>
+            </aside>
+
+            <div class="main-content-area">
+                @RenderBody()
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <div class="container footer-content">
+            <div class="footer-section">
+                <h3>Kitap Dünyası</h3>
+                <p>Okumayı sevenleri bir araya getiren platform.</p>
+                <div class="social-links">
+                    <a href="#"><i class="fab fa-facebook-f"></i></a>
+                    <a href="#"><i class="fab fa-twitter"></i></a>
+                    <a href="#"><i class="fab fa-instagram"></i></a>
+                    <a href="#"><i class="fab fa-linkedin-in"></i></a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Hızlı Erişim</h3>
+                <ul>
+                    <li><a href="#">Anasayfa</a></li>
+                    <li><a href="#kitaplar">Tüm Kitaplar</a></li>
+                    <li><a href="#okur-yorumlari">Yorumlar</a></li>
+                    <li><a href="#gunun-alintisi">Günün Alıntısı</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Yardım</h3>
+                <ul>
+                    <li><a href="#">Sıkça Sorulan Sorular</a></li>
+                    <li><a href="#">Gizlilik Politikası</a></li>
+                    <li><a href="#">Kullanım Koşulları</a></li>
+                    <li><a href="#">İletişim</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Bize Ulaşın</h3>
+                <p>Adres: Kitap Sok. No: 123, Okur Şehri</p>
+                <p>E-posta: info@kitapdunyasi.com</p>
+                <p>Telefon: +90 123 456 7890</p>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            &copy; 2025 Kitap Dünyası. Tüm Hakları Saklıdır.
+        </div>
+    </footer>
+
+    <script>
+        let cart = JSON.parse(localStorage.getItem('kitapDunyasiCart')) || [];
+        const cartItemCountSpan = document.getElementById('cart-item-count');
+
+        // Book data (for category filtering and general use, although books are static in HTML)
+        const books = [
+            { id: '1', title: 'Suç ve Ceza', author: 'Fyodor Dostoyevski', price: 35.99, category: 'roman' },
+            { id: '2', title: '1984', author: 'George Orwell', price: 29.99, category: 'roman' },
+            { id: '3', title: 'Simyacı', author: 'Paulo Coelho', price: 24.99, category: 'roman' },
+            { id: '4', title: 'Sapiens', author: 'Yuval Noah Harari', price: 42.99, category: 'bilim' },
+            { id: '5', title: 'Kürk Mantolu Madonna', author: 'Sabahattin Ali', price: 19.99, category: 'roman' },
+            { id: '6', title: 'İnsan Nasıl Yaşar', author: 'Lev Tolstoy', price: 27.99, category: 'kisisel-gelisim' },
+            { id: '7', title: 'Evrenin Kısa Tarihi', author: 'Stephen Hawking', price: 39.50, category: 'bilim' },
+            { id: '8', title: 'Sanatın Öyküsü', author: 'E. H. Gombrich', price: 55.00, category: 'sanat' },
+            { id: '9', title: 'Etkili İnsanların 7 Alışkanlığı', author: 'Stephen Covey', price: 32.00, category: 'is-kariyer' },
+            { id: '10', title: 'Nutuk', author: 'Mustafa Kemal Atatürk', price: 45.00, category: 'tarih' },
+            { id: '11', title: 'Küçük Prens', author: 'Antoine de Saint-Exupéry', price: 18.50, category: 'cocuk' },
+            { id: '12', title: 'Hobbit', author: 'J.R.R. Tolkien', price: 30.00, category: 'fantastik' },
+            { id: '13', title: 'Psikolojinin Temelleri', author: 'Carole Wade', price: 60.00, category: 'bilim' },
+            { id: '14', title: 'Sıfırıncı Gün', author: 'Sabahattin Zaim', price: 22.00, category: 'is-kariyer' },
+            { id: '15', title: 'Dönüşüm', author: 'Franz Kafka', price: 15.00, category: 'roman' }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            updateCartCount();
+            attachGlobalEventListeners();
+            displayQuote(); // Initial quote display
+            observeSectionsForAnimations(); // Re-attach observer for dynamic sections
+            setupAccountActions(); // Setup account actions for sidebar
+        });
+
+        function attachGlobalEventListeners() {
+            const searchBtn = document.getElementById('search-btn');
+            const searchInput = document.getElementById('search-input');
+            if (searchBtn && searchInput) {
+                searchBtn.addEventListener('click', () => {
+                    const searchTerm = searchInput.value.trim().toLowerCase();
+                    filterBooks(searchTerm);
+                });
+                searchInput.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        searchBtn.click();
+                    }
+                });
+            }
+
+            const cartContainer = document.getElementById('cart-container');
+            if (cartContainer) {
+                cartContainer.addEventListener('click', () => {
+                    alert(`Sepetinizde ${cart.reduce((sum, item) => sum + item.quantity, 0)} ürün var. (Bu bir demo özelliğidir)`);
+                });
+            }
+
+            // Add to Cart / Read buttons for static books
+            document.querySelectorAll('.book-card .btn-primary-book-action').forEach(button => {
+                button.addEventListener('click', function () {
+                    const bookTitle = this.closest('.book-content').querySelector('.book-title').textContent;
+                    // Simulate adding to cart with an alert
+                    alert(`${bookTitle} sepete eklendi!`);
+                });
+            });
+
+            document.querySelectorAll('.book-card .btn-secondary-book-action').forEach(button => {
+                button.addEventListener('click', function () {
+                    const bookTitle = this.closest('.book-content').querySelector('.book-title').textContent;
+                    alert(`${bookTitle} şimdi okunuyor... (Bu bir demo özelliğidir)`);
+                });
+            });
+
+            // Smooth scrolling for navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+        }
+
+        function updateCartCount() {
+            const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
+            if (cartItemCountSpan) {
+                cartItemCountSpan.textContent = totalItems;
+                if (totalItems > 0) {
+                    cartItemCountSpan.classList.add('bounce');
+                    setTimeout(() => {
+                        cartItemCountSpan.classList.remove('bounce');
+                    }, 500);
+                }
+            }
+        }
+
+        function saveCart() {
+            localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
+            updateCartCount();
+        }
+
+        // --- Günün Alıntısı Dinamikleştirme ---
+        const quotes = [
+            {
+                quote: "Okumak, bilginin en derin kuyularından kana kana içmek gibidir. Her yeni sayfa, yeni bir dünyaya açılan kapıdır.",
+                author: "Mevlana"
+            },
+            {
+                quote: "İnsan ruhunun gıdası kitaplardır. Okudukça büyür, gelişimini sürdürür ve hayatı daha derinden anlar.",
+                author: "Fyodor Dostoyevski"
+            },
+            {
+                quote: "Bir kitap, uykusuz bir gecenin ve sonsuz bir düşüncenin ürünüdür.",
+                author: "George Orwell"
+            },
+            {
+                quote: "En iyi arkadaşım, bana okumadığım bir kitabı veren kişidir.",
+                author: "Abraham Lincoln"
+            },
+            {
+                quote: "Kitaplar, hiç kapanmayan pencerelerdir.",
+                author: "Nazım Hikmet"
+            },
+            {
+                quote: "Okumadan geçen bir gün, kaybolmuş bir gündür.",
+                author: "Anonim"
+            }
+        ];
+
+        let currentQuoteIndex = 0;
+        const dailyQuoteElement = document.getElementById('daily-quote');
+        const quoteAuthorElement = document.getElementById('quote-author');
+        const newQuoteButton = document.getElementById('new-quote-btn');
+
+        function displayQuote() {
+            if (!dailyQuoteElement || !quoteAuthorElement) return;
+
+            dailyQuoteElement.classList.add('fade-out');
+            quoteAuthorElement.classList.add('fade-out');
+
+            setTimeout(() => {
+                const quote = quotes[currentQuoteIndex];
+                dailyQuoteElement.textContent = `"${quote.quote}"`;
+                quoteAuthorElement.textContent = `- ${quote.author}`;
+
+                dailyQuoteElement.classList.remove('fade-out');
+                quoteAuthorElement.classList.remove('fade-in-quote');
+                dailyQuoteElement.classList.add('fade-in-quote');
+                quoteAuthorElement.classList.add('fade-in-quote');
+
+                setTimeout(() => {
+                    dailyQuoteElement.classList.remove('fade-in-quote');
+                    quoteAuthorElement.classList.remove('fade-in-quote');
+                }, 1000);
+            }, 300);
+
+            currentQuoteIndex = (currentQuoteIndex + 1) % quotes.length;
+        }
+
+        if (newQuoteButton) {
+            newQuoteButton.addEventListener('click', displayQuote);
+        }
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, observerOptions);
+
+        function observeSectionsForAnimations() {
+            document.querySelectorAll('.dynamic-section, .stats-section, .testimonials-section, .quote-of-the-day-section, .call-to-action-section').forEach(el => {
+                el.style.opacity = '0';
+                el.style.transform = 'translateY(20px)';
+                el.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(el);
+            });
+        }
+
+        // Special animation for hero section elements on load
+        document.addEventListener('DOMContentLoaded', () => {
+            // Check if these elements exist before trying to animate them
+            const heroTitle = document.querySelector('.hero-section h1');
+            const heroSubtitle = document.querySelector('.hero-section p');
+            const ctaButtons = document.querySelector('.cta-buttons');
+
+            if (heroTitle) heroTitle.style.animationPlayState = 'running';
+            if (heroSubtitle) heroSubtitle.style.animationPlayState = 'running';
+            if (ctaButtons) ctaButtons.style.animationPlayState = 'running';
+        });
+
+        // --- Book Filtering by Search Term ---
+        function filterBooks(searchTerm) {
+            const allBookCards = document.querySelectorAll('.book-card');
+            let foundResults = false;
+
+            allBookCards.forEach(card => {
+                const bookTitle = card.querySelector('.book-title').textContent.toLowerCase();
+                const bookAuthor = card.querySelector('.book-author').textContent.toLowerCase();
+
+                if (bookTitle.includes(searchTerm) || bookAuthor.includes(searchTerm)) {
+                    card.style.display = 'block';
+                    foundResults = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            const booksSection = document.getElementById('kitaplar');
+            let noResultsMessage = booksSection ? booksSection.querySelector('.no-results') : null;
+            if (!noResultsMessage && booksSection) {
+                noResultsMessage = document.createElement('div');
+                noResultsMessage.classList.add('no-results');
+                noResultsMessage.innerHTML = `<i class="fas fa-exclamation-circle"></i><p>Aradığınız kriterlere uygun kitap bulunamadı.</p>`;
+                booksSection.appendChild(noResultsMessage);
+            }
+
+            if (foundResults) {
+                if (noResultsMessage) noResultsMessage.style.display = 'none';
+            } else {
+                if (noResultsMessage) noResultsMessage.style.display = 'block';
+            }
+        }
+
+        // --- Hesap Yönetimi Aksiyonları ---
+        function setupAccountActions() {
+            const accountActionButtons = document.querySelectorAll('.sidebar button[data-action]');
+            const accountContentSections = document.querySelectorAll('.account-content-section');
+
+            // Function to hide all content sections
+            function hideAllAccountContent() {
+                accountContentSections.forEach(section => {
+                    section.style.display = 'none';
+                    section.classList.remove('active-content'); // Remove active class as well
+                });
+            }
+
+            accountActionButtons.forEach(button => {
+                button.addEventListener('click', function () {
+                    const action = this.dataset.action;
+
+                    // Remove 'active' class from all sidebar buttons
+                    accountActionButtons.forEach(btn => btn.classList.remove('active'));
+                    // Add 'active' class to the clicked button
+                    this.classList.add('active');
+
+                    // Hide all content sections first
+                    hideAllAccountContent();
+
+                    // Show the relevant content section based on the data-action
+                    const targetContentId = `${action}-content`;
+                    const targetContent = document.getElementById(targetContentId);
+                    if (targetContent) {
+                        targetContent.style.display = 'block';
+                        targetContent.classList.add('active-content'); // Add active class for potential animations
+                    } else {
+                        // Fallback for actions without specific content divs, or to show a general message
+                        alert('İçerik yükleniyor: ' + action);
+                    }
+                });
+            });
+
+            // Set default active state and show content for "Siparişlerim" on load
+            const defaultButton = document.querySelector('.sidebar button[data-action="siparislerim"]');
+            if (defaultButton) {
+                defaultButton.classList.add('active');
+                const defaultContent = document.getElementById('siparislerim-content');
+                if (defaultContent) {
+                    defaultContent.style.display = 'block';
+                    defaultContent.classList.add('active-content');
+                }
+            }
+        }
+    </script>
+</body>
+</html>

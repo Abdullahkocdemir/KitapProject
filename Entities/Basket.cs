@@ -13,7 +13,6 @@ namespace KitapProject.Entities
         public string AppUserId { get; set; } = string.Empty;
         public virtual AppUser AppUser { get; set; } = null!;
 
-        // DateTime.Now yerine DateTime.UtcNow
         public DateTime CreatedDate { get; set; } = DateTime.UtcNow;
 
         public DateTime? UpdatedDate { get; set; }

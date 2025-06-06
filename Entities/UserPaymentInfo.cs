@@ -18,14 +18,13 @@ namespace KitapProject.Entities
         public string CardHolderName { get; set; } = string.Empty;
 
         [Required]
-        [StringLength(19)] // Kart numarası 16 haneli + 3 boşluk
-        public string CardNumberLastFour { get; set; } = string.Empty; // Güvenlik için sadece son 4 haneyi saklayalım
+        [StringLength(19)] 
+        public string CardNumberLastFour { get; set; } = string.Empty; 
 
         [Required]
         [StringLength(5)] // MM/YY
         public string ExpirationDate { get; set; } = string.Empty;
 
-        // Gerçek bir uygulamada CVV saklanmaz. Bu sadece örnek içindir.
         [Required]
         [StringLength(4)]
         public string CVV { get; set; } = string.Empty;

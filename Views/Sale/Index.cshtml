@@ -1,0 +1,74 @@
+﻿@model List<KitapProject.Entities.Order>
+
+@{
+    ViewData["Title"] = "Siparişlerim";
+    Layout = "~/Views/Shared/_DefaultLayout.cshtml";
+}
+
+<section id="siparislerim-content" class="account-content-section active">
+    <h2 class="section-title">Siparişlerim</h2>
+
+    @if (Model != null && Model.Any())
+    {
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Sipariş Kodu</th>
+                        <th>Tarih</th>
+                        <th>Toplam Tutar</th>
+                        <th>Durum</th>
+                        <th>Ürün Sayısı</th>
+                        <th>Detaylar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var order in Model)
+                    {
+                        <tr>
+                            <td>#KTP-@order.OrderId.ToString("000000")</td>
+                            <td>@order.OrderDate.ToString("dd.MM.yyyy")</td>
+                            <td>@order.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</td>
+                            <td>
+                                <span class="status-badge @GetStatusClass(order.OrderStatus)">
+                                    @order.OrderStatus
+                                </span>
+                            </td>
+                            <td>@order.OrderDetails.Sum(od => od.Quantity) adet</td>
+                            <td>
+                                <a href="@Url.Action("OrderDetails", "Sale", new { id = order.OrderId })"
+                                   class="table-action-btn view-details-btn">
+                                    Görüntüle
+                                </a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+    else
+    {
+        <div class="no-orders-message">
+            <div class="alert alert-info">
+                <h4>Henüz siparişiniz bulunmuyor</h4>
+                <p>İlk siparişinizi vermek için <a href="@Url.Action("Index", "Home")">alışverişe başlayın</a>.</p>
+            </div>
+        </div>
+    }
+</section>
+
+@functions {
+    string GetStatusClass(string status)
+    {
+        return status.ToLower() switch
+        {
+            "teslim edildi" => "delivered",
+            "kargoda" => "shipped",
+            "hazırlanıyor" => "processing",
+            "beklemede" => "pending",
+            "iptal edildi" => "cancelled",
+            _ => "pending"
+        };
+    }
+}

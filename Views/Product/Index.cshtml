@@ -1,298 +1,600 @@
-﻿@model List<KitapProject.DTO.ProductDTO.ResultProductDTO>
-
-@{
-    ViewData["Title"] = "Products";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+﻿@{
+    Layout = null;
 }
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kitap Mağazası</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <style>
+        @@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
 
-<div class="container">
-    <div class="page-header">
-        <h1 class="page-title">Ürün Yönetimi</h1>
-        <p class="page-subtitle">Tüm ürünlerinizi buradan yönetebilirsiniz</p>
-    </div>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-    <div class="controls-section">
-        <div class="filters-row">
-            <div class="filters-group">
-                <input type="text" id="searchInput" class="form-control" placeholder="🔍 Ürün adına göre ara...">
-                <select id="categoryFilter" class="form-select">
-                    <option value="">📁 Tüm Kategoriler</option>
-                    @foreach (var category in Model?.Select(p => p.CategoryName).Distinct() ?? new List<string>())
-                    {
-                        <option value="@category.ToLower()">@category</option>
-                    }
-                </select>
-                <select id="itemsPerPage" class="form-select">
-                    <option value="5">5 öğe</option>
-                    <option value="10" selected>10 öğe</option>
-                    <option value="20">20 öğe</option>
-                    <option value="50">50 öğe</option>
-                </select>
-            </div>
-            <a href="/Product/Create" class="btn-add">
-                <i class="bi bi-plus-circle"></i>
-                Yeni Ürün Ekle
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --secondary: #ec4899;
+            --accent: #f59e0b;
+            --success: #10b981;
+            --dark: #0f172a;
+            --light: #f8fafc;
+            --glass: rgba(255, 255, 255, 0.1);
+            --shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+            --glow: 0 0 50px rgba(99, 102, 241, 0.5);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 50%, #f093fb 100%);
+            min-height: 100vh;
+            color: white;
+            overflow-x: hidden;
+        }
+
+            body::before {
+                content: '';
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: radial-gradient(circle at 20% 80%, rgba(120, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 80% 20%, rgba(255, 119, 198, 0.3) 0%, transparent 50%), radial-gradient(circle at 40% 40%, rgba(120, 219, 255, 0.3) 0%, transparent 50%);
+                animation: floating 20s ease-in-out infinite;
+                pointer-events: none;
+                z-index: -1;
+            }
+
+        @@keyframes floating {
+            0%, 100% {
+                transform: scale(1) rotate(0deg);
+            }
+
+            50% {
+                transform: scale(1.1) rotate(180deg);
+            }
+        }
+
+        header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            z-index: 1000;
+            backdrop-filter: blur(20px);
+            background: rgba(15, 23, 42, 0.8);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        nav {
+            padding: 1rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 800;
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .nav-menu {
+            display: flex;
+            list-style: none;
+            gap: 2rem;
+            align-items: center;
+        }
+
+            .nav-menu a {
+                color: rgba(255, 255, 255, 0.8);
+                text-decoration: none;
+                font-weight: 500;
+                padding: 0.5rem 1rem;
+                border-radius: 50px;
+                transition: all 0.3s ease;
+            }
+
+                .nav-menu a:hover {
+                    color: white;
+                    background: rgba(99, 102, 241, 0.2);
+                }
+
+        .search-container {
+            display: flex;
+            justify-content: center;
+            margin: 120px auto 2rem;
+            padding: 0 2rem;
+        }
+
+        .search-bar {
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 60px;
+            padding: 1rem 2rem;
+            width: 100%;
+            max-width: 600px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+            .search-bar input {
+                background: none;
+                border: none;
+                outline: none;
+                color: white;
+                font-size: 1.1rem;
+                width: 100%;
+                padding: 0.5rem;
+            }
+
+                .search-bar input::placeholder {
+                    color: rgba(255, 255, 255, 0.6);
+                }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 3rem;
+            max-width: 1400px;
+            margin: 0 auto 4rem;
+            padding: 0 2rem;
+        }
+
+        .sidebar {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            padding: 2rem;
+            height: fit-content;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            position: sticky;
+            top: 120px;
+        }
+
+            .sidebar h3 {
+                font-size: 1.5rem;
+                font-weight: 700;
+                margin-bottom: 2rem;
+                color: white;
+                text-align: center;
+            }
+
+        .category-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .category-btn {
+            background: none;
+            border: none;
+            color: rgba(255, 255, 255, 0.8);
+            padding: 1rem 1.5rem;
+            border-radius: 15px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            text-align: left;
+            width: 100%;
+            display: flex; 
+            align-items: center;
+            gap: 0.75rem; 
+        }
+
+            .category-btn i {
+                width: 20px; 
+                text-align: center;
+            }
+
+            .category-btn:hover {
+                background: rgba(255, 255, 255, 0.1);
+                color: white;
+                transform: translateX(10px);
+            }
+
+            .category-btn.active {
+                background: linear-gradient(135deg, var(--primary), var(--secondary));
+                color: white;
+                box-shadow: 0 10px 30px rgba(99, 102, 241, 0.3);
+            }
+
+        .main-content {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 25px;
+            padding: 3rem 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            box-shadow: var(--shadow);
+        }
+
+        .section-title {
+            font-size: 2.5rem;
+            margin-bottom: 3rem;
+            color: white;
+            font-weight: 800;
+            text-align: center;
+        }
+
+        .books-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 2rem;
+        }
+
+        .book-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border-radius: 25px;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            cursor: pointer;
+        }
+
+            .book-card:hover {
+                transform: translateY(-20px) scale(1.02);
+                box-shadow: 0 30px 60px rgba(0, 0, 0, 0.3);
+            }
+
+        .book-image {
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: white;
+            text-align: center;
+            padding: 2rem;
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+        }
+
+        .book-content {
+            padding: 2rem;
+        }
+
+        .book-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: white;
+            margin-bottom: 0.5rem;
+        }
+
+        .book-author {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 1rem;
+        }
+
+        .book-price {
+            font-size: 1.8rem;
+            font-weight: 800;
+            color: var(--accent);
+            margin-bottom: 1.5rem;
+        }
+
+        .book-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--primary), var(--secondary));
+            color: white;
+        }
+
+            .btn-primary:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 15px 30px rgba(99, 102, 241, 0.4);
+            }
+
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+            .btn-secondary:hover {
+                background: rgba(255, 255, 255, 0.2);
+                transform: translateY(-2px);
+            }
+
+        /* Loading */
+        .loading {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 200px;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top: 3px solid white;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @@keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        @@media (max-width: 768px) {
+            .content-wrapper {
+                grid-template-columns: 1fr;
+                gap: 2rem;
+            }
+
+            .sidebar {
+                position: static;
+            }
+
+            .books-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="#" class="logo">
+                <i class="fas fa-book"></i>
+                KitapDünyası
             </a>
-        </div>
-    </div>
+            <ul class="nav-menu">
+                <li><a href="#home">Ana Sayfa</a></li>
+                <li><a href="#books">Kitaplar</a></li>
+                <li><a href="#authors">Yazarlar</a></li>
+                <li><a href="#contact">İletişim</a></li>
+            </ul>
+        </nav>
+    </header>
 
-    <div class="table-container">
-        <div class="loading" id="loading">
-            <i class="fas fa-spinner"></i>
-            <p>Yükleniyor...</p>
-        </div>
-
-        <table class="data-table" id="productTable">
-            <thead>
-                <tr>
-                    <th>Ürün ID</th>
-                    <th>Ürün Adı</th>
-                    <th>Kategori</th>
-                    <th>Popüler</th>
-                    <th>Fiyat</th>
-                    <th>İşlemler</th>
-                </tr>
-            </thead>
-            <tbody>
-                @if (Model != null && Model.Any())
-                {
-                    @foreach (var item in Model)
-                    {
-                        <tr>
-                            <td><span class="product-id">@item.ProductId</span></td>
-                            <td><span class="product-name">@item.Name</span></td>
-                            <td><span class="category-badge">@item.CategoryName</span></td>
-                            <td>
-                                <span class="popular-badge @(item.PopulerProduct ? "popular-yes" : "popular-no")">
-                                    <i class="fas @(item.PopulerProduct ? "fa-star" : "fa-star-o")"></i>
-                                    @(item.PopulerProduct ? "Evet" : "Hayır")
-                                </span>
-                            </td>
-                            <td><span class="price">₺@item.Price.ToString("N2")</span></td>
-                            <td>
-                                <div class="actions-group">
-                                    <button class="action-btn btn-view" title="Görüntüle" data-id="@item.ProductId">
-                                        <i class="fas fa-eye"></i>
-                                    </button>
-                                    <button class="action-btn btn-edit" title="Düzenle" data-id="@item.ProductId">
-                                        <i class="fas fa-edit"></i>
-                                    </button>
-                                    <button class="action-btn btn-delete" title="Sil" data-id="@item.ProductId" data-name="@item.Name">
-                                        <i class="fas fa-trash-alt"></i>
-                                    </button>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                }
-            </tbody>
-        </table>
-
-        <div class="no-results" id="noResults" style="display: none;">
+    <div class="search-container">
+        <div class="search-bar">
+            <input type="text" id="searchInput" placeholder="Kitap ara...">
             <i class="fas fa-search"></i>
-            <h4>Sonuç bulunamadı</h4>
-            <p>Arama kriterlerinize uygun ürün bulunamadı.</p>
         </div>
     </div>
 
-    <ul id="pagination" class="pagination"></ul>
-</div>
+    <div class="content-wrapper">
+        <aside class="sidebar">
+            <h3>Kategoriler</h3>
+            <ul class="category-list" id="categoryList">
+            </ul>
+        </aside>
 
-<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+        <main class="main-content">
+            <h2 class="section-title" id="categoryTitle">Tüm Kitaplar</h2>
 
-<script>
-    $(document).ready(function () {
-        const searchInput = $("#searchInput");
-        const categoryFilter = $("#categoryFilter");
-        const rowsPerPageSelect = $("#itemsPerPage");
-        const pagination = $("#pagination");
-        const noResults = $("#noResults");
-        const loading = $("#loading");
+            <div id="booksContainer">
+                <div class="books-grid" id="booksGrid">
+                </div>
+            </div>
 
-        // Model'den gelen veriyi JavaScript'te kullanılabilir hale getirin
-        const allProducts = @Html.Raw(Json.Serialize(Model));
+            <div id="loadingSpinner" class="loading" style="display: none;">
+                <div class="loading-spinner"></div>
+            </div>
+        </main>
+    </div>
 
-        let currentPage = 1;
-        let filteredProducts = [];
+    <script>
+        const categoryList = document.getElementById('categoryList');
+        const booksGrid = document.getElementById('booksGrid');
+        const categoryTitle = document.getElementById('categoryTitle');
+        const searchInput = document.getElementById('searchInput');
+        const loadingSpinner = document.getElementById('loadingSpinner');
 
-        function renderProducts() {
-            const searchTerm = searchInput.val().toLowerCase();
-            const selectedCategory = categoryFilter.val().toLowerCase();
-            const itemsPerPage = parseInt(rowsPerPageSelect.val());
+        let currentFilteredBooks = []; 
+        let activeCategory = 'all'; 
 
-            // Ürünleri filtrele
-            filteredProducts = allProducts.filter(product => {
-                const matchesSearch = product.Name.toLowerCase().includes(searchTerm);
-                const matchesCategory = selectedCategory === "" || product.CategoryName.toLowerCase() === selectedCategory;
-                return matchesSearch && matchesCategory;
-            });
-
-            // Sayfalama hesapla
-            const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-            if (currentPage > totalPages && totalPages > 0) currentPage = totalPages;
-            if (totalPages === 0) currentPage = 1;
-
-            // Loading göster
-            loading.show();
-            $("#productTable").hide(); // Tabloyu gizle
-
-            setTimeout(() => {
-                loading.hide();
-
-                if (filteredProducts.length === 0) {
-                    noResults.show();
-                    $("#productTable").hide(); // Tabloyu gizli tut
-                    pagination.empty();
-                    return;
+        async function fetchAndRenderCategories() {
+            try {
+                const response = await fetch('/Product/GetCategories');
+                if (!response.ok) {
+                    throw new Error(`HTTP error! status: ${response.status}`);
                 }
+                const categories = await response.json();
+                categoryList.innerHTML = ''; 
 
-                noResults.hide();
-                $("#productTable").show(); // Tabloyu göster
-
-                // Mevcut sayfanın ürünlerini göster
-                const start = (currentPage - 1) * itemsPerPage;
-                const end = start + itemsPerPage;
-                const pageProducts = filteredProducts.slice(start, end);
-
-                // Tablo içeriğini temizle ve yeni ürünleri ekle
-                $("#productTable tbody").empty();
-                pageProducts.forEach(item => {
-                    const row = `
-                                <tr>
-                                    <td><span class="product-id">${item.ProductId}</span></td>
-                                    <td><span class="product-name">${item.Name}</span></td>
-                                    <td><span class="category-badge">${item.CategoryName}</span></td>
-                                    <td>
-                                        <span class="popular-badge ${item.PopulerProduct ? "popular-yes" : "popular-no"}">
-                                            <i class="fas ${item.PopulerProduct ? "fa-star" : "fa-star-o"}"></i>
-                                            ${item.PopulerProduct ? "Evet" : "Hayır"}
-                                        </span>
-                                    </td>
-                                    <td><span class="price">₺${item.Price.toFixed(2).replace('.', ',')}</span></td>
-                                    <td>
-                                        <div class="actions-group">
-                                            <button class="action-btn btn-view" title="Görüntüle" data-id="${item.ProductId}">
-                                                <i class="fas fa-eye"></i>
-                                            </button>
-                                            <button class="action-btn btn-edit" title="Düzenle" data-id="${item.ProductId}">
-                                                <i class="fas fa-edit"></i>
-                                            </button>
-                                            <button class="action-btn btn-delete" title="Sil" data-id="${item.ProductId}" data-name="${item.Name}">
-                                                <i class="fas fa-trash-alt"></i>
-                                            </button>
-                                        </div>
-                                    </td>
-                                </tr>
-                            `;
-                    $("#productTable tbody").append(row);
+                categories.forEach(category => {
+                    const listItem = document.createElement('li');
+                    const button = document.createElement('button');
+                    button.classList.add('category-btn');
+                    button.dataset.category = category.name;
+                    button.innerHTML = `<i class="${category.icon}"></i> ${category.displayName}`;
+                    listItem.appendChild(button);
+                    categoryList.appendChild(listItem);
                 });
 
+                document.querySelectorAll('.category-btn').forEach(button => {
+                    button.addEventListener('click', (event) => {
+                        document.querySelectorAll('.category-btn').forEach(btn => btn.classList.remove('active'));
+                        event.currentTarget.classList.add('active');
 
-                renderPagination(totalPages);
-            }, 300); // 300ms gecikme
-        }
-
-        function renderPagination(totalPages) {
-            pagination.empty();
-
-            if (totalPages <= 1) return;
-
-            for (let i = 1; i <= totalPages; i++) {
-                const pageItem = $(`
-                                    <li class="page-item ${i === currentPage ? 'active' : ''}">
-                                        <a class="page-link" href="#" data-page="${i}">${i}</a>
-                                    </li>
-                                `);
-                pagination.append(pageItem);
-            }
-        }
-
-        // Event handlers
-        searchInput.on("input", () => {
-            currentPage = 1;
-            renderProducts();
-        });
-
-        categoryFilter.on("change", () => {
-            currentPage = 1;
-            renderProducts();
-        });
-
-        rowsPerPageSelect.on("change", () => {
-            currentPage = 1;
-            renderProducts();
-        });
-
-        pagination.on("click", "a", function (e) {
-            e.preventDefault();
-            const page = parseInt($(this).data("page"));
-            if (!isNaN(page)) {
-                currentPage = page;
-                renderProducts();
-            }
-        });
-
-        // Delete button handler
-        $(document).on("click", ".btn-delete", function () {
-            const productId = parseInt($(this).data("id"));
-            const productName = $(this).data("name");
-
-            Swal.fire({
-                title: 'Emin misiniz?',
-                text: `"${productName}" adlı ürünü silmek istediğinize emin misiniz? Bu işlem geri alınamaz!`,
-                icon: 'warning',
-                showCancelButton: true,
-                confirmButtonColor: '#dc2626',
-                cancelButtonColor: '#64748b',
-                confirmButtonText: 'Evet, sil!',
-                cancelButtonText: 'İptal'
-            }).then((result) => {
-                if (result.isConfirmed) {
-                    // AJAX ile silme işlemi
-                    $.ajax({
-                        url: `/Product/Delete/${productId}`, // Controller adınız "Product" ise bu doğru
-                        type: 'POST',
-                        success: function () {
-                            // allProducts dizisinden silinen ürünü çıkar
-                            const index = allProducts.findIndex(p => p.ProductId === productId);
-                            if (index > -1) {
-                                allProducts.splice(index, 1);
-                            }
-
-                            Swal.fire({
-                                title: 'Silindi!',
-                                text: `${productName} başarıyla silindi.`,
-                                icon: 'success',
-                                timer: 2000,
-                                showConfirmButton: false
-                            }).then(() => { // SweetAlert kapandıktan sonra yönlendirme yap
-                                window.location.href = "/Product/Index"; // Index sayfasına yönlendir
-                            });
-                        },
-                        error: function () {
-                            Swal.fire({
-                                title: 'Hata!',
-                                text: 'Ürün silinirken bir hata oluştu.',
-                                icon: 'error'
-                            });
-                        }
+                        activeCategory = event.currentTarget.dataset.category;
+                        fetchAndRenderBooks(activeCategory, searchInput.value);
                     });
+                });
+
+                const allButton = document.querySelector('.category-btn[data-category="all"]');
+                if (allButton) {
+                    allButton.classList.add('active');
                 }
-            });
+
+            } catch (error) {
+                console.error("Kategoriler yüklenirken hata oluştu:", error);
+                categoryList.innerHTML = '<li>Kategoriler yüklenemedi.</li>';
+            }
+        }
+
+        function renderBooks(booksToRender) {
+            if (booksToRender.length === 0) {
+                booksGrid.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
+                                <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; color: rgba(255, 255, 255, 0.3);"></i>
+                                <p>Aradığınız kriterlere uygun kitap bulunamadı.</p>
+                            </div>
+                        `;
+                return;
+            }
+
+            booksGrid.innerHTML = booksToRender.map(book => `
+                        <div class="book-card">
+                            <div class="book-image" style="background-image: url('${book.image}'); background-size: cover; background-position: center;">
+                                ${!book.image || book.image.includes('placeholder') || book.image.length < 5 ? 'Görsel Yok' : ''}
+                            </div>
+                            <div class="book-content">
+                                <h3 class="book-title">${book.title}</h3>
+                                <p class="book-author">${book.author}</p>
+                                <div class="book-price">₺${book.price.toFixed(2)}</div>
+                                <div class="book-actions">
+                                    <button class="btn btn-primary" onclick="addToCart(${book.id})">
+                                        <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="viewDetails(${book.id})">
+                                        <i class="fas fa-eye"></i> Detay
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    `).join('');
+        }
+
+        function showLoading() {
+            loadingSpinner.style.display = 'flex';
+            booksGrid.style.display = 'none';
+        }
+
+        function hideLoading() {
+            loadingSpinner.style.display = 'none';
+            booksGrid.style.display = 'grid';
+        }
+
+        async function fetchAndRenderBooks(category = 'all', searchTerm = '') {
+            showLoading();
+            try {
+                const url = `/Product/GetProducts?categoryName=${category}&searchTerm=${searchTerm}`;
+                const response = await fetch(url);
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    if (response.status === 404) {
+                        renderBooks([]);
+                        categoryTitle.textContent = categoryTitles[category] || 'Kitaplar';
+                        hideLoading();
+                        return;
+                    }
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
+                }
+
+                const books = await response.json();
+                currentFilteredBooks = books;
+                renderBooks(currentFilteredBooks);
+                categoryTitle.textContent = categoryTitles[category] || 'Kitaplar';
+            } catch (error) {
+                console.error("Kitaplar yüklenirken hata oluştu:", error);
+                booksGrid.innerHTML = `
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
+                                <p>Kitaplar yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+                                <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">Hata: ${error.message}</p>
+                            </div>
+                        `;
+            } finally {
+                hideLoading();
+            }
+        }
+
+        searchInput.addEventListener('input', () => {
+            fetchAndRenderBooks(activeCategory, searchInput.value);
         });
 
-        // View and Edit button handlers
-        $(document).on("click", ".btn-view", function () {
-            const productId = $(this).data("id");
-            window.location.href = `/Product/Detail/${productId}`;
-        });
+        const categoryTitles = {
+            'all': 'Tüm Kitaplar',
+            'roman': 'Roman Kitapları',
+            'bilim-kurgu': 'Bilim Kurgu Kitapları',
+            'tarih': 'Tarih Kitapları',
+            'biyografi': 'Biyografi Kitapları',
+            'felsefe': 'Felsefe Kitapları',
+            'cocuk': 'Çocuk Kitapları',
+            'sanat': 'Sanat Kitapları',
+            'psikoloji': 'Psikoloji Kitapları'
+        };
 
-        $(document).on("click", ".btn-edit", function () {
-            const productId = $(this).data("id");
-            window.location.href = `/Product/Edit/${productId}`;
-        });
+        async function addToCart(bookId) {
+            const book = currentFilteredBooks.find(b => b.id === bookId);
+            if (!book) {
+                alert('Hata: Kitap bulunamadı.');
+                return;
+            }
 
-        renderProducts();
-    });
-</script>
+            try {
+                const response = await fetch('/Product/AddToCart', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ productId: bookId, quantity: 1 }) 
+                });
+
+                const result = await response.json();
+
+                if (response.ok) {
+                    alert(result.message); 
+                } else {
+                    alert(`Sepete eklenirken hata oluştu: ${result.message || 'Bilinmeyen Hata'}`);
+                }
+            } catch (error) {
+                console.error("Sepete ekleme hatası:", error);
+                alert('Sepete eklenirken bir ağ hatası oluştu. Lütfen tekrar deneyin.');
+            }
+        }
+
+        function viewDetails(bookId) {
+            const book = currentFilteredBooks.find(b => b.id === bookId);
+            if (book) {
+                alert(`"${book.title}" detay sayfası açılacak. (ID: ${book.id})`);
+
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchAndRenderCategories();
+            fetchAndRenderBooks(); 
+        });
+    </script>
+</body>
+</html>

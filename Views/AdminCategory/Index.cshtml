@@ -5,10 +5,266 @@
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+<link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
+<link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
+
+<style>
+
+
+    .page-header {
+        text-align: center;
+        margin-bottom: 40px;
+        color: #343a40;
+    }
+
+    .page-title {
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin-bottom: 10px;
+        color: #2c3e50; /* Koyu mavi tonu */
+    }
+
+    .page-subtitle {
+        font-size: 1.1rem;
+        color: #6c757d;
+    }
+
+    .controls-section {
+        background-color: #f2f4f6;
+        padding: 20px;
+        border-radius: 10px;
+        margin-bottom: 30px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.05);
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        flex-wrap: wrap;
+        gap: 15px;
+    }
+
+    .filters-row {
+        display: flex;
+        gap: 15px;
+        align-items: center;
+        flex-wrap: wrap; /* Küçük ekranlarda sarmalama */
+    }
+
+    .filters-group {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+    }
+
+    .form-control, .form-select {
+        border-radius: 8px;
+        border: 1px solid #ced4da;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #8bb4ff;
+        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    }
+
+    .btn-add {
+        background-color: #28a745; /* Yeşil ekleme butonu */
+        color: white;
+        padding: 0.8rem 1.5rem;
+        border-radius: 8px;
+        text-decoration: none;
+        font-weight: 600;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+
+    .btn-add:hover {
+        background-color: #218838;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
+    }
+
+    .table-container {
+        background-color: #ffffff;
+        border-radius: 10px;
+        overflow: hidden;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+        position: relative; /* loading spinner için */
+    }
+
+    .data-table {
+        width: 100%;
+        border-collapse: collapse;
+        margin-bottom: 0; /* Sayfalama ile uyumlu */
+    }
+
+    .data-table thead {
+        background-color: #e9ecef;
+        color: #495057;
+    }
+
+    .data-table th, .data-table td {
+        padding: 1.2rem 1.5rem;
+        text-align: left;
+        border-bottom: 1px solid #e0e0e0;
+        vertical-align: middle;
+    }
+
+    .data-table th {
+        font-weight: 600;
+        font-size: 0.95rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+
+    .data-table tbody tr:hover {
+        background-color: #f5f5f5;
+        transition: background-color 0.2s ease;
+    }
+
+    .product-id {
+        font-weight: bold;
+        color: #555;
+    }
+
+    .product-name {
+        font-weight: 500;
+        color: #333;
+    }
+
+    .category-description {
+        color: #777;
+    }
+
+    .actions-group {
+        display: flex;
+        gap: 8px;
+        justify-content: center; /* Ortala */
+    }
+
+    .action-btn {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 40px;
+        height: 40px;
+        border-radius: 50%; /* Yuvarlak butonlar */
+        text-decoration: none;
+        transition: all 0.2s ease;
+        font-size: 1.1rem;
+        color: white; /* İkon rengi */
+    }
+
+    .btn-view {
+        background-color: #17a2b8; /* Mavi - info */
+    }
+    .btn-view:hover {
+        background-color: #138496;
+        transform: scale(1.1);
+    }
+
+    .btn-edit {
+        background-color: #ffc107; /* Sarı - warning */
+        color: #212529; /* Koyu ikon rengi */
+    }
+    .btn-edit:hover {
+        background-color: #e0a800;
+        transform: scale(1.1);
+    }
+
+    .btn-delete {
+        background-color: #dc3545; /* Kırmızı - danger */
+    }
+    .btn-delete:hover {
+        background-color: #c82333;
+        transform: scale(1.1);
+    }
+
+    /* Pagination Styling */
+    .pagination-container {
+        display: flex;
+        justify-content: center;
+        padding: 20px 0;
+        background-color: #f8f9fa; /* Sayfalama alanı için hafif arka plan */
+        border-bottom-left-radius: 10px;
+        border-bottom-right-radius: 10px;
+        box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.03);
+    }
+
+    .pagination .page-item .page-link {
+        border-radius: 6px !important;
+        margin: 0 3px;
+        transition: all 0.2s ease;
+        color: #007bff;
+        border: 1px solid #dee2e6;
+        padding: 0.75rem 1rem;
+    }
+
+    .pagination .page-item.active .page-link {
+        background-color: #007bff;
+        border-color: #007bff;
+        color: white;
+        box-shadow: 0 2px 8px rgba(0, 123, 255, 0.2);
+    }
+
+    .pagination .page-item .page-link:hover {
+        background-color: #e9ecef;
+        border-color: #007bff;
+        color: #0056b3;
+    }
+
+    /* Loading Spinner */
+    .loading {
+        display: none; /* Varsayılan olarak gizli */
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background: rgba(255, 255, 255, 0.8);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        font-size: 1.5rem;
+        color: #007bff;
+        z-index: 10;
+        border-radius: 10px;
+    }
+
+    .loading i {
+        font-size: 3rem;
+        margin-bottom: 10px;
+        animation: spin 1s linear infinite;
+    }
+
+    @@keyframes spin {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+
+    /* No Results Message */
+    #noResultsMessage {
+        display: none;
+        text-align: center;
+        padding: 20px;
+        color: #6c757d;
+        font-size: 1.1rem;
+        background-color: #fefefe;
+        border-radius: 8px;
+        margin-top: 20px;
+    }
+</style>
+
 <div class="container">
     <div class="page-header">
         <h1 class="page-title">Kategori Yönetimi</h1>
-        <p class="page-subtitle">Tüm kategorilerinizi buradan yönetebilirsiniz</p>
+        <p class="page-subtitle">Tüm kategorilerinizi buradan yönetebilirsiniz.</p>
     </div>
 
     <div class="controls-section">
@@ -22,11 +278,11 @@
                     <option value="50">50 öğe</option>
                 </select>
             </div>
-            <a href="/AdminCategory/Create" class="btn-add">
-                <i class="bi bi-plus-circle"></i>
-                Yeni Kategori Ekle
-            </a>
         </div>
+        <a href="/AdminCategory/Create" class="btn-add">
+            <i class="bi bi-plus-circle"></i>
+            Yeni Kategori Ekle
+        </a>
     </div>
 
     <div class="table-container">
@@ -35,21 +291,21 @@
             <p>Yükleniyor...</p>
         </div>
 
-        <table class="data-table">
+        <table class="data-table" id="categoryTable">
             <thead>
                 <tr>
-                    <th>Kategori ID</th>
+                    <th>#</th>
                     <th>Kategori Adı</th>
-                    <th >İkon</th> 
+                    <th>İkon</th>
                     <th>İşlemler</th>
                 </tr>
             </thead>
             <tbody>
-
+                @* JavaScript tarafından doldurulacak veya başlangıçta modellenmiş veriler burada listelenecek *@
                 @foreach (var item in Model)
                 {
-                    <tr>
-                        <td><span class="product-id">@item.CategoryId</span></td>
+                    <tr data-category-name="@item.Name.ToLower()">
+                        <td></td> @* Sıra numarası JS tarafından atanacak *@
                         <td><span class="product-name">@item.Name</span></td>
                         <td>
                             <span class="category-description">
@@ -65,22 +321,165 @@
                         </td>
                         <td>
                             <div class="actions-group">
-                                <a href="/AdminCategory/Detail/@item.CategoryId" class="action-btn btn-view" title="Görüntüle" data-id="@item.CategoryId">
+                                <a href="/AdminCategory/Detail/@item.CategoryId" class="action-btn btn-view" title="Görüntüle">
                                     <i class="fas fa-eye"></i>
                                 </a>
-                                <a href="/AdminCategory/Update/@item.CategoryId" class="action-btn btn-edit" title="Düzenle" data-id="@item.CategoryId">
+                                <a href="/AdminCategory/Update/@item.CategoryId" class="action-btn btn-edit" title="Düzenle">
                                     <i class="fas fa-edit"></i>
                                 </a>
-                                <a href="/AdminCategory/Delete/@item.CategoryId" class="action-btn btn-delete" title="Sil" data-id="@item.CategoryId" data-name="@item.Name">
+                                <a href="#" class="action-btn btn-delete" title="Sil" data-id="@item.CategoryId" data-name="@item.Name">
                                     <i class="fas fa-trash-alt"></i>
                                 </a>
+                                <form id="deleteForm-@item.CategoryId" action="/AdminCategory/Delete/@item.CategoryId" method="post" style="display:none;">
+                                    @Html.AntiForgeryToken()
+                                </form>
                             </div>
                         </td>
                     </tr>
                 }
             </tbody>
         </table>
+        <div id="noResultsMessage">Aradığınız kriterlere uygun kategori bulunamadı.</div>
     </div>
 
+    <div class="pagination-container">
+        <nav>
+            <ul class="pagination" id="pagination"></ul>
+        </nav>
+    </div>
 </div>
 
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+    $(document).ready(function () {
+        const searchInput = $("#searchInput");
+        const itemsPerPageSelect = $("#itemsPerPage");
+        const categoryTableBody = $("#categoryTable tbody");
+        const tableRows = categoryTableBody.find("tr"); // Başlangıçtaki tüm satırları al
+        const pagination = $("#pagination");
+        const loadingSpinner = $("#loading");
+        const noResultsMessage = $("#noResultsMessage");
+
+        let currentPage = 1;
+
+        // SweetAlert ile silme onayı
+        $(document).on("click", ".btn-delete", function (e) {
+            e.preventDefault(); // Sayfa yönlendirmesini engelle
+            const categoryId = $(this).data("id");
+            const categoryName = $(this).data("name");
+
+            Swal.fire({
+                title: 'Emin misiniz?',
+                text: `"${categoryName}" kategorisini silmek istediğinize emin misiniz? Bu işlem geri alınamaz!`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#d33',
+                cancelButtonColor: '#3085d6',
+                confirmButtonText: 'Evet, sil!',
+                cancelButtonText: 'İptal'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    $(`#deleteForm-${categoryId}`).submit();
+                }
+            });
+        });
+
+        function renderTable() {
+            loadingSpinner.show(); // Yükleniyor spinner'ını göster
+            noResultsMessage.hide(); // Sonuç yok mesajını gizle
+
+            setTimeout(() => { // Simülasyon için gecikme
+                const searchTerm = searchInput.val().toLowerCase();
+                const itemsPerPage = parseInt(itemsPerPageSelect.val());
+
+                const filteredRows = tableRows.filter(function () {
+                    const categoryName = $(this).find('.product-name').text().toLowerCase();
+                    return categoryName.includes(searchTerm);
+                });
+
+                // Sonuç yoksa mesaj göster
+                if (filteredRows.length === 0) {
+                    noResultsMessage.show();
+                    categoryTableBody.empty(); // Tablo içeriğini boşalt
+                    pagination.empty(); // Sayfalama butonlarını temizle
+                    loadingSpinner.hide();
+                    return;
+                }
+
+                const pageCount = Math.ceil(filteredRows.length / itemsPerPage);
+
+                function showPage(page) {
+                    currentPage = page;
+                    categoryTableBody.empty(); // Mevcut tablo içeriğini temizle
+
+                    const start = (page - 1) * itemsPerPage;
+                    const end = start + itemsPerPage;
+
+                    let currentSiraNo = start + 1; // Başlangıç sıra numarasını ayarla
+
+                    filteredRows.slice(start, end).each(function () {
+                        const clonedRow = $(this).clone(); // Orijinal satırı klonla
+                        clonedRow.find('td:first').text(currentSiraNo++); // İlk sütuna sıra numarasını ata
+                        categoryTableBody.append(clonedRow); // Klonlanmış satırı tabloya ekle
+                    });
+
+                    updatePagination(pageCount, currentPage);
+                }
+
+                function updatePagination(pageCount, currentPage) {
+                    pagination.empty(); // Mevcut sayfalandırmayı temizle
+
+                    if (pageCount > 1) {
+                        // Önceki sayfası butonu
+                        pagination.append(`
+                            <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
+                                <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Previous">
+                                    <span aria-hidden="true">&laquo;</span>
+                                </a>
+                            </li>
+                        `);
+
+                        // Sayfa numaraları
+                        for (let i = 1; i <= pageCount; i++) {
+                            pagination.append(
+                                `<li class="page-item ${i === currentPage ? 'active' : ''}">
+                                    <a class="page-link" href="#" data-page="${i}">${i}</a>
+                                </li>`
+                            );
+                        }
+
+                        // Sonraki sayfası butonu
+                        pagination.append(`
+                            <li class="page-item ${currentPage === pageCount ? 'disabled' : ''}">
+                                <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Next">
+                                    <span aria-hidden="true">&raquo;</span>
+                                </a>
+                            </li>
+                        `);
+                    }
+                }
+
+                // Sayfalama butonlarına tıklama olayı
+                pagination.off("click").on("click", "a.page-link", function (e) {
+                    e.preventDefault();
+                    const targetPage = parseInt($(this).data("page"));
+                    if (!isNaN(targetPage) && targetPage >= 1 && targetPage <= pageCount) {
+                        showPage(targetPage);
+                    }
+                });
+
+                showPage(1); // Filtrelenmiş sonuçların ilk sayfasını göster
+                loadingSpinner.hide(); // Yükleniyor spinner'ını gizle
+            }, 300); // Küçük bir gecikme ekleyerek yükleme hissi ver
+        }
+
+        // Arama ve sayfa başına öğe değiştiğinde tabloyu yeniden render et
+        searchInput.on("input", renderTable);
+        itemsPerPageSelect.on("change", renderTable);
+
+        // Sayfa yüklendiğinde tabloyu ilk kez render et
+        renderTable();
+    });
+</script>

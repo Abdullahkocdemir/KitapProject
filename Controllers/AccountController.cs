@@ -154,7 +154,7 @@ namespace KitapProject.Controllers
 
                         // Add standard claims (UserName is usually default for User.Identity.Name)
                         claims.Add(new Claim(ClaimTypes.NameIdentifier, user.Id));
-                        claims.Add(new Claim(ClaimTypes.Name, user.UserName)); // This will typically be your username/email
+                        claims.Add(new Claim(ClaimTypes.Name, user.UserName!)); // This will typically be your username/email
 
                         // Add your custom claims from AppUser properties
                         if (!string.IsNullOrEmpty(user.FirstName))
@@ -195,7 +195,7 @@ namespace KitapProject.Controllers
                         // The above HttpContext.SignInAsync gives you full control.
 
                         // Redirect to home or return URL
-                        return RedirectToAction("Index", "Home");
+                        return RedirectToAction("Index", "Default");
                     }
                     if (result.IsLockedOut)
                     {
@@ -223,7 +223,7 @@ namespace KitapProject.Controllers
         public async Task<IActionResult> Logout()
         {
             await _signInManager.SignOutAsync();
-            return RedirectToAction("Index", "Home"); // Çıkış sonrası ana sayfaya yönlendir
+            return RedirectToAction("Index", "Default"); // Çıkış sonrası ana sayfaya yönlendir
         }
     }
 }
