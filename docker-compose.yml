@@ -1,0 +1,41 @@
+version: '3.8'
+
+services:
+  redis:
+    image: redis:latest
+    container_name: KitapProject_Redis
+
+    ports:
+      - "6379:6379"
+    volumes:
+      - redis-data:/data
+
+  db:
+    image: postgres:latest
+    container_name: KitapProjectRedisVeritabanim
+    environment:
+      POSTGRES_DB: KitapProjectDb
+      POSTGRES_USER: Apo2550
+      POSTGRES_PASSWORD: 123456aA*
+    ports:
+      - "5432:5432"
+    volumes:
+      - pg-data:/var/lib/postgresql/data
+
+  mywebapp:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: benim-kitap-uygulamam
+    ports:
+      - "8080:80"
+    depends_on:
+      - redis
+      - db
+    environment:
+      Redis__ConnectionString: redis:6379
+      ConnectionStrings__PostgreSqlConnection: Host=db;Port=5432;Database=KitapProjectDb;Username=Apo2550;Password=123456aA*
+
+volumes:
+  redis-data:
+  pg-data:

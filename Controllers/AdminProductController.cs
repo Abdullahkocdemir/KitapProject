@@ -30,20 +30,20 @@ namespace KitapProject.Controllers
             ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name");
 
             var productDtos = await _context.Products
-                                            .Include(p => p.Category)
-                                            .ProjectTo<ResultProductDTO>(_mapper.ConfigurationProvider)
-                                            .ToListAsync();
+                                                .Include(p => p.Category)
+                                                .ProjectTo<ResultProductDTO>(_mapper.ConfigurationProvider)
+                                                .ToListAsync();
 
-            return View(productDtos); 
+            return View(productDtos);
         }
 
         [HttpGet]
         public async Task<IActionResult> Detail(int id)
         {
             var productDto = await _context.Products
-                                               .Where(p => p.ProductId == id)
-                                               .ProjectTo<GetByIdProductDTO>(_mapper.ConfigurationProvider)
-                                               .FirstOrDefaultAsync();
+                                                .Where(p => p.ProductId == id)
+                                                .ProjectTo<GetByIdProductDTO>(_mapper.ConfigurationProvider)
+                                                .FirstOrDefaultAsync();
 
             if (productDto == null)
             {
@@ -119,21 +119,19 @@ namespace KitapProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromForm] UpdateProductDTO updateProductDto)
         {
-            if (!ModelState.IsValid)
-            {
-                var productForView = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.ProductId == updateProductDto.ProductId);
-                ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", updateProductDto.CategoryId);
-                if (productForView != null)
-                {
-                    updateProductDto.CurrentImageUrl = productForView.ImageUrl;
-                }
-                return View(updateProductDto);
-            }
+            // Fetch the product from the database first to retain its ID and other properties
+            var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.ProductId == updateProductDto.ProductId);
 
-            var product = await _context.Products.FindAsync(updateProductDto.ProductId);
             if (product == null)
             {
                 return NotFound($"ID'si {updateProductDto.ProductId} olan ürün bulunamadı.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                ViewBag.Categories = new SelectList(await _context.Categories.ToListAsync(), "CategoryId", "Name", updateProductDto.CategoryId);
+                updateProductDto.CurrentImageUrl = product.ImageUrl;
+                return View(updateProductDto);
             }
 
             var categoryExists = await _context.Categories.AnyAsync(c => c.CategoryId == updateProductDto.CategoryId);
@@ -144,23 +142,16 @@ namespace KitapProject.Controllers
                 updateProductDto.CurrentImageUrl = product.ImageUrl;
                 return View(updateProductDto);
             }
+            _mapper.Map(updateProductDto, product);
 
             if (updateProductDto.ImageFile != null && updateProductDto.ImageFile.Length > 0)
             {
                 await DeleteImageAsync(product.ImageUrl);
-
                 var newImageUrl = await SaveImageAsync(updateProductDto.ImageFile);
                 product.ImageUrl = newImageUrl;
             }
 
-            product.Name = updateProductDto.Name;
-            product.Author = updateProductDto.Author;
-            product.Description = updateProductDto.Description;
-            product.Price = updateProductDto.Price;
-            product.Status = updateProductDto.Status;
-            product.PopulerProduct = updateProductDto.PopulerProduct;
-            product.CategoryId = updateProductDto.CategoryId;
-            product.UpdatedDate = DateTime.UtcNow; 
+            product.UpdatedDate = DateTime.UtcNow;
 
             _context.Products.Update(product);
             await _context.SaveChangesAsync();

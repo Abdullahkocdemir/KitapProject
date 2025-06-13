@@ -6,65 +6,53 @@ using KitapProject.Entities;
 using KitapProject.Mapping;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
-using StackExchange.Redis; // Bu satýrý ekleyin!
+using StackExchange.Redis;
 
 var builder = WebApplication.CreateBuilder(args);
 var connectionString = builder.Configuration.GetConnectionString("PostgreSqlConnection");
 
-// Redis baðlantýsýný servis olarak ekle
-// --- REDIS SERVÝSÝ BURAYA EKLENÝYOR ---
+
 builder.Services.AddSingleton<IConnectionMultiplexer>(sp =>
     ConnectionMultiplexer.Connect(builder.Configuration.GetSection("Redis:ConnectionString").Value!));
-// --- REDIS SERVÝSÝ BURAYA EKLENDÝ ---
 
-// DbContext ve Identity servislerini ekle
 builder.Services.AddDbContext<BookContext>(options =>
     options.UseNpgsql(connectionString));
 builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
-builder.Services.AddCors(options => {
-    options.AddPolicy("AllowAll", builder => {
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll", builder =>
+    {
         builder.AllowAnyOrigin()
                .AllowAnyMethod()
                .AllowAnyHeader();
     });
 });
-
-// --- BURADAN ÝTÝBAREN IDENTITY AYARLARI EKLENDÝ VE GÜNCELLENDÝ ---
-// Identity servislerini ve þifre/kullanýcý seçeneklerini yapýlandýrma
-builder.Services.AddIdentity<AppUser, AppRole>(options => // AppRole kullandýðýnýz için AppRole olarak býrakýldý
+builder.Services.AddIdentity<AppUser, AppRole>(options =>
 {
-    // Þifre Politikalarý (güvenliði artýrmak için)
-    options.Password.RequireDigit = true; // Þifrede en az bir rakam olmalý
-    options.Password.RequireLowercase = true; // Þifrede en az bir küçük harf olmalý
-    options.Password.RequireUppercase = true; // Þifrede en az bir büyük harf olmalý
-    options.Password.RequireNonAlphanumeric = true; // Þifrede en az bir özel karakter olmalý
-    options.Password.RequiredLength = 6; // Þifre en az 8 karakter uzunluðunda olmalý
-    // options.Password.RequiredUniqueChars = 1; // Opsiyonel: Þifrede tekrarlayan karakterlerin minimum sayýsý
-
-    // Kullanýcý Ayarlarý
-    options.User.RequireUniqueEmail = true; // Her kullanýcýnýn benzersiz bir e-posta adresi olmasý zorunludur
-
-    // Giriþ Ayarlarý (API projelerinde genellikle e-posta onayý gerekmez, ancak kontrol edilebilir)
-    options.SignIn.RequireConfirmedEmail = false; // E-posta onayýnýn giriþ için zorunlu olup olmadýðýný belirler
-    options.SignIn.RequireConfirmedAccount = false; // Hesap onayýnýn giriþ için zorunlu olup olmadýðýný belirler
+    options.Password.RequireDigit = true;
+    options.Password.RequireLowercase = true;
+    options.Password.RequireUppercase = true;
+    options.Password.RequireNonAlphanumeric = true;
+    options.Password.RequiredLength = 6;
+    options.User.RequireUniqueEmail = true;
+    options.SignIn.RequireConfirmedEmail = false;
+    options.SignIn.RequireConfirmedAccount = false;
 })
-.AddEntityFrameworkStores<BookContext>() // Identity'nin veritabaný deposunu belirtir
-.AddDefaultTokenProviders(); // Þifre sýfýrlama, e-posta onayý vb. için token saðlayýcýlarýný ekler
+.AddEntityFrameworkStores<BookContext>()
+.AddDefaultTokenProviders();
 
-// Add services to the container.
 builder.Services.AddControllersWithViews();
 
 
-builder.Services.AddAutoMapper(typeof(GeneralMapping)); // GeneralMapping sýnýfýnýzýn bulunduðu assembly'yi belirtir
+builder.Services.AddAutoMapper(typeof(GeneralMapping));
 
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
     app.UseExceptionHandler("/Home/Error");
-    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+
     app.UseHsts();
 }
 
@@ -87,9 +75,8 @@ using (var scope = app.Services.CreateScope())
 
     string adminRole = "Admin";
     string adminEmail = "kcdmirapo96@gmail.com";
-    string adminPassword = "123456aA*"; // Þifre politikalarýnýza uygun olmalý!
+    string adminPassword = "123456aA*";
 
-    // Admin rolünün varlýðýný kontrol et ve yoksa oluþtur
     if (!await roleManager.RoleExistsAsync(adminRole))
     {
         await roleManager.CreateAsync(new AppRole
@@ -105,22 +92,21 @@ using (var scope = app.Services.CreateScope())
     {
         adminUser = new AppUser
         {
-            UserName = "Apo2550", // Admin kullanýcýsý için kullanýcý adý
+            UserName = "Apo2550",
             Email = adminEmail,
             EmailConfirmed = true,
             FirstName = "Abdullah",
             LastName = "KOÇDEMÝR",
-            CreatedAt = DateTime.UtcNow // DateTimeKind hatasýný önlemek için UTC
+            CreatedAt = DateTime.UtcNow
         };
 
         var result = await userManager.CreateAsync(adminUser, adminPassword);
         if (result.Succeeded)
         {
-            await userManager.AddToRoleAsync(adminUser, adminRole); // Admin rolünü kullanýcýya ata
+            await userManager.AddToRoleAsync(adminUser, adminRole);
         }
         else
         {
-            // Admin kullanýcý oluþturulamazsa hata mesajlarýný loglamak iyi bir pratiktir
             foreach (var error in result.Errors)
             {
                 Console.WriteLine($"Admin User Creation Error: {error.Description}");

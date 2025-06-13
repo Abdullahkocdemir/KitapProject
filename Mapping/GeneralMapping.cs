@@ -18,18 +18,26 @@ namespace KitapProject.Mapping
                 .ReverseMap();
 
             CreateMap<Product, GetByIdProductDTO>()
-                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category!.Name)) 
-                .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId)); 
-            CreateMap<Product, UpdateProductDTO>()
-                .ForMember(dest => dest.ImageFile, opt => opt.Ignore()) 
-                .ForMember(dest => dest.CurrentImageUrl, opt => opt.MapFrom(src => src.ImageUrl)) 
+                .ForMember(dest => dest.CategoryName, opt => opt.MapFrom(src => src.Category!.Name))
                 .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId));
 
+            CreateMap<Product, UpdateProductDTO>()
+                .ForMember(dest => dest.ImageFile, opt => opt.Ignore())
+                .ForMember(dest => dest.CurrentImageUrl, opt => opt.MapFrom(src => src.ImageUrl))
+                .ForMember(dest => dest.CategoryId, opt => opt.MapFrom(src => src.CategoryId));
 
-            CreateMap<Category, ResultCategoryDTO>();
-            CreateMap<CreateCategoryDTO, Category>();
-            CreateMap<UpdateCategoryDTO, Category>().ReverseMap(); 
-            CreateMap<Category, GetByIdCategoryDTO>();
+            CreateMap<UpdateProductDTO, Product>()
+                .ForMember(dest => dest.ImageUrl, opt => opt.Ignore())
+                .ForMember(dest => dest.CreatedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.UpdatedDate, opt => opt.Ignore())
+                .ForMember(dest => dest.ProductId, opt => opt.Ignore());
+
+
+
+            CreateMap<Category, ResultCategoryDTO>().ReverseMap();
+            CreateMap<Category, CreateCategoryDTO>().ReverseMap();
+            CreateMap<Category, UpdateCategoryDTO>().ReverseMap();
+            CreateMap<Category, GetByIdCategoryDTO>().ReverseMap();
 
 
             CreateMap<Testimonial, ResultTestimonialDTO>().ReverseMap();
