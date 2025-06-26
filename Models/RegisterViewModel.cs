@@ -24,11 +24,10 @@ namespace KitapProject.Models
         [Display(Name = "E-posta")]
         public string Email { get; set; } = string.Empty;
 
-        // BURASI GÜNCELLENDİ: PhoneNumber'ı string? olarak değiştiriyoruz
-        [Phone(ErrorMessage = "Geçerli bir telefon numarası giriniz.")] // Telefon formatı doğrulaması
+        [Phone(ErrorMessage = "Geçerli bir telefon numarası giriniz.")] 
         [StringLength(20, ErrorMessage = "Telefon numarası en fazla 20 karakter olmalıdır.")]
         [Display(Name = "Telefon Numarası")]
-        public string? PhoneNumber { get; set; } // Nullable string olarak tanımlandı
+        public string? PhoneNumber { get; set; } 
 
         [Required(ErrorMessage = "Şifre alanı zorunludur.")]
         [StringLength(100, ErrorMessage = "{0} en az {2} ve en fazla {1} karakter uzunluğunda olmalıdır.", MinimumLength = 6)]

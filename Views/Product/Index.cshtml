@@ -9,29 +9,31 @@
     <title>Kitap Mağazası</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="~/css/Product.css" />
-@*     <link rel="stylesheet" href="~/css/WebSite.css" />
- *@    @* CSRF Token için HEAD içine ekledik *@
     @Html.AntiForgeryToken()
     <style>
-                /* Responsive Ayarlamalar */
         @@media (max-width: 992px) {
             .nav-menu {
                 gap: 15px;
             }
+
             .header-actions {
                 gap: 10px;
             }
         }
-                .user-greeting {
+
+        .user-greeting {
             color: var(--text-light);
             font-weight: 500;
             font-size: 1rem;
         }
+
         .header-actions {
             display: flex;
             align-items: center;
-            gap: 15px; 
-                    .cart-container {
+            gap: 15px;
+            .cart-container
+
+        {
             position: relative;
             color: var(--text-dark);
             text-decoration: none;
@@ -42,10 +44,11 @@
             border-radius: 5px;
             transition: background-color 0.3s ease;
         }
-                .header-actions {
+
+        .header-actions {
             display: flex;
             align-items: center;
-            gap: 15px; /* Aksiyon öğeleri arasında boşluk */
+            gap: 15px;
         }
 
         .cart-container:hover {
@@ -57,7 +60,7 @@
         }
 
         .cart-count {
-            background-color: #FF6347; /* Domates kırmızısı */
+            background-color: #FF6347;
             color: white;
             font-size: 0.8rem;
             font-weight: bold;
@@ -71,7 +74,8 @@
             line-height: 1;
             box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
         }
-                .user-greeting {
+
+        .user-greeting {
             color: var(--text-light);
             font-weight: 500;
             font-size: 1rem;
@@ -119,7 +123,6 @@
         let currentFilteredBooks = [];
         let activeCategory = 'all';
 
-        // CSRF Token için cookie okuma fonksiyonu
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -170,34 +173,34 @@
         function renderBooks(booksToRender) {
             if (booksToRender.length === 0) {
                 booksGrid.innerHTML = `
-                        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
-                            <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; color: rgba(255, 255, 255, 0.3);"></i>
-                            <p>Aradığınız kriterlere uygun kitap bulunamadı.</p>
-                        </div>
-                    `;
+                                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
+                                    <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; color: rgba(255, 255, 255, 0.3);"></i>
+                                    <p>Aradığınız kriterlere uygun kitap bulunamadı.</p>
+                                </div>
+                            `;
                 return;
             }
 
             booksGrid.innerHTML = booksToRender.map(book => `
-                        <div class="book-card">
-                            <div class="book-image" style="background-image: url('${book.image}'); background-size: cover; background-position: center;">
-                                ${!book.image || book.image.includes('placeholder') || book.image.length < 5 ? 'Görsel Yok' : ''}
-                            </div>
-                            <div class="book-content">
-                                <h3 class="book-title">${book.title}</h3>
-                                <p class="book-author">${book.author}</p>
-                                <div class="book-price">₺${book.price.toFixed(2)}</div>
-                                <div class="book-actions">
-                                    <button class="btn btn-primary" onclick="addToCart(${book.id})">
-                                        <i class="fas fa-shopping-cart"></i> Sepete Ekle
-                                    </button>
-                                    <button class="btn btn-secondary" onclick="viewDetails(${book.id})">
-                                        <i class="fas fa-eye"></i> Detay
-                                    </button>
+                                <div class="book-card">
+                                    <div class="book-image" style="background-image: url('${book.image}'); background-size: cover; background-position: center;">
+                                        ${!book.image || book.image.includes('placeholder') || book.image.length < 5 ? 'Görsel Yok' : ''}
+                                    </div>
+                                    <div class="book-content">
+                                        <h3 class="book-title">${book.title}</h3>
+                                        <p class="book-author">${book.author}</p>
+                                        <div class="book-price">₺${book.price.toFixed(2)}</div>
+                                        <div class="book-actions">
+                                            <button class="btn btn-primary" onclick="addToCart(${book.id})">
+                                                <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                                            </button>
+                                            <button class="btn btn-secondary" onclick="viewDetails(${book.id})">
+                                                <i class="fas fa-eye"></i> Detay
+                                            </button>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div>
-                    `).join('');
+                            `).join('');
         }
 
         function showLoading() {
@@ -217,7 +220,6 @@
                 const response = await fetch(url);
 
                 if (!response.ok) {
-                    // response.json() hata fırlatabilir, bu yüzden try-catch bloğunda ele al
                     try {
                         const errorData = await response.json();
                         if (response.status === 404) {
@@ -228,7 +230,6 @@
                         }
                         throw new Error(`HTTP error! status: ${response.status} - ${errorData.message || response.statusText}`);
                     } catch (jsonError) {
-                        // Yanıt JSON değilse veya parse hatası verirse
                         const errorText = await response.text();
                         console.error('API yanıtı JSON değil:', errorText);
                         throw new Error(`HTTP error! status: ${response.status} - Beklenmedik yanıt formatı.`);
@@ -242,11 +243,11 @@
             } catch (error) {
                 console.error("Kitaplar yüklenirken hata oluştu:", error);
                 booksGrid.innerHTML = `
-                        <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
-                            <p>Kitaplar yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
-                            <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">Hata: ${error.message}</p>
-                        </div>
-                    `;
+                                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
+                                    <p>Kitaplar yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+                                    <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">Hata: ${error.message}</p>
+                                </div>
+                            `;
             } finally {
                 hideLoading();
             }
@@ -276,25 +277,24 @@
             }
 
             try {
-                // Sepete eklemeden önce kullanıcının giriş yapmış olup olmadığını kontrol et
                 const loginStatusResponse = await fetch('/Basket/CheckLoginStatus');
                 const loginStatusData = await loginStatusResponse.json();
 
                 if (!loginStatusData.isLoggedIn) {
                     alert("Sepete ürün eklemek için lütfen giriş yapmalısınız.");
-                    window.location.href = '/Account/Login'; // Kullanıcıyı login sayfasına yönlendir
-                    return; // Fonksiyonu burada durdur
+                    window.location.href = '/Account/Login';
+                    return;
                 }
 
                 const formData = new URLSearchParams();
                 formData.append('productId', bookId);
                 formData.append('quantity', 1);
 
-                const response = await fetch('/Basket/AddToBasket', { // Doğru endpoint
+                const response = await fetch('/Basket/AddToBasket', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-                        'RequestVerificationToken': getCookie('RequestVerificationToken') // CSRF token ekledik
+                        'RequestVerificationToken': getCookie('RequestVerificationToken')
                     },
                     body: formData.toString()
                 });
@@ -302,15 +302,11 @@
                 if (response.ok) {
                     const data = await response.json();
                     alert(data.message);
-                    // Başarılı olursa, sepetin global sayacını güncellemek için bir event tetikleyebilirsin
-                    // veya ana layout'tan cart count'u çeken bir fonksiyon çağırabilirsin.
-                    // Örneğin: window.dispatchEvent(new Event('cartUpdated'));
                 } else {
-                    // Sunucudan dönen yanıtın içeriğini daha detaylı inceleyelim
-                    const errorText = await response.text(); // JSON değilse bile metin olarak al
+                    const errorText = await response.text();
                     console.error('Server-side sepete ürün eklenirken hata:', response.status, response.statusText, errorText);
                     try {
-                        const errorData = JSON.parse(errorText); // JSON parse etmeye çalış
+                        const errorData = JSON.parse(errorText);
                         alert(`Sepete eklenirken hata oluştu: ${errorData.message || 'Bilinmeyen Hata'}`);
                     } catch (e) {
                         alert(`Sepete eklenirken beklenmedik bir hata oluştu. Lütfen tekrar deneyin. (Sunucu yanıtı: ${errorText.substring(0, 100)}...)`);
@@ -326,7 +322,6 @@
             const book = currentFilteredBooks.find(b => b.id === bookId);
             if (book) {
                 alert(`"${book.title}" detay sayfası açılacak. (ID: ${book.id})`);
-                // window.location.href = `/Product/Details/${book.id}`; // Detay sayfasına yönlendirme örneği
             }
         }
 

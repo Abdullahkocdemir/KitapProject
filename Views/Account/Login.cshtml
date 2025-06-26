@@ -13,26 +13,24 @@
 </head>
 
 <style>
-    /* Keyframe for animated background */
     @@keyframes gradientAnimation {
         0% { background-position: 0% 50%; }
         50% { background-position: 100% 50%; }
         100% { background-position: 0% 50%; }
     }
 
-    /* Custom CSS for Login Page - Vibrant & Animated */
     body {
-        background: linear-gradient(270deg, #8A2BE2, #FF1493, #00BFFF, #20B2AA); /* More dynamic gradient */
-        background-size: 400% 400%; /* For animation */
-        animation: gradientAnimation 15s ease infinite; /* Apply animation */
+        background: linear-gradient(270deg, #8A2BE2, #FF1493, #00BFFF, #20B2AA); 
+        background-size: 400% 400%; 
+        animation: gradientAnimation 15s ease infinite; /
         display: flex;
         justify-content: center;
         align-items: center;
         min-height: 100vh;
         margin: 0;
-        font-family: 'Poppins', sans-serif; /* Modern Google Font */
-        color: #333; /* Default text color */
-        overflow: hidden; /* Hide potential scrollbar from animation */
+        font-family: 'Poppins', sans-serif; 
+        color: #333; 
+        overflow: hidden; 
     }
 
     .login-container {
@@ -41,34 +39,34 @@
         align-items: center;
         width: 100%;
         padding: 20px;
-        position: relative; /* For potential overlay effects */
-        z-index: 1; /* Ensure card is above background */
+        position: relative; 
+        z-index: 1; 
     }
 
     .card {
-        border-radius: 20px; /* More rounded */
-        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); /* Deeper, softer shadow */
+        border-radius: 20px; 
+        box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3); 
         overflow: hidden;
-        background-color: rgba(255, 255, 255, 0.98); /* Almost opaque white */
+        background-color: rgba(255, 255, 255, 0.98);
         border: none;
-        max-width: 480px; /* Slightly wider card */
+        max-width: 480px; 
         width: 100%;
-        backdrop-filter: blur(5px); /* Subtle blur effect on card background */
-        transform: translateY(0); /* Initial position for animation */
+        backdrop-filter: blur(5px); 
+        transform: translateY(0);
         transition: transform 0.5s ease-out, box-shadow 0.5s ease-out;
     }
 
     .card:hover {
-        transform: translateY(-5px); /* Slight lift on hover */
-        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); /* More prominent shadow on hover */
+        transform: translateY(-5px); 
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4); 
     }
 
     .card-header {
-        background-image: linear-gradient(to right, #8A2BE2, #FF1493); /* Vibrant header gradient */
-        color: white; /* White text for contrast */
+        background-image: linear-gradient(to right, #8A2BE2, #FF1493); 
+        color: white; 
         padding: 25px;
         text-align: center;
-        font-weight: 700; /* Bolder header text */
+        font-weight: 700;
         border-top-left-radius: 20px;
         border-top-right-radius: 20px;
         position: relative;
@@ -77,59 +75,59 @@
 
     .card-header h3 {
         margin-bottom: 0;
-        font-size: 2.2rem; /* Larger header text */
-        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); /* Subtle text shadow */
+        font-size: 2.2rem; 
+        text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.2); 
     }
 
     .card-body {
-        padding: 40px; /* More generous padding */
+        padding: 40px; 
     }
 
     .form-group label {
         font-weight: 500;
-        color: #555; /* Slightly softer text color */
+        color: #555;
         margin-bottom: 10px;
         display: block;
         font-size: 1.05rem;
     }
 
     .form-control {
-        border-radius: 10px; /* Even more rounded inputs */
-        padding: 14px 18px; /* Larger padding */
+        border-radius: 10px;
+        padding: 14px 18px; 
         border: 1px solid #ddd;
-        transition: all 0.4s ease; /* Smoother transition */
-        background-color: #f9f9f9; /* Slightly off-white background */
+        transition: all 0.4s ease; 
+        background-color: #f9f9f9; 
     }
 
     .form-control:focus {
-        border-color: #8A2BE2; /* Primary gradient start color on focus */
-        box-shadow: 0 0 0 0.3rem rgba(138, 43, 226, 0.2); /* More noticeable shadow */
-        background-color: #fff; /* White on focus */
+        border-color: #8A2BE2; 
+        box-shadow: 0 0 0 0.3rem rgba(138, 43, 226, 0.2); 
+        background-color: #fff; 
         outline: none;
     }
 
     .btn-primary {
-        background-image: linear-gradient(to right, #8A2BE2 0%, #FF1493 100%); /* Stronger button gradient */
+        background-image: linear-gradient(to right, #8A2BE2 0%, #FF1493 100%); 
         border: none;
         border-radius: 10px;
         padding: 15px 30px;
-        font-size: 1.2rem; /* Larger button text */
+        font-size: 1.2rem; 
         font-weight: 600;
-        letter-spacing: 0.5px; /* Slight letter spacing */
-        transition: all 0.3s cubic-bezier(.25,.8,.25,1); /* More complex, smooth transition */
-        box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2); /* More prominent button shadow */
+        letter-spacing: 0.5px;
+        transition: all 0.3s cubic-bezier(.25,.8,.25,1); 
+        box-shadow: 0 7px 15px rgba(0, 0, 0, 0.2); 
         width: 100%;
-        color: white; /* Ensure text is white */
+        color: white; 
     }
 
     .btn-primary:hover {
-        transform: translateY(-3px); /* More pronounced lift */
-        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3); /* Even stronger shadow on hover */
-        background-image: linear-gradient(to right, #FF1493 0%, #8A2BE2 100%); /* Reverse gradient on hover */
+        transform: translateY(-3px); 
+        box-shadow: 0 10px 20px rgba(0, 0, 0, 0.3);
+        background-image: linear-gradient(to right, #FF1493 0%, #8A2BE2 100%); 
     }
 
     .form-check-input:checked {
-        background-color: #8A2BE2; /* Checkbox color matching primary */
+        background-color: #8A2BE2; 
         border-color: #8A2BE2;
     }
 
@@ -140,24 +138,24 @@
     .text-danger {
         font-size: 0.9rem;
         margin-top: 8px;
-        color: #dc3545; /* Standard danger red */
+        color: #dc3545; 
     }
 
     .mt-3 p {
         text-align: center;
         color: #666;
-        margin-top: 25px; /* More space */
+        margin-top: 25px;
     }
 
     .mt-3 a {
-        color: #FF1493; /* Link color matching secondary gradient color */
+        color: #FF1493; 
         text-decoration: none;
-        font-weight: 600; /* Bolder link */
+        font-weight: 600; 
         transition: color 0.3s ease, text-decoration 0.3s ease;
     }
 
     .mt-3 a:hover {
-        color: #8A2BE2; /* Primary gradient color on hover */
+        color: #8A2BE2; 
         text-decoration: underline;
     }
 </style>

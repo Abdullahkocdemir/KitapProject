@@ -1,6 +1,7 @@
 ﻿using KitapProject.Entities; 
 using KitapProject.Models; 
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using StackExchange.Redis; 
@@ -109,6 +110,78 @@ namespace KitapProject.Controllers
             }
             return View(model);
         }
+
+        [Authorize]
+        [HttpGet]
+        public async Task<IActionResult> Manage()
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Kullanıcı ID'si '{_userManager.GetUserId(User)}' olan kullanıcı yüklenemedi.");
+            }
+
+            var userRoles = await _userManager.GetRolesAsync(user);
+
+            var model = new ManageViewModel
+            {
+                UserName = user.UserName,
+                Email = user.Email,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Roles = userRoles
+            };
+
+            if (TempData["SuccessMessage"] != null)
+            {
+                ViewData["SuccessMessage"] = TempData["SuccessMessage"];
+            }
+
+            return View(model);
+        }
+
+        [Authorize]
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Manage(ManageViewModel model)
+        {
+            var user = await _userManager.GetUserAsync(User);
+            if (user == null)
+            {
+                return NotFound($"Kullanıcı ID'si '{_userManager.GetUserId(User)}' olan kullanıcı yüklenemedi.");
+            }
+
+            if (!ModelState.IsValid)
+            {
+                model.Roles = await _userManager.GetRolesAsync(user);
+                model.UserName = user.UserName;
+                return View(model);
+            }
+
+            var changePasswordResult = await _userManager.ChangePasswordAsync(user, model.OldPassword, model.NewPassword);
+
+            if (changePasswordResult.Succeeded)
+            {
+                await _signInManager.RefreshSignInAsync(user);
+
+                TempData["SuccessMessage"] = "Şifreniz başarıyla güncellendi.";
+
+                return RedirectToAction("Manage");
+            }
+
+            foreach (var error in changePasswordResult.Errors)
+            {
+                ModelState.AddModelError(string.Empty, error.Description);
+            }
+
+            model.Roles = await _userManager.GetRolesAsync(user);
+            model.UserName = user.UserName;
+
+            return View(model);
+        }
+
+
+
 
         [HttpGet]
         public IActionResult Login()

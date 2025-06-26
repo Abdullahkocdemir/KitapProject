@@ -10,6 +10,8 @@
     <title>Kitap Dünyası - Sepetim</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css" />
     <link rel="stylesheet" href="~/css/WebSite.css" />
+    <link rel="stylesheet" href="~/css/StyleSheet.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
     <style>
         .cart-item {
             display: flex;
@@ -17,6 +19,7 @@
             gap: 15px;
             padding: 10px;
             border-bottom: 1px solid #ccc;
+            transition: opacity 0.3s ease; /* Yüklenme efekti için geçiş eklendi */
         }
 
         .cart-item-image {
@@ -35,23 +38,55 @@
             display: block;
         }
 
-        .cart-item-quantity button {
-            padding: 5px 10px;
-            margin: 0 5px;
+        /* --- YENİ ADET SEÇİCİ STİLLERİ --- */
+
+        .quantity-selector {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Butonlar ve sayı arasında boşluk */
+        }
+
+        .quantity-btn {
+            width: 32px; /* Sabit genişlik */
+            height: 32px; /* Sabit yükseklik */
+            border-radius: 50%; /* Tamamen yuvarlak butonlar */
             border: 1px solid #ddd;
-            background: #f8f9fa;
+            background-color: #fff;
+            color: #555;
             cursor: pointer;
-            border-radius: 4px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 14px;
+            transition: all 0.2s ease; /* Tüm değişiklikler için yumuşak geçiş */
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
         }
 
-        .cart-item-quantity button:hover {
-            background: #e9ecef;
+        .quantity-btn:hover {
+            background-color: #f0f0f0;
+            transform: scale(1.1); /* Üzerine gelince hafifçe büyüt */
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
         }
 
-        .cart-item-quantity button:disabled {
+        .quantity-btn:active {
+            transform: scale(0.95); /* Tıklanma anında küçülme efekti */
+            background-color: #e9ecef;
+        }
+
+        .quantity-btn:disabled {
             opacity: 0.5;
             cursor: not-allowed;
+            transform: scale(1);
         }
+        
+        .quantity-value {
+            font-weight: bold;
+            font-size: 16px;
+            min-width: 25px; /* 1 ve 10 gibi farklı basamak sayılarında kaymayı engeller */
+            text-align: center;
+        }
+
+        /* --- ESKİ STİLLER --- */
 
         .remove-item-btn {
             background: #dc3545;
@@ -68,11 +103,11 @@
 
         .loading {
             opacity: 0.6;
-            pointer-events: none;
+            pointer-events: none; /* Yüklenirken tekrar tıklamayı engelle */
         }
     </style>
 
-    @Html.AntiForgeryToken() @* CSRF Token için *@
+    @Html.AntiForgeryToken()
 </head>
 <body>
     @await Component.InvokeAsync("_DefaultHeaderPartials")
@@ -119,7 +154,6 @@
         const VAT_RATE = 0.18;
         const SHIPPING_FEE = 15.00;
 
-        // CSRF Token için cookie okuma fonksiyonu
         function getCookie(name) {
             const value = `; ${document.cookie}`;
             const parts = value.split(`; ${name}=`);
@@ -142,7 +176,7 @@
             }
         }
 
-        function saveCartToLocalStorage() { // Sadece localStorage'a kaydetme fonksiyonu
+        function saveCartToLocalStorage() {
             localStorage.setItem('kitapDunyasiCart', JSON.stringify(cart));
             updateCartCount();
         }
@@ -167,7 +201,6 @@
                 booksSubtotal += itemTotal;
 
                 let imageUrl = item.imageUrl || '/images/no-image.png';
-
                 if (!imageUrl || imageUrl === '' || imageUrl === 'undefined' || imageUrl === 'null') {
                     imageUrl = '/images/no-image.png';
                 }
@@ -176,6 +209,7 @@
                 cartItemDiv.classList.add('cart-item');
                 cartItemDiv.dataset.productId = item.id;
 
+                // --- HTML YAPISI YENİ BUTONLARLA GÜNCELLENDİ ---
                 cartItemDiv.innerHTML = `
                     <div class="cart-item-image">
                         <img src="${imageUrl}" onerror="this.onerror=null;this.src='/images/no-image.png';" alt="${item.name}" />
@@ -184,10 +218,14 @@
                         <div class="cart-item-title">${item.name}</div>
                         <div class="cart-item-price">₺${item.price.toFixed(2)}</div>
                     </div>
-                    <div class="cart-item-quantity">
-                        <button data-action="decrease">-</button>
-                        <span>${item.quantity}</span>
-                        <button data-action="increase">+</button>
+                    <div class="quantity-selector">
+                        <button class="quantity-btn" data-action="decrease" ${item.quantity <= 1 ? 'disabled' : ''}>
+                            <i class="fas fa-minus"></i>
+                        </button>
+                        <span class="quantity-value">${item.quantity}</span>
+                        <button class="quantity-btn" data-action="increase">
+                            <i class="fas fa-plus"></i>
+                        </button>
                     </div>
                     <button class="remove-item-btn" data-action="remove">Sil</button>
                 `;
@@ -204,31 +242,32 @@
         }
 
         async function handleCartActions(event) {
-            const target = event.target;
+            const target = event.target.closest('.quantity-btn, .remove-item-btn');
+            if (!target) return; // Buton veya içindeki ikon tıklanmadıysa çık
+
             const cartItemDiv = target.closest('.cart-item');
-            const productId = parseInt(cartItemDiv?.dataset.productId);
+            if (!cartItemDiv) return;
+
+            const productId = parseInt(cartItemDiv.dataset.productId);
             if (isNaN(productId)) return;
-
+            
+            // İşlem başladığında görsel geri bildirim ver
+            cartItemDiv.classList.add('loading');
+            
+            let actionType = target.dataset.action;
             let change = 0;
-            let actionType = '';
 
-            if (target.dataset.action === 'increase') {
+            if (actionType === 'increase') {
                 change = 1;
-                actionType = 'update';
-            } else if (target.dataset.action === 'decrease') {
+            } else if (actionType === 'decrease') {
                 change = -1;
-                actionType = 'update';
-            } else if (target.dataset.action === 'remove') {
-                actionType = 'remove';
             }
-
+            
             try {
                 let url = '';
-                let method = 'POST';
                 let bodyData = {};
-                let contentType = 'application/json'; // JSON olarak gönderiyoruz
 
-                if (actionType === 'update') {
+                if (actionType === 'increase' || actionType === 'decrease') {
                     url = '/Basket/UpdateBasketItemQuantity';
                     bodyData = { productId: productId, change: change };
                 } else if (actionType === 'remove') {
@@ -237,28 +276,25 @@
                 }
 
                 const response = await fetch(url, {
-                    method: method,
+                    method: 'POST',
                     headers: {
-                        'Content-Type': contentType,
-                        'RequestVerificationToken': getCookie('RequestVerificationToken') // CSRF token ekledik
+                        'Content-Type': 'application/json',
+                        'RequestVerificationToken': getCookie('RequestVerificationToken')
                     },
                     body: JSON.stringify(bodyData)
                 });
 
                 if (response.ok) {
-                    console.log(`Server-side sepet ${actionType} başarılı.`);
-                    await fetchAndRenderServerCart(); // Sepeti yeniden çek ve render et
+                    await fetchAndRenderServerCart();
                 } else {
-                    console.error(`Server-side sepet öğesi ${actionType} edilirken hata oluştu:`, response.statusText);
-                    const errorText = await response.text();
-                    console.error('Server hata yanıtı:', errorText);
+                    console.error(`Server-side sepet işlemi (${actionType}) hatası:`, response.statusText);
                     alert('Sepet güncellenirken bir hata oluştu. Lütfen tekrar deneyin.');
-                    await fetchAndRenderServerCart(); // Hata durumunda da güncel sepeti çek
+                    cartItemDiv.classList.remove('loading'); // Hata durumunda yüklenme efektini kaldır
                 }
             } catch (error) {
-                console.error(`AJAX ${actionType} isteği gönderilirken hata:`, error);
+                console.error(`AJAX (${actionType}) isteği hatası:`, error);
                 alert('Ağ hatası: Sepet güncellenemedi.');
-                await fetchAndRenderServerCart(); // Ağ hatasında da güncel sepeti çek
+                cartItemDiv.classList.remove('loading'); // Hata durumunda yüklenme efektini kaldır
             }
         }
 
@@ -292,42 +328,30 @@
             });
         }
 
-        // Sunucudan sepeti çeken ve render eden ana fonksiyon
         async function fetchAndRenderServerCart() {
             try {
                 const response = await fetch('/Basket/GetBasketItems');
-                console.log('GetBasketItems yanıt durumu:', response.status);
                 if (response.ok) {
                     const data = await response.json();
-                    console.log('GetBasketItems yanıt verisi:', data);
                     if (data.success) {
                         cart = data.items;
-                        saveCartToLocalStorage(); // Sepeti localStorage'a kaydet ve sayacı güncelle
-                        renderCartItems(); // Sepet öğelerini render et
-                        console.log('Client-side sepet server verisi ile senkronize edildi.');
                     } else {
-                        cart = []; // Sepet boşsa veya giriş yapılmamışsa client sepetini sıfırla
-                        saveCartToLocalStorage();
-                        renderCartItems(); // Boş sepeti render et
-                        console.log('Kullanıcı giriş yapmamış veya sepet boş, sepet sıfırlandı. Sunucu mesajı:', data.message);
+                        cart = [];
+                        console.log('Sunucu sepeti boş veya kullanıcı giriş yapmamış:', data.message);
                     }
                 } else {
-                    console.error('Server sepeti çekilirken HTTP hatası:', response.status, response.statusText);
-                    const errorText = await response.text();
-                    console.error('Server sepeti çekilirken detaylı hata yanıtı:', errorText);
-                    cart = []; // Hata durumunda sepeti sıfırla
-                    saveCartToLocalStorage();
-                    renderCartItems();
+                    console.error('Server sepeti çekilirken HTTP hatası:', response.status);
+                    cart = [];
                 }
             } catch (error) {
-                console.error('Server sepetini çekme hatası (ağ hatası/parse hatası):', error);
-                cart = []; // Ağ hatasında da sepeti sıfırla
+                console.error('Server sepetini çekme hatası:', error);
+                cart = [];
+            } finally {
                 saveCartToLocalStorage();
                 renderCartItems();
             }
         }
 
-        // Sayfa yüklendiğinde ilk olarak server'dan sepeti çek
         document.addEventListener('DOMContentLoaded', async () => {
             await fetchAndRenderServerCart();
         });

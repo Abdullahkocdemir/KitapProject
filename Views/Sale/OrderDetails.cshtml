@@ -2,14 +2,14 @@
 
 @{
     ViewData["Title"] = "Sipariş Detayları";
-    Layout = "~/Views/Shared/_DefaultLayout.cshtml";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
 }
 
 <section class="order-details-section">
     <div class="order-header">
         <div class="d-flex justify-content-between align-items-center mb-4">
             <h2 class="section-title" style="color:red">Sipariş Detayları</h2>
-            <a href="@Url.Action("Index", "Sale")" class="btn btn-secondary">
+            <a href="@Url.Action("Index", "AdminSale")" class="btn btn-secondary">
                 <i class="fas fa-arrow-left me-2"></i> Siparişlerime Dön
             </a>
         </div>
@@ -18,7 +18,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <h4>Sipariş Bilgileri</h4>
-                   
+
                     <p><strong>Sipariş Tarihi:</strong> @Model.OrderDate.ToString("dd MMMM yyyy, HH:mm", new System.Globalization.CultureInfo("tr-TR"))</p>
                     <p>
                         <strong>Durum:</strong>
@@ -28,13 +28,11 @@
                     </p>
                     <p>
                         <strong>Toplam Tutar:</strong>
-                        <strong class="total-amount">@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</strong> @* Using OrderTotal *@
+                        <strong class="total-amount">@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</strong>
                     </p>
                 </div>
                 <div class="col-md-6">
                     <h4>Teslimat Bilgileri</h4>
-                    @* These shipping details would typically come from the AppUser or a dedicated ShippingAddress entity linked to the Order.
-                    Assuming for now they are directly on the Order model for simplicity, as indicated by your view. *@
                     <p><strong>Adres:</strong> @Model.ShippingAddress</p>
                     <p><strong>Şehir:</strong> @Model.City</p>
                     <p><strong>Ülke:</strong> @Model.Country</p>
@@ -64,7 +62,7 @@
                             <tr>
                                 <td>
                                     <div class="product-info">
-                                        <strong>@(item.Product?.Name ?? "Ürün Bilgisi Yok")</strong> @* Accessing Product.ProductName *@
+                                        <strong>@(item.Product?.Name ?? "Ürün Bilgisi Yok")</strong>
                                     </div>
                                 </td>
                                 <td>@item.UnitPrice.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</td>
@@ -83,7 +81,7 @@
                 <tfoot>
                     <tr class="total-row">
                         <td colspan="3"><strong>Genel Toplam:</strong></td>
-                        <td><strong class="total-amount">@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</strong></td> @* Using OrderTotal *@
+                        <td><strong class="total-amount">@Model.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))</strong></td>
                     </tr>
                 </tfoot>
             </table>
@@ -101,21 +99,19 @@
             "hazırlanıyor" => "processing",
             "beklemede" => "pending",
             "iptal edildi" => "cancelled",
-            _ => "pending" // Default for unknown statuses
+            _ => "pending"
         };
     }
 }
 
 <style>
-    /* General Section Styling */
     .order-details-section {
         padding: 30px;
-        background-color: #f0f2f5; /* Light background for the whole section */
+        background-color: #f0f2f5;
         border-radius: 10px;
         box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
     }
 
-    /* Header and Title */
     .order-header {
         margin-bottom: 30px;
     }
@@ -124,17 +120,16 @@
         color: red;
         font-size: 2rem;
         font-weight: 700;
-        margin-bottom: 0; /* Adjust margin to align with button */
+        margin-bottom: 0;
     }
 
-    /* Back Button */
     .btn-secondary {
         background-color: #6c757d;
         color: white;
         border: 1px solid #6c757d;
-        display: flex; /* For icon alignment */
+        display: flex;
         align-items: center;
-        gap: 8px; /* Space between icon and text */
+        gap: 8px;
         padding: 10px 20px;
         border-radius: 5px;
         transition: background-color 0.3s ease, border-color 0.3s ease;
@@ -145,7 +140,6 @@
             border-color: #545b62;
         }
 
-    /* Order Info Card */
     .order-info-card {
         background: #ffffff;
         padding: 25px;
@@ -155,7 +149,7 @@
     }
 
         .order-info-card h4 {
-            color: #007bff; /* Primary blue for headings */
+            color: #007bff;
             margin-bottom: 20px;
             border-bottom: 2px solid #007bff;
             padding-bottom: 8px;
@@ -173,49 +167,47 @@
                 color: #343a40;
             }
 
-    /* Status Badges */
     .status-badge {
         padding: 5px 15px;
         border-radius: 15px;
         font-size: 0.85em;
         font-weight: 600;
-        text-transform: capitalize; /* More natural capitalization */
-        display: inline-block; /* For better padding control */
+        text-transform: capitalize;
+        display: inline-block;
         margin-left: 5px;
     }
 
         .status-badge.delivered {
-            background-color: #e6ffed; /* Lighter green */
-            color: #007b3e; /* Darker green */
+            background-color: #e6ffed;
+            color: #007b3e;
         }
 
         .status-badge.shipped {
-            background-color: #e0f2fe; /* Lighter blue */
-            color: #0d6efd; /* Deeper blue */
+            background-color: #e0f2fe;
+            color: #0d6efd;
         }
 
         .status-badge.processing {
-            background-color: #fff8e1; /* Lighter yellow */
-            color: #ffc107; /* Orange-yellow */
+            background-color: #fff8e1;
+            color: #ffc107;
         }
 
         .status-badge.pending {
-            background-color: #e9ecef; /* Light gray */
-            color: #6c757d; /* Darker gray */
+            background-color: #e9ecef;
+            color: #6c757d;
         }
 
         .status-badge.cancelled {
-            background-color: #ffebee; /* Lighter red */
-            color: #dc3545; /* Darker red */
+            background-color: #ffebee;
+            color: #dc3545;
         }
 
     .total-amount {
-        color: #28a745; /* Green for total */
+        color: #28a745;
         font-size: 1.25em;
         font-weight: 700;
     }
 
-    /* Order Items Table */
     .order-items {
         margin-top: 40px;
     }
@@ -232,10 +224,10 @@
     .order-items-table {
         background: white;
         border-radius: 10px;
-        overflow: hidden; /* Ensures rounded corners are visible */
+        overflow: hidden;
         box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08);
-        width: 100%; /* Ensure table takes full width */
-        border-collapse: collapse; /* For cleaner borders */
+        width: 100%;
+        border-collapse: collapse;
     }
 
         .order-items-table thead {
@@ -251,7 +243,7 @@
         }
 
         .order-items-table tbody tr:nth-child(even) {
-            background-color: #f8f9fa; /* Zebra striping for readability */
+            background-color: #f8f9fa;
         }
 
         .order-items-table td {
@@ -261,7 +253,7 @@
         }
 
         .order-items-table tbody tr:last-child td {
-            border-bottom: none; /* No border for the last row */
+            border-bottom: none;
         }
 
     .product-info strong {
@@ -269,9 +261,8 @@
         font-size: 1.05em;
     }
 
-    /* Table Footer Total */
     .total-row {
-        background-color: #e9f5ff; /* Light blue background for total row */
+        background-color: #e9f5ff;
         font-size: 1.2em;
         font-weight: 700;
     }
@@ -283,10 +274,9 @@
         }
 
         .total-row strong.total-amount {
-            font-size: 1.3em; /* Slightly larger for emphasis */
+            font-size: 1.3em;
         }
 
-    /* Utilities (if not using Bootstrap CSS directly) */
     .d-flex {
         display: flex;
     }
@@ -307,7 +297,7 @@
         margin-bottom: 1.5rem;
     }
 
-    .me-2 { /* For spacing with icon */
+    .me-2 {
         margin-right: 0.5rem;
     }
 </style>

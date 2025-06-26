@@ -10,7 +10,6 @@
     <title>Kayıt Ol - Modern Tasarım</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* CSS kodunuz burada kalacak, değişmedi */
         * {
             margin: 0;
             padding: 0;
@@ -25,7 +24,6 @@
             overflow-x: hidden;
         }
 
-        /* Animated background particles */
         .bg-animation {
             position: fixed;
             top: 0;
@@ -283,7 +281,6 @@
             }
         }
 
-        /* Responsive Design */
         @@media (max-width: 768px) {
             .register-card {
                 padding: 30px 25px;
@@ -304,7 +301,6 @@
             }
         }
 
-        /* Success animation */
         .success-animation {
             display: none;
             position: fixed;
@@ -449,28 +445,10 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation/1.19.3/jquery.validate.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.12/jquery.validate.unobtrusive.min.js"></script>
     <script>
-        // Form submission (handled by ASP.NET Core Unobtrusive Validation, so remove custom submit logic)
-        // document.getElementById('registerForm').addEventListener('submit', function (e) {
-        //     e.preventDefault(); // Bu satırı kaldırdık
-        //     // ... diğer kendi doğrulama mantığınız ...
-        // });
-
-        // Önceki isValidEmail fonksiyonu (ASP.NET Core'un kendi doğrulamasını kullanıyorsak buna gerek kalmaz)
-        // function isValidEmail(email) {
-        //     const emailRegex = /^[^\s@@]+@@[^\s@@]+\.[^\s@@]+$/;
-        //     return emailRegex.test(email);
-        // }
-
-        // Kendi hata göster/gizle fonksiyonlarınızı kaldırdık
-        // function clearErrors() { ... }
-        // function showError(elementId, message) { ... }
-
         function showLoginMessage() {
-            // alert('Giriş sayfasına yönlendirileceksiniz...'); // Alert yerine doğrudan yönlendirme daha iyi
-            window.location.href = '@Url.Action("Login", "Account")'; // Login sayfasına yönlendir
+            window.location.href = '@Url.Action("Login", "Account")'; 
         }
 
-        // Add floating label effect
         const inputs = document.querySelectorAll('.form-control');
         inputs.forEach(input => {
             input.addEventListener('focus', function () {
@@ -484,10 +462,7 @@
             });
         });
 
-        // Add ripple effect to button
         document.querySelector('.btn-register').addEventListener('click', function (e) {
-            // Yalnızca form geçerliyse ripple efekti göstermek daha mantıklı olabilir
-            // if ($('#registerForm').valid()) { // jQuery Validation kontrolü
             const ripple = document.createElement('span');
             const rect = this.getBoundingClientRect();
             const size = Math.max(rect.width, rect.height);
@@ -504,22 +479,7 @@
             setTimeout(() => {
                 ripple.remove();
             }, 600);
-            // }
         });
-
-        // ASP.NET Core Identity'nin başarılı kayıt sonrası yönlendirmesini takip etmek için
-        // JavaScript'teki success animasyonu genellikle sunucu yönlendirmesiyle birlikte iyi çalışmaz.
-        // Controller'dan redirect yapıldığı için bu modal gösterilemez.
-        // Eğer client-side animasyon istiyorsanız, formu AJAX ile göndermeniz gerekir.
-        // Şu anki durumda, Controller'dan yönlendirme yapıldığı için bu "success-animation" kısmı görünmeyecektir.
-        // Eğer kayıt başarılı olursa doğrudan ana sayfaya yönlendirilirsiniz.
-        // Bu yüzden alttaki kodlar aslında çalışmaz (yönlendirme gerçekleştiği için).
-        // if (/* Kayıt başarılı kontrolü */) {
-        //     document.getElementById('successModal').style.display = 'flex';
-        //     setTimeout(() => {
-        //         document.getElementById('successModal').style.display = 'none';
-        //     }, 3000);
-        // }
     </script>
 </body>
 </html>

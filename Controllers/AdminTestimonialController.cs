@@ -2,7 +2,7 @@
 using KitapProject.DTO.TestimonialDTO;
 using KitapProject.Entities;
 using Microsoft.AspNetCore.Mvc;
-using AutoMapper; // AutoMapper'ı ekledik
+using AutoMapper; 
 
 namespace KitapProject.Controllers
 {

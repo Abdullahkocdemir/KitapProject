@@ -38,7 +38,6 @@ namespace KitapProject.Controllers
             return View(userOrders);
         }
 
-        // Sipariş detaylarını göster
         public async Task<IActionResult> OrderDetails(int id)
         {
             var currentUserId = _userManager.GetUserId(User);

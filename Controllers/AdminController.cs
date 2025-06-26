@@ -45,7 +45,6 @@ namespace KitapProject.Controllers
         }
 
         [HttpPost]
-        [ValidateAntiForgeryToken] 
         public async Task<IActionResult> Delete(string id)
         {
             if (id == null)

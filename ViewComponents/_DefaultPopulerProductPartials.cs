@@ -18,7 +18,7 @@ namespace KitapProject.ViewComponents
             var popularProducts = _context.Products
                                           .Where(p => p.PopulerProduct && p.Status)
                                           .Include(p => p.Category)
-                                          .Where(y => y.PopulerProduct == true) // Bu ikinci Where koşulu ilkini tekrar ediyor, istersen kaldırabilirsin.
+                                          .Where(y => y.PopulerProduct == true) 
                                           .ToList();
 
             return View(popularProducts);

@@ -2,12 +2,11 @@
 @{
     ViewData["Title"] = "Kullanıcı Detayları";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
-    var userRoles = ViewBag.UserRoles as IEnumerable<string>; // Controller'dan gelen rolleri al
+    var userRoles = ViewBag.UserRoles as IEnumerable<string>; 
 }
 
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-    /* Özel CSS Stilleri */
     .card-detail {
         box-shadow: 0 6px 12px rgba(0,0,0,0.1);
         border-radius: 10px;
@@ -15,7 +14,7 @@
         background-color: #fff;
     }
     .card-detail .card-header {
-        background-color: #007bff; /* Primary blue for header */
+        background-color: #007bff; 
         color: white;
         padding: 25px;
         border-bottom: none;
@@ -40,12 +39,12 @@
     }
     .detail-item .label {
         font-weight: 600;
-        color: #495057; /* Darker gray for labels */
-        flex-basis: 25%; /* Genişliği ayarla */
-        min-width: 150px; /* Minimum genişlik */
+        color: #495057; 
+        flex-basis: 25%; 
+        min-width: 150px; 
     }
     .detail-item .value {
-        color: #343a40; /* Darker text for values */
+        color: #343a40; 
         flex-basis: 75%;
     }
     .badge-detail {
@@ -54,11 +53,11 @@
         border-radius: 0.3rem;
         margin-right: 8px;
         margin-bottom: 5px;
-        display: inline-block; /* Yan yana durmaları için */
+        display: inline-block; 
     }
-    .badge-active { background-color: #28a745; color: white; } /* Green for Active */
-    .badge-passive { background-color: #6c757d; color: white; } /* Gray for Passive */
-    .badge-role { background-color: #17a2b8; color: white; } /* Info blue for roles */
+    .badge-active { background-color: #28a745; color: white; } 
+    .badge-passive { background-color: #6c757d; color: white; } 
+    .badge-role { background-color: #17a2b8; color: white; } 
     .btn-back {
         background-color: #6c757d;
         border-color: #6c757d;

@@ -25,15 +25,13 @@ namespace KitapProject.Models
         [Display(Name = "Posta Kodu")]
         public string PostalCode { get; set; } = string.Empty;
 
-        // Ödeme Bilgileri
-        // Yeni kart eklenecekse bu alanlar kullanılacak
         [Display(Name = "Kart Sahibi Adı")]
         [StringLength(100, ErrorMessage = "Kart sahibi adı en fazla 100 karakter olabilir.")]
         public string? CardHolderName { get; set; }
 
         [Display(Name = "Kart Numarası")]
         [StringLength(19, MinimumLength = 16, ErrorMessage = "Kart numarası 16 ila 19 karakter olmalıdır.")]
-        public string? CardNumber { get; set; } // Tam kart numarası sadece işlem anında kullanılacak
+        public string? CardNumber { get; set; } 
 
         [Display(Name = "Son Kullanma Tarihi")]
         [StringLength(5, MinimumLength = 5, ErrorMessage = "Son kullanma tarihi AA/YY formatında olmalıdır.")]
@@ -43,16 +41,14 @@ namespace KitapProject.Models
         [StringLength(4, MinimumLength = 3, ErrorMessage = "CVV 3 veya 4 haneli olmalıdır.")]
         public string? CVV { get; set; }
 
-        // Mevcut kart seçimi için
         [Display(Name = "Kayıtlı Kartlar")]
-        public int? SelectedPaymentInfoId { get; set; } // Seçilen kayıtlı kartın ID'si
+        public int? SelectedPaymentInfoId { get; set; } 
 
-        public List<UserPaymentInfo>? SavedPaymentInfos { get; set; } // Kullanıcının kayıtlı kartları
+        public List<UserPaymentInfo>? SavedPaymentInfos { get; set; } 
 
-        // Sepet ve Toplam Bilgileri
         public List<BasketItem> BasketItems { get; set; } = new List<BasketItem>();
         public decimal TotalAmount { get; set; }
-        public decimal VATAmount { get; set; } // KDV tutarı
-        public decimal ShippingFee { get; set; } // Kargo ücreti
+        public decimal VATAmount { get; set; } 
+        public decimal ShippingFee { get; set; } 
     }
 }

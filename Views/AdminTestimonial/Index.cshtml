@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Referanslar";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Admin layout'unuzu buraya göre ayarlayın
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; 
 }
 
 <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
@@ -11,7 +11,6 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
 
 <style>
-    /* Genel Container ve Başlık Stilleri */
     .container {
         padding: 20px;
     }
@@ -26,7 +25,7 @@
         font-size: 2.8rem;
         font-weight: 700;
         margin-bottom: 10px;
-        color: #2c3e50; /* Koyu mavi tonu */
+        color: #2c3e50; 
     }
 
     .page-subtitle {
@@ -34,7 +33,6 @@
         color: #6c757d;
     }
 
-    /* Kontrol Alanı (Arama, Sayfalama, Ekle Butonu) */
     .controls-section {
         background-color: #f2f4f6;
         padding: 20px;
@@ -75,7 +73,7 @@
     }
 
     .btn-add {
-        background-color: #28a745; /* Yeşil ekleme butonu */
+        background-color: #28a745; 
         color: white;
         padding: 0.8rem 1.5rem;
         border-radius: 8px;
@@ -93,7 +91,6 @@
         box-shadow: 0 4px 10px rgba(40, 167, 69, 0.2);
     }
 
-    /* Tablo Konteyner ve Stil */
     .table-container {
         background-color: #ffffff;
         border-radius: 10px;
@@ -147,10 +144,10 @@
     }
     
     .rating-stars .fas.fa-star {
-        color: #ffc107; /* Sarı yıldız rengi */
+        color: #ffc107; 
     }
     .rating-stars .far.fa-star {
-        color: #e0e0e0; /* Boş yıldız rengi */
+        color: #e0e0e0; 
     }
 
     .actions-group {
@@ -173,7 +170,7 @@
     }
 
     .btn-view {
-        background-color: #17a2b8; /* Mavi - info */
+        background-color: #17a2b8;
     }
     .btn-view:hover {
         background-color: #138496;
@@ -181,8 +178,8 @@
     }
 
     .btn-edit {
-        background-color: #ffc107; /* Sarı - warning */
-        color: #212529; /* Koyu ikon rengi */
+        background-color: #ffc107; 
+        color: #212529; 
     }
     .btn-edit:hover {
         background-color: #e0a800;
@@ -190,14 +187,13 @@
     }
 
     .btn-delete {
-        background-color: #dc3545; /* Kırmızı - danger */
+        background-color: #dc3545; 
     }
     .btn-delete:hover {
         background-color: #c82333;
         transform: scale(1.1);
     }
 
-    /* Sayfalama Stili */
     .pagination-container {
         display: flex;
         justify-content: center;
@@ -230,7 +226,6 @@
         color: #0056b3;
     }
 
-    /* Loading Spinner */
     .loading {
         display: none;
         position: absolute;
@@ -260,7 +255,6 @@
         100% { transform: rotate(360deg); }
     }
 
-    /* No Results Message */
     #noResultsMessage {
         display: none;
         text-align: center;
@@ -332,7 +326,6 @@
                 @foreach (var item in Model)
                 {
                     <tr data-testimonial-name="@item.Name.ToLower()">
-                        <td></td> @* Sıra numarası JS tarafından atanacak *@
                         <td><span class="testimonial-name">@item.Name</span></td>
                         <td>
                             <span class="testimonial-description">
@@ -396,16 +389,15 @@
         const searchInput = $("#searchInput");
         const itemsPerPageSelect = $("#itemsPerPage");
         const testimonialTableBody = $("#testimonialTable tbody");
-        const tableRows = testimonialTableBody.find("tr"); // Başlangıçtaki tüm satırları al
+        const tableRows = testimonialTableBody.find("tr"); 
         const pagination = $("#pagination");
         const loadingSpinner = $("#loading");
         const noResultsMessage = $("#noResultsMessage");
 
         let currentPage = 1;
 
-        // SweetAlert ile silme onayı
         $(document).on("click", ".btn-delete", function (e) {
-            e.preventDefault(); // Sayfa yönlendirmesini engelle
+            e.preventDefault(); 
             const testimonialId = $(this).data("id");
             const testimonialName = $(this).data("name");
 
@@ -420,13 +412,11 @@
                 cancelButtonText: 'İptal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // Hidden form'u göndererek POST isteği at
                     $(`#deleteForm-${testimonialId}`).submit();
                 }
             });
         });
 
-        // TempData başarılı silme mesajını SweetAlert ile göster
         @if (TempData["Başarılı Bir Şekilde Silindi"] != null)
         {
             <text>
@@ -440,10 +430,10 @@
         }
 
         function renderTable() {
-            loadingSpinner.show(); // Yükleniyor spinner'ını göster
-            noResultsMessage.hide(); // Sonuç yok mesajını gizle
+            loadingSpinner.show(); 
+            noResultsMessage.hide(); 
 
-            setTimeout(() => { // Simülasyon için gecikme (gerçek projede kaldırılabilir)
+            setTimeout(() => { 
                 const searchTerm = searchInput.val().toLowerCase();
                 const itemsPerPage = parseInt(itemsPerPageSelect.val());
 
@@ -452,11 +442,10 @@
                     return testimonialName.includes(searchTerm);
                 });
 
-                // Sonuç yoksa mesaj göster
                 if (filteredRows.length === 0) {
                     noResultsMessage.show();
-                    testimonialTableBody.empty(); // Tablo içeriğini boşalt
-                    pagination.empty(); // Sayfalama butonlarını temizle
+                    testimonialTableBody.empty(); 
+                    pagination.empty(); 
                     loadingSpinner.hide();
                     return;
                 }
@@ -465,27 +454,26 @@
 
                 function showPage(page) {
                     currentPage = page;
-                    testimonialTableBody.empty(); // Mevcut tablo içeriğini temizle
+                    testimonialTableBody.empty();
 
                     const start = (page - 1) * itemsPerPage;
                     const end = start + itemsPerPage;
 
-                    let currentSiraNo = start + 1; // Başlangıç sıra numarasını ayarla
+                    let currentSiraNo = start + 1; 
 
                     filteredRows.slice(start, end).each(function () {
-                        const clonedRow = $(this).clone(); // Orijinal satırı klonla
-                        clonedRow.find('td:first').text(currentSiraNo++); // İlk sütuna sıra numarasını ata
-                        testimonialTableBody.append(clonedRow); // Klonlanmış satırı tabloya ekle
+                        const clonedRow = $(this).clone(); 
+                        clonedRow.find('td:first').text(currentSiraNo++); 
+                        testimonialTableBody.append(clonedRow); 
                     });
 
                     updatePagination(pageCount, currentPage);
                 }
 
                 function updatePagination(pageCount, currentPage) {
-                    pagination.empty(); // Mevcut sayfalandırmayı temizle
+                    pagination.empty(); 
 
                     if (pageCount > 1) {
-                        // Önceki sayfası butonu
                         pagination.append(`
                             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
                                 <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Previous">
@@ -494,7 +482,6 @@
                             </li>
                         `);
 
-                        // Sayfa numaraları
                         for (let i = 1; i <= pageCount; i++) {
                             pagination.append(
                                 `<li class="page-item ${i === currentPage ? 'active' : ''}">
@@ -503,7 +490,6 @@
                             );
                         }
 
-                        // Sonraki sayfası butonu
                         pagination.append(`
                             <li class="page-item ${currentPage === pageCount ? 'disabled' : ''}">
                                 <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Next">
@@ -514,7 +500,6 @@
                     }
                 }
 
-                // Sayfalama butonlarına tıklama olayı
                 pagination.off("click").on("click", "a.page-link", function (e) {
                     e.preventDefault();
                     const targetPage = parseInt($(this).data("page"));
@@ -523,16 +508,14 @@
                     }
                 });
 
-                showPage(1); // Filtrelenmiş sonuçların ilk sayfasını göster
-                loadingSpinner.hide(); // Yükleniyor spinner'ını gizle
-            }, 300); // Küçük bir gecikme ekleyerek yükleme hissi ver
+                showPage(1);
+                loadingSpinner.hide(); 
+            }, 300); 
         }
 
-        // Arama ve sayfa başına öğe değiştiğinde tabloyu yeniden render et
         searchInput.on("input", renderTable);
         itemsPerPageSelect.on("change", renderTable);
 
-        // Sayfa yüklendiğinde tabloyu ilk kez render et
         renderTable();
     });
 </script>

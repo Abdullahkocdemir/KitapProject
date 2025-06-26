@@ -1,0 +1,149 @@
+﻿@model KitapProject.Models.ManageViewModel
+@{
+    ViewData["Title"] = "Hesap Yönetimi";
+    Layout = "~/Views/Shared/_AdminLayout.cshtml";
+}
+
+<style>
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
+
+    h2, h4 {
+        color: #ffffff;
+    }
+
+    .form-control {
+        background-color: #1e1e1e;
+        color: #ffffff;
+        border: 1px solid #444;
+    }
+
+    .form-control:focus {
+        background-color: #2a2a2a;
+        border-color: #888;
+        box-shadow: none;
+        color: #fff;
+    }
+
+    label {
+        color: #cccccc;
+    }
+
+    .alert-success {
+        background-color: #2e7d32;
+        color: #fff;
+        border: none;
+    }
+
+    .btn-primary {
+        background-color: #1976d2;
+        border: none;
+    }
+
+    .btn-primary:hover {
+        background-color: #1565c0;
+    }
+
+    dt {
+        color: #bbbbbb;
+    }
+
+    dd {
+        color: #e0e0e0;
+    }
+
+    .badge.bg-info {
+        background-color: #29b6f6 !important;
+        color: #212121 !important;
+    }
+
+    .container-dark {
+        background-color: #1c1c1c;
+        padding: 30px;
+        border-radius: 10px;
+        box-shadow: 0 0 10px rgba(0,0,0,0.5);
+        margin-top: 40px;
+    }
+
+    hr {
+        border-top: 1px solid #444;
+    }
+</style>
+
+<div class="container container-dark">
+    <h2>@ViewData["Title"]</h2>
+
+    <div class="row">
+        <div class="col-md-6">
+            <h4>Hesap Bilgileri</h4>
+            <hr />
+            <dl class="row">
+                <dt class="col-sm-4">Kullanıcı Adı</dt>
+                <dd class="col-sm-8">@Model.UserName</dd>
+
+                <dt class="col-sm-4">E-posta</dt>
+                <dd class="col-sm-8">@Model.Email</dd>
+
+                <dt class="col-sm-4">Adı</dt>
+                <dd class="col-sm-8">@Model.FirstName</dd>
+
+                <dt class="col-sm-4">Soyadı</dt>
+                <dd class="col-sm-8">@Model.LastName</dd>
+
+                <dt class="col-sm-4">Roller</dt>
+                <dd class="col-sm-8">
+                    @if (Model.Roles != null && Model.Roles.Any())
+                    {
+                        <ul class="list-unstyled">
+                            @foreach (var role in Model.Roles)
+                            {
+                                <li><span class="badge bg-info text-dark">@role</span></li>
+                            }
+                        </ul>
+                    }
+                    else
+                    {
+                        <span>Rol atanmamış.</span>
+                    }
+                </dd>
+            </dl>
+        </div>
+        <div class="col-md-6">
+            <h4>Şifre Değiştir</h4>
+            <hr />
+
+            @if (ViewData["SuccessMessage"] != null)
+            {
+                <div class="alert alert-success" role="alert">
+                    @ViewData["SuccessMessage"]
+                </div>
+            }
+
+            <form asp-action="Manage" method="post">
+                @Html.AntiForgeryToken()
+                <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+                <div class="form-group mb-3">
+                    <label asp-for="OldPassword" class="control-label"></label>
+                    <input asp-for="OldPassword" class="form-control" />
+                    <span asp-validation-for="OldPassword" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="NewPassword" class="control-label"></label>
+                    <input asp-for="NewPassword" class="form-control" />
+                    <span asp-validation-for="NewPassword" class="text-danger"></span>
+                </div>
+                <div class="form-group mb-3">
+                    <label asp-for="ConfirmPassword" class="control-label"></label>
+                    <input asp-for="ConfirmPassword" class="form-control" />
+                    <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+                </div>
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary">Şifreyi Güncelle</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

@@ -23,7 +23,7 @@
         font-size: 2.8rem;
         font-weight: 700;
         margin-bottom: 10px;
-        color: #2c3e50; /* Koyu mavi tonu */
+        color: #2c3e50; 
     }
 
     .page-subtitle {
@@ -48,7 +48,7 @@
         display: flex;
         gap: 15px;
         align-items: center;
-        flex-wrap: wrap; /* Küçük ekranlarda sarmalama */
+        flex-wrap: wrap; 
     }
 
     .filters-group {
@@ -71,7 +71,7 @@
     }
 
     .btn-add {
-        background-color: #28a745; /* Yeşil ekleme butonu */
+        background-color: #28a745; 
         color: white;
         padding: 0.8rem 1.5rem;
         border-radius: 8px;
@@ -94,13 +94,13 @@
         border-radius: 10px;
         overflow: hidden;
         box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
-        position: relative; /* loading spinner için */
+        position: relative; 
     }
 
     .data-table {
         width: 100%;
         border-collapse: collapse;
-        margin-bottom: 0; /* Sayfalama ile uyumlu */
+        margin-bottom: 0; 
     }
 
     .data-table thead {
@@ -144,7 +144,7 @@
     .actions-group {
         display: flex;
         gap: 8px;
-        justify-content: center; /* Ortala */
+        justify-content: center; 
     }
 
     .action-btn {
@@ -153,15 +153,15 @@
         justify-content: center;
         width: 40px;
         height: 40px;
-        border-radius: 50%; /* Yuvarlak butonlar */
+        border-radius: 50%; 
         text-decoration: none;
         transition: all 0.2s ease;
         font-size: 1.1rem;
-        color: white; /* İkon rengi */
+        color: white; 
     }
 
     .btn-view {
-        background-color: #17a2b8; /* Mavi - info */
+        background-color: #17a2b8; 
     }
     .btn-view:hover {
         background-color: #138496;
@@ -169,8 +169,8 @@
     }
 
     .btn-edit {
-        background-color: #ffc107; /* Sarı - warning */
-        color: #212529; /* Koyu ikon rengi */
+        background-color: #ffc107; 
+        color: #212529; 
     }
     .btn-edit:hover {
         background-color: #e0a800;
@@ -178,19 +178,18 @@
     }
 
     .btn-delete {
-        background-color: #dc3545; /* Kırmızı - danger */
+        background-color: #dc3545; 
     }
     .btn-delete:hover {
         background-color: #c82333;
         transform: scale(1.1);
     }
 
-    /* Pagination Styling */
     .pagination-container {
         display: flex;
         justify-content: center;
         padding: 20px 0;
-        background-color: #f8f9fa; /* Sayfalama alanı için hafif arka plan */
+        background-color: #f8f9fa; 
         border-bottom-left-radius: 10px;
         border-bottom-right-radius: 10px;
         box-shadow: 0 -3px 10px rgba(0, 0, 0, 0.03);
@@ -218,9 +217,8 @@
         color: #0056b3;
     }
 
-    /* Loading Spinner */
     .loading {
-        display: none; /* Varsayılan olarak gizli */
+        display: none; 
         position: absolute;
         top: 0;
         left: 0;
@@ -248,7 +246,6 @@
         100% { transform: rotate(360deg); }
     }
 
-    /* No Results Message */
     #noResultsMessage {
         display: none;
         text-align: center;
@@ -301,11 +298,10 @@
                 </tr>
             </thead>
             <tbody>
-                @* JavaScript tarafından doldurulacak veya başlangıçta modellenmiş veriler burada listelenecek *@
                 @foreach (var item in Model)
                 {
                     <tr data-category-name="@item.Name.ToLower()">
-                        <td></td> @* Sıra numarası JS tarafından atanacak *@
+                        <td></td> 
                         <td><span class="product-name">@item.Name</span></td>
                         <td>
                             <span class="category-description">
@@ -357,16 +353,15 @@
         const searchInput = $("#searchInput");
         const itemsPerPageSelect = $("#itemsPerPage");
         const categoryTableBody = $("#categoryTable tbody");
-        const tableRows = categoryTableBody.find("tr"); // Başlangıçtaki tüm satırları al
+        const tableRows = categoryTableBody.find("tr"); 
         const pagination = $("#pagination");
         const loadingSpinner = $("#loading");
         const noResultsMessage = $("#noResultsMessage");
 
         let currentPage = 1;
 
-        // SweetAlert ile silme onayı
         $(document).on("click", ".btn-delete", function (e) {
-            e.preventDefault(); // Sayfa yönlendirmesini engelle
+            e.preventDefault(); 
             const categoryId = $(this).data("id");
             const categoryName = $(this).data("name");
 
@@ -387,10 +382,10 @@
         });
 
         function renderTable() {
-            loadingSpinner.show(); // Yükleniyor spinner'ını göster
-            noResultsMessage.hide(); // Sonuç yok mesajını gizle
+            loadingSpinner.show(); 
+            noResultsMessage.hide(); 
 
-            setTimeout(() => { // Simülasyon için gecikme
+            setTimeout(() => { 
                 const searchTerm = searchInput.val().toLowerCase();
                 const itemsPerPage = parseInt(itemsPerPageSelect.val());
 
@@ -399,11 +394,10 @@
                     return categoryName.includes(searchTerm);
                 });
 
-                // Sonuç yoksa mesaj göster
                 if (filteredRows.length === 0) {
                     noResultsMessage.show();
-                    categoryTableBody.empty(); // Tablo içeriğini boşalt
-                    pagination.empty(); // Sayfalama butonlarını temizle
+                    categoryTableBody.empty(); 
+                    pagination.empty(); 
                     loadingSpinner.hide();
                     return;
                 }
@@ -412,27 +406,26 @@
 
                 function showPage(page) {
                     currentPage = page;
-                    categoryTableBody.empty(); // Mevcut tablo içeriğini temizle
+                    categoryTableBody.empty(); 
 
                     const start = (page - 1) * itemsPerPage;
                     const end = start + itemsPerPage;
 
-                    let currentSiraNo = start + 1; // Başlangıç sıra numarasını ayarla
+                    let currentSiraNo = start + 1; 
 
                     filteredRows.slice(start, end).each(function () {
-                        const clonedRow = $(this).clone(); // Orijinal satırı klonla
-                        clonedRow.find('td:first').text(currentSiraNo++); // İlk sütuna sıra numarasını ata
-                        categoryTableBody.append(clonedRow); // Klonlanmış satırı tabloya ekle
+                        const clonedRow = $(this).clone(); 
+                        clonedRow.find('td:first').text(currentSiraNo++); 
+                        categoryTableBody.append(clonedRow); 
                     });
 
                     updatePagination(pageCount, currentPage);
                 }
 
                 function updatePagination(pageCount, currentPage) {
-                    pagination.empty(); // Mevcut sayfalandırmayı temizle
+                    pagination.empty(); 
 
                     if (pageCount > 1) {
-                        // Önceki sayfası butonu
                         pagination.append(`
                             <li class="page-item ${currentPage === 1 ? 'disabled' : ''}">
                                 <a class="page-link" href="#" data-page="${currentPage - 1}" aria-label="Previous">
@@ -441,7 +434,6 @@
                             </li>
                         `);
 
-                        // Sayfa numaraları
                         for (let i = 1; i <= pageCount; i++) {
                             pagination.append(
                                 `<li class="page-item ${i === currentPage ? 'active' : ''}">
@@ -450,7 +442,6 @@
                             );
                         }
 
-                        // Sonraki sayfası butonu
                         pagination.append(`
                             <li class="page-item ${currentPage === pageCount ? 'disabled' : ''}">
                                 <a class="page-link" href="#" data-page="${currentPage + 1}" aria-label="Next">
@@ -461,7 +452,6 @@
                     }
                 }
 
-                // Sayfalama butonlarına tıklama olayı
                 pagination.off("click").on("click", "a.page-link", function (e) {
                     e.preventDefault();
                     const targetPage = parseInt($(this).data("page"));
@@ -470,16 +460,14 @@
                     }
                 });
 
-                showPage(1); // Filtrelenmiş sonuçların ilk sayfasını göster
-                loadingSpinner.hide(); // Yükleniyor spinner'ını gizle
-            }, 300); // Küçük bir gecikme ekleyerek yükleme hissi ver
+                showPage(1); 
+                loadingSpinner.hide(); 
+            }, 300); 
         }
 
-        // Arama ve sayfa başına öğe değiştiğinde tabloyu yeniden render et
         searchInput.on("input", renderTable);
         itemsPerPageSelect.on("change", renderTable);
 
-        // Sayfa yüklendiğinde tabloyu ilk kez render et
         renderTable();
     });
 </script>

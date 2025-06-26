@@ -1,6 +1,6 @@
 ﻿@model KitapProject.Models.OrderCreateViewModel
 @{
-    Layout = null; // Layout kullanıyorsanız kaldırın veya uygun layout'u ayarlayın
+    Layout = null; 
 }
 
 <!DOCTYPE html>
@@ -11,7 +11,6 @@
     <title>Sipariş Tamamla - Kitap Mağazası</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Mevcut CSS kodlarınız buraya gelecek */
         * {
             margin: 0;
             padding: 0;
@@ -146,7 +145,7 @@
         input[type="text"],
         input[type="email"],
         textarea,
-        select { /* select elementi için de stil ekledim */
+        select { 
             width: 100%;
             padding: 15px;
             border: 2px solid #e1e5e9;
@@ -178,7 +177,7 @@
         }
 
         .card-form input,
-        .card-form select { /* select elementi için de stil ekledim */
+        .card-form select { 
             background: rgba(255, 255, 255, 0.9);
         }
 
@@ -212,7 +211,6 @@
         .item-image {
             width: 60px;
             height: 80px;
-            /* background: linear-gradient(135deg, #667eea, #764ba2); */
             border-radius: 8px;
             display: flex;
             align-items: center;
@@ -220,7 +218,7 @@
             color: white;
             font-size: 1.5rem;
             margin-right: 15px;
-            overflow: hidden; /* Resim sığmazsa taşmasını engeller */
+            overflow: hidden; 
         }
         .item-image img {
             width: 100%;
@@ -640,7 +638,6 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
     <script>
-        // Kart numarası formatlaması
         document.getElementById('CardNumber').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\s/g, '');
             let formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
@@ -649,7 +646,6 @@
             }
         });
 
-        // Son kullanma tarihi formatlaması
         document.getElementById('ExpirationDate').addEventListener('input', function(e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length >= 2) {
@@ -658,24 +654,19 @@
             e.target.value = value;
         });
 
-        // CVV sadece rakam
         document.getElementById('CVV').addEventListener('input', function(e) {
             e.target.value = e.target.value.replace(/\D/g, '');
         });
 
-        // Form gönderimi
         document.getElementById('orderForm').addEventListener('submit', function(e) {
-            // Client tarafı validasyonu geçmezse submit'i durdur
             if (!$(this).valid()) {
                 return;
             }
 
-            e.preventDefault(); // Varsayılan formu göndermeyi engeller
+            e.preventDefault(); 
 
-            // Loading overlay göster
             document.getElementById('loadingOverlay').style.display = 'flex';
 
-            // Formu asenkron olarak gönder
             const form = e.target;
             const formData = new FormData(form);
 
@@ -687,15 +678,14 @@
                 }
             })
             .then(response => {
-                // Sunucudan gelen yanıtı JSON olarak veya text olarak al
                 if (response.ok && response.redirected) {
-                    window.location.href = response.url; // Yönlendirmeyi takip et
+                    window.location.href = response.url; 
                 } else if (response.ok) {
-                    return response.text().then(text => { // Yanıtı text olarak al
+                    return response.text().then(text => { 
                         try {
-                            return JSON.parse(text); // JSON ise parse et
+                            return JSON.parse(text); 
                         } catch (error) {
-                            return text; // JSON değilse text olarak bırak
+                            return text; 
                         }
                     });
                 } else {
@@ -703,15 +693,12 @@
                 }
             })
             .then(data => {
-                // Eğer sunucudan bir hata mesajı gelirse veya model geçerli değilse
                 if (typeof data === 'string' && data.includes("validation-summary-errors")) {
-                     // Hata HTML'i döndüyse, mevcut sayfayı bu HTML ile güncelle
                     document.documentElement.innerHTML = data;
                 }
                 else {
-                    // Yükleniyor ekranını gizle (yönlendirme olmazsa)
                     document.getElementById('loadingOverlay').style.display = 'none';
-                    if (data && data.success === false) { // Örnek olarak hata durumu
+                    if (data && data.success === false) { 
                         alert(data.message || "Sipariş işlenirken bir hata oluştu.");
                     }
                 }
@@ -719,11 +706,10 @@
             .catch(error => {
                 console.error('Sipariş gönderilirken hata oluştu:', error);
                 alert('Bir hata oluştu: ' + error.message);
-                document.getElementById('loadingOverlay').style.display = 'none'; // Hata durumunda gizle
+                document.getElementById('loadingOverlay').style.display = 'none'; 
             });
         });
 
-        // Kayıtlı kart seçimi değiştiğinde yeni kart alanlarını gizle/göster
         document.addEventListener('DOMContentLoaded', function() {
             const selectedPaymentInfoId = document.getElementById('SelectedPaymentInfoId');
             const newCardFields = document.getElementById('newCardFields');
@@ -735,14 +721,12 @@
             function toggleNewCardFields() {
                 if (selectedPaymentInfoId && selectedPaymentInfoId.value !== "") {
                     newCardFields.style.display = 'none';
-                    // Yeni kart alanlarını zorunlu olmaktan çıkar
                     cardHolderNameInput.removeAttribute('required');
                     cardNumberInput.removeAttribute('required');
                     expirationDateInput.removeAttribute('required');
                     cvvInput.removeAttribute('required');
                 } else {
                     newCardFields.style.display = 'block';
-                    // Yeni kart alanlarını zorunlu yap
                     cardHolderNameInput.setAttribute('required', 'required');
                     cardNumberInput.setAttribute('required', 'required');
                     expirationDateInput.setAttribute('required', 'required');
@@ -752,10 +736,9 @@
 
             if (selectedPaymentInfoId) {
                 selectedPaymentInfoId.addEventListener('change', toggleNewCardFields);
-                toggleNewCardFields(); // Sayfa yüklendiğinde başlangıç durumunu ayarla
+                toggleNewCardFields(); 
             }
 
-            // Animasyonlar için
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if (entry.isIntersecting) {

@@ -10,167 +10,155 @@
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
 
 <style>
-    /* Evrensel kutu boyutlandırma modeli: padding ve border'ın elementin toplam genişlik ve yüksekliğine dahil olmasını sağlar */
     * {
         box-sizing: border-box;
     }
 
-    /* Body için temel stil ayarları */
     body {
-        margin: 0; /* Sayfanın kenarlarındaki boşlukları kaldırır */
-        padding: 0; /* Sayfanın içeriğindeki boşlukları kaldırır */
-        font-family: Arial, sans-serif; /* Yazı tipini belirler */
-        overflow-x: hidden; /* Yatay kaydırma çubuğunu gizler, ekrandan taşmayı engeller */
-        font-size: 14px; /* GENEL YAZI TİPİ BOYUTUNU KÜÇÜLT */
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+        overflow-x: hidden;
+        font-size: 14px;
     }
 
-    /* Gradyan arka plan stili */
     .gradient-bg {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); /* Belirtilen renklerle doğrusal gradyan arka plan */
-        padding: 0.75rem; /* İÇ BOŞLUĞU KÜÇÜLT */
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        padding: 0.75rem;
     }
 
-    /* Kartların üzerine gelindiğinde (hover) uygulanan efektler */
     .card-hover {
-        transition: all 0.3s ease; /* Tüm değişikliklerin 0.3 saniyede yumuşak geçiş yapmasını sağlar */
-        max-width: 100%; /* Kartın maksimum genişliğini %100 olarak ayarlar */
-        width: 100%; /* Kartın genişliğini %100 olarak ayarlar */
-        margin: 0 auto; /* Kartı yatayda ortalar */
+        transition: all 0.3s ease;
+        max-width: 100%;
+        width: 100%;
+        margin: 0 auto;
     }
 
-    .card-hover:hover {
-        transform: translateY(-2px); /* Üzerine gelindiğinde kartı dikeyde 2px yukarı hareket ettirir */
-        box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); /* Üzerine gelindiğinde karta gölge ekler */
-    }
+        .card-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
 
-    /* --- Durum Kartları --- */
-    /* Tüm durum kartları için ortak stiller */
     .status-pending,
     .status-completed,
     .status-cancelled,
     .status-preparing {
-        max-width: 100%; /* KART GENİŞLİĞİNİ %100 YAPTIM (Daha küçük olmalı) */
-        margin: 0.5rem auto; /* Dikeyde 0.5rem boşluk ve yatayda ortalama */
-        padding: 0.5rem 1rem; /* İÇ BOŞLUĞU KÜÇÜLT */
-        border-radius: 8px; /* KÖŞELERİ DAHA AZ YUVARLA */
-        text-align: center; /* Metni ortalar */
-        word-wrap: break-word; /* Uzun kelimelerin kutu dışına taşmasını engeller, satır atlatır */
-        display: inline-block; /* Metinle birlikte kullanıldığında daha iyi hizalama */
-        font-size: 0.85rem; /* YAZI TİPİ BOYUTUNU KÜÇÜLT */
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1); /* Gölgeyi küçült */
+        max-width: 100%;
+        margin: 0.5rem auto;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        text-align: center;
+        word-wrap: break-word;
+        display: inline-block;
+        font-size: 0.85rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    /* Beklemedeki durum kartı stili */
     .status-pending {
-        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%); /* Belirtilen renklerle doğrusal gradyan arka plan */
-        color: #8b4513; /* Metin rengi */
-        border: 1px solid #f4a261; /* Kenar çizgisi kalınlığını azalt */
+        background: linear-gradient(135deg, #ffecd2 0%, #fcb69f 100%);
+        color: #8b4513;
+        border: 1px solid #f4a261;
     }
 
-    /* Tamamlanmış durum kartı stili */
     .status-completed {
-        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%); /* Belirtilen renklerle doğrusal gradyan arka plan */
-        color: #155724; /* Metin rengi */
-        border: 1px solid #28a745; /* Kenar çizgisi kalınlığını azalt */
+        background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+        color: #155724;
+        border: 1px solid #28a745;
     }
 
-    /* İptal edilmiş durum kartı stili */
     .status-cancelled {
-        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%); /* Belirtilen renklerle doğrusal gradyan arka plan */
-        color: #721c24; /* Metin rengi */
-        border: 1px solid #dc3545; /* Kenar çizgisi kalınlığını azalt */
+        background: linear-gradient(135deg, #ff9a9e 0%, #fecfef 100%);
+        color: #721c24;
+        border: 1px solid #dc3545;
     }
 
-    /* Hazırlanıyor durum kartı stili */
     .status-preparing {
-        background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%); /* Belirtilen renklerle doğrusal gradyan arka plan */
-        color: #0c5460; /* Metin rengi */
-        border: 1px solid #17a2b8; /* Kenar çizgisi kalınlığını azalt */
+        background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+        color: #0c5460;
+        border: 1px solid #17a2b8;
     }
 
-    /* Gökkuşağı kenarlıklı kart stili */
     .rainbow-border {
-        border: 2px solid; /* KENAR ÇİZGİSİ KALINLIĞINI AZALT */
+        border: 2px solid;
         border-image: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3) 1;
-        border-radius: 12px; /* KÖŞELERİ KÜÇÜLT */
-        padding: 0.75rem; /* İÇ BOŞLUĞU KÜÇÜLT */
-        max-width: 95%; /* MAKSİMUM GENİŞLİĞİ %95 YAP (Çerçeve için daha uygun) */
-        margin: 0.75rem auto; /* Dikeyde 0.75rem boşluk ve yatayda ortalama */
+        border-radius: 12px;
+        padding: 0.75rem;
+        max-width: 95%;
+        margin: 0.75rem auto;
     }
 
-    /* Nabız atışı (pulse) animasyonu */
     .pulse-animation {
-        animation: pulse 2s infinite; /* 'pulse' animasyonunu 2 saniyede bir sonsuz döngüde çalıştırır */
+        animation: pulse 2s infinite;
     }
 
-    /* 'pulse' animasyonunun keyframe'leri (anahtar kareleri) */
     @@keyframes pulse {
         0% {
-            transform: scale(1); /* Başlangıçta normal boyut */
+            transform: scale(1);
         }
+
         50% {
-            transform: scale(1.01); /* Ortada %1.01 oranında daha az büyür */
+            transform: scale(1.01);
         }
+
         100% {
-            transform: scale(1); /* Sonda tekrar normal boyuta döner */
+            transform: scale(1);
         }
     }
 
-    /* Yüzen (floating) animasyon */
     .floating {
-        animation: floating 3s ease-in-out infinite; /* 'floating' animasyonunu 3 saniyede bir sonsuz döngüde çalıştırır */
+        animation: floating 3s ease-in-out infinite;
     }
 
-    /* 'floating' animasyonunun keyframe'leri */
     @@keyframes floating {
         0% {
-            transform: translateY(0px); /* Başlangıçta dikeyde hareket yok */
+            transform: translateY(0px);
         }
+
         50% {
-            transform: translateY(-3px); /* Ortada dikeyde 3px yukarı hareket eder (daha az) */
+            transform: translateY(-3px);
         }
+
         100% {
-            transform: translateY(0px); /* Sonda tekrar başlangıç konumuna döner */
+            transform: translateY(0px);
         }
     }
 
-    /* Cam (glass) efekti stili */
     .glass-effect {
-        background: rgba(255, 255, 255, 0.85); /* Şeffaflığı biraz artır */
-        backdrop-filter: blur(8px); /* Bulanıklığı azalt */
-        border: 1px solid rgba(255, 255, 255, 0.15); /* Kenar çizgisi şeffaflığını artır */
-        padding: 1rem; /* İÇ BOŞLUĞU KÜÇÜLT */
-        border-radius: 10px; /* KÖŞELERİ KÜÇÜLT */
-        max-width: 95%; /* MAKSİMUM GENİŞLİĞİ %95 YAP */
-        margin: 0.75rem auto; /* Dikeyde 0.75rem boşluk ve yatayda ortalama */
+        background: rgba(255, 255, 255, 0.85);
+        backdrop-filter: blur(8px);
+        border: 1px solid rgba(255, 255, 255, 0.15);
+        padding: 1rem;
+        border-radius: 10px;
+        max-width: 95%;
+        margin: 0.75rem auto;
     }
 
-    /* --- Ana Kapsayıcı ve Genel Sayfa Dolgusu --- */
     .min-h-screen {
         min-height: 100vh;
     }
-    .main-content-padding { /* Yeni eklenen bir sınıf */
-        padding: 1rem; /* p-4 yerine daha küçük bir değer */
-    }
-    .background-gradient { /* bg-gradient-to-br from-purple-400 via-pink-500 to-red-500 yerine */
-        background: linear-gradient(to bottom right, #a78bfa, #ec4899, #ef4444); /* Tailwind renklerine yakın gradyan */
+
+    .main-content-padding {
+        padding: 1rem;
     }
 
-    /* --- Başlık Alanı Stilleri --- */
+    .background-gradient {
+        background: linear-gradient(to bottom right, #a78bfa, #ec4899, #ef4444);
+    }
+
     .order-header-container {
-        margin-bottom: 1.5rem; /* mb-8 yerine daha az boşluk */
-        border-radius: 1rem; /* rounded-3xl yerine daha az yuvarlama */
+        margin-bottom: 1.5rem;
+        border-radius: 1rem;
         position: relative;
         overflow: hidden;
-        max-width: 95%; /* Tablo ile uyumlu olması için genişliği azalt */
+        max-width: 95%;
         margin-left: auto;
         margin-right: auto;
-        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1); /* Gölgeyi küçült */
+        box-shadow: 0 5px 10px rgba(0, 0, 0, 0.1);
     }
 
     .order-header-bg {
         background: linear-gradient(to right, #2563eb, #9333ea, #ec4899);
-        padding: 1.5rem; /* p-8 yerine daha az dolgu */
+        padding: 1.5rem;
     }
 
     .order-header-content {
@@ -178,72 +166,69 @@
     }
 
     .order-header-title {
-        font-size: 2.5rem; /* text-5xl yerine daha küçük font boyutu */
+        font-size: 2.5rem;
         font-weight: bold;
         color: #fff;
-        margin-bottom: 0.5rem; /* mb-4 yerine daha az boşluk */
-        /* floating animasyonu zaten yukarıda tanımlı */
+        margin-bottom: 0.5rem;
     }
 
     .order-header-icon-left {
-        margin-right: 0.75rem; /* mr-4 yerine daha az boşluk */
+        margin-right: 0.75rem;
         color: #facc15;
     }
 
     .order-header-icon-right {
-        margin-left: 0.75rem; /* ml-4 yerine daha az boşluk */
+        margin-left: 0.75rem;
         color: #facc15;
     }
 
     .order-header-subtitle {
-        font-size: 1rem; /* text-xl yerine daha küçük font boyutu */
+        font-size: 1rem;
         color: #e9d5ff;
     }
 
-    /* --- Durum Kartları Izgarası --- */
     .status-cards-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); /* Daha küçük kartlar ve esneklik */
-        gap: 1.25rem; /* gap-6 yerine daha küçük boşluk */
-        margin-bottom: 1.5rem; /* mb-8 yerine daha az boşluk */
-        max-width: 95%; /* Sayfanın genel genişliği ile uyumlu */
+        grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+        gap: 1.25rem;
+        margin-bottom: 1.5rem;
+        max-width: 95%;
         margin-left: auto;
         margin-right: auto;
     }
 
-    .status-card-inner { /* Her bir durum kartının içindeki elementler için */
-        padding: 1rem; /* p-6 yerine daha az dolgu */
-        border-radius: 1rem; /* rounded-2xl yerine daha az yuvarlama */
+    .status-card-inner {
+        padding: 1rem;
+        border-radius: 1rem;
     }
 
     .status-card-icon {
-        font-size: 2.5rem; /* text-4xl yerine daha küçük ikon boyutu */
-        margin-bottom: 0.5rem; /* mb-3 yerine daha az boşluk */
+        font-size: 2.5rem;
+        margin-bottom: 0.5rem;
     }
 
     .status-card-title {
-        font-size: 1.25rem; /* text-2xl yerine daha küçük başlık boyutu */
+        font-size: 1.25rem;
         font-weight: bold;
     }
 
     .status-card-count {
-        font-size: 2rem; /* text-3xl yerine daha küçük sayı boyutu */
+        font-size: 2rem;
         font-weight: bold;
     }
 
-    /* --- Tablo Alanı --- */
     .table-section-container {
-        border-radius: 1.5rem; /* rounded-3xl */
-        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1); /* shadow-2xl */
-        overflow: hidden; /* overflow-hidden */
-        border: 2px solid; /* rainbow-border kalınlığını kullan */
+        border-radius: 1.5rem;
+        box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+        overflow: hidden;
+        border: 2px solid;
         border-image: linear-gradient(45deg, #ff6b6b, #4ecdc4, #45b7d1, #96ceb4, #feca57, #ff9ff3) 1;
-        max-width: 95%; /* Genel genişlik ile uyumlu */
+        max-width: 95%;
         margin-left: auto;
         margin-right: auto;
     }
 
-    .table-responsive { /* overflow-x-auto yerine */
+    .table-responsive {
         overflow-x: auto;
     }
 
@@ -257,136 +242,141 @@
     }
 
     .table-header-cell {
-        padding: 0.75rem 1rem; /* px-6 py-4 yerine daha az dolgu */
+        padding: 0.75rem 1rem;
         text-align: left;
         font-weight: bold;
-        font-size: 0.9rem; /* Başlık font boyutunu küçült */
-
+        font-size: 0.9rem;
     }
 
-    .table-header-cell i {
-        margin-right: 0.25rem; /* mr-2 yerine daha az boşluk */
-    }
+        .table-header-cell i {
+            margin-right: 0.25rem;
+        }
 
     .table-cell-padding {
-        padding: 0.75rem 1rem; /* px-6 py-6 yerine daha az dolgu */
-        font-size: 0.85rem; /* Genel hücre metin boyutunu küçült */
-        color:green;
+        padding: 0.75rem 1rem;
+        font-size: 0.85rem;
+        color: green;
     }
 
     .user-initials-avatar {
-        width: 2.5rem; /* w-12 yerine daha küçük */
-        height: 2.5rem; /* h-12 yerine daha küçük */
-        font-size: 0.9rem; /* Font boyutunu küçült */
-        margin-right: 0.75rem; /* mr-4 yerine daha az boşluk */
+        width: 2.5rem;
+        height: 2.5rem;
+        font-size: 0.9rem;
+        margin-right: 0.75rem;
     }
 
     .user-info-text p.font-bold {
-        font-size: 0.9rem; /* text-lg yerine daha küçük */
-        color:blue;
+        font-size: 0.9rem;
+        color: blue;
     }
 
     .user-info-text p.text-sm {
-        font-size: 0.75rem; /* text-sm kalabilir veya küçültülebilir */
-        color:red;
+        font-size: 0.75rem;
+        color: red;
     }
 
     .total-amount-display {
-        font-size: 1.25rem; /* text-2xl yerine daha küçük */
+        font-size: 1.25rem;
         font-weight: bold;
     }
 
     .status-dropdown-button {
-        padding: 0.3rem 0.6rem; /* px-4 py-2 yerine daha küçük dolgu */
-        font-size: 0.8rem; /* Font boyutunu küçült */
-        border-radius: 9999px; /* rounded-full */
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); /* Gölgeyi küçült */
+        padding: 0.3rem 0.6rem;
+        font-size: 0.8rem;
+        border-radius: 9999px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
     }
 
     .dropdown-menu-wrapper {
-        margin-top: 0.25rem; /* mt-2 yerine daha az boşluk */
-        width: 10rem; /* w-48 yerine daha küçük */
-        border-radius: 0.75rem; /* rounded-2xl yerine daha az yuvarlama */
-        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05); /* Gölgeyi küçült */
+        margin-top: 0.25rem;
+        width: 10rem;
+        border-radius: 0.75rem;
+        box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
     }
 
     .dropdown-menu-item {
-        padding: 0.5rem 0.75rem; /* px-4 py-3 yerine daha az dolgu */
-        font-size: 0.8rem; /* Font boyutunu küçült */
-        border-radius: 0.5rem; /* rounded-xl yerine daha az yuvarlama */
+        padding: 0.5rem 0.75rem;
+        font-size: 0.8rem;
+        border-radius: 0.5rem;
     }
 
     .message-span, .error-span {
-        padding: 0.2rem 0.5rem; /* px-3 py-1 yerine daha küçük dolgu */
-        font-size: 0.75rem; /* Font boyutunu küçült */
+        padding: 0.2rem 0.5rem;
+        font-size: 0.75rem;
     }
 
-    /* Alt Kısım Metni */
     .footer-message-container {
-        text-align: center; /* text-center */
-        padding: 1.5rem; /* p-8 yerine daha az dolgu */
-        margin-top: 1.5rem; /* mt-8 yerine daha az boşluk */
+        text-align: center;
+        padding: 1.5rem;
+        margin-top: 1.5rem;
     }
+
     .footer-message-inner {
-        padding: 0.75rem 1.5rem; /* px-8 py-4 yerine daha az dolgu */
-        border-radius: 1rem; /* rounded-2xl yerine daha az yuvarlama */
+        padding: 0.75rem 1.5rem;
+        border-radius: 1rem;
     }
+
     .footer-message-text {
-        font-size: 1rem; /* text-lg yerine daha küçük font boyutu */
-        font-weight: 600; /* font-semibold */
-    }
-    .footer-message-text i {
-        margin-right: 0.5rem; /* mr-2 */
-        margin-left: 0.5rem; /* ml-2 */
+        font-size: 1rem;
+        font-weight: 600;
     }
 
+        .footer-message-text i {
+            margin-right: 0.5rem;
+            margin-left: 0.5rem;
+        }
 
-    /* --- Responsive Ayarlamalar (Mobil Uyumlu) --- */
-    /* Zaten var olan responsive kurallarınızı daha da optimize edebilirsiniz.
-       Yukarıdaki ayarlamalar genel olarak daha küçük bir görünüm sağladığı için
-       çok daha az medya sorgusuna ihtiyacınız olabilir.
-       Ancak, belirli kırılma noktalarında daha fazla ayarlama yapmak isterseniz
-       burayı kullanın. */
     @@media (max-width: 768px) {
         .order-header-title {
-            font-size: 1.8rem; /* Daha küçük mobil başlık */
+            font-size: 1.8rem;
         }
+
         .order-header-subtitle {
             font-size: 0.9rem;
         }
+
         .status-cards-grid {
-            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* Mobil için daha da küçük kartlar */
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
             gap: 1rem;
         }
+
         .status-card-icon {
             font-size: 2rem;
         }
+
         .status-card-title {
             font-size: 1rem;
         }
+
         .status-card-count {
             font-size: 1.8rem;
         }
+
         .table-header-cell, .table-cell-padding {
-            padding: 0.5rem 0.75rem; /* Mobil tabloda daha az dolgu */
-            font-size: 0.8rem; /* Mobil tablo fontu */
+            padding: 0.5rem 0.75rem;
+            font-size: 0.8rem;
         }
+
         .user-initials-avatar {
             width: 2rem;
             height: 2rem;
             font-size: 0.75rem;
         }
+
         .status-dropdown-button {
             padding: 0.2rem 0.4rem;
             font-size: 0.7rem;
         }
+
         .dropdown-menu-wrapper {
             width: 8rem;
         }
+
         .dropdown-menu-item {
             font-size: 0.75rem;
             padding: 0.4rem 0.6rem;
         }
+
         .message-span, .error-span {
             font-size: 0.7rem;
             padding: 0.15rem 0.4rem;
@@ -451,30 +441,34 @@
             <div class="table-responsive">
                 <table class="min-w-full">
                     <thead>
-                        <tr class="table-header-row">
-                            <th class="table-header-cell">
-                                <i class="fas fa-user mr-2"></i>Müşteri
-                            </th>
-                            <th class="table-header-cell">
-                                <i class="fas fa-calendar mr-2"></i>Sipariş Tarihi
-                            </th>
-                            <th class="table-header-cell">
-                                <i class="fas fa-lira-sign mr-2"></i>Toplam Tutar
-                            </th>
-                            <th class="table-header-cell">
-                                <i class="fas fa-info-circle mr-2"></i>Durum
-                            </th>
-                            <th class="table-header-cell">
-                                <i class="fas fa-map-marker-alt mr-2"></i>Teslimat Adresi
-                            </th>
-                            <th class="table-header-cell">
-                                <i class="fas fa-city mr-2"></i>Şehir
-                            </th>
-                            <th class="table-header-cell"> <i class="fas fa-flag mr-2"></i>Ülke
-                            </th>
-                        </tr>
-                    </thead>
-                    <tbody>
+                            <tr class="table-header-row">
+                                <th class="table-header-cell">
+                                    <i class="fas fa-user mr-2"></i>Müşteri
+                                </th>
+                                <th class="table-header-cell">
+                                    <i class="fas fa-calendar mr-2"></i>Sipariş Tarihi
+                                </th>
+                                <th class="table-header-cell">
+                                    <i class="fas fa-lira-sign mr-2"></i>Toplam Tutar
+                                </th>
+                                <th class="table-header-cell">
+                                    <i class="fas fa-info-circle mr-2"></i>Durum
+                                </th>
+                                <th class="table-header-cell">
+                                    <i class="fas fa-map-marker-alt mr-2"></i>Teslimat Adresi
+                                </th>
+                                <th class="table-header-cell">
+                                    <i class="fas fa-city mr-2"></i>Şehir
+                                </th>
+                                <th class="table-header-cell">
+                                    <i class="fas fa-flag mr-2"></i>Ülke
+                                </th>
+                                <th class="table-header-cell">
+                                    <i class="fas fa-cogs mr-2"></i>İşlemler
+                                </th>
+                            </tr>
+                        </thead>
+                   <tbody>
                         @foreach (var order in Model)
                         {
                             var currentStatusDisplay = ((OrderStatus)Enum.Parse(typeof(OrderStatus), order.OrderStatus)).GetDisplayName();
@@ -502,14 +496,14 @@
                             }
 
                             var userInitials = order.AppUser?.FullName?.Split(' ')
-                            .Select(n => n.FirstOrDefault())
-                            .Take(2)
-                            .Aggregate("", (acc, c) => acc + c)
-                            ?? "??";
+                                .Select(n => n.FirstOrDefault())
+                                .Take(2)
+                                .Aggregate("", (acc, c) => acc + c)
+                                ?? "??";
 
-                            <tr class="bg-gradient-to-r @rowGradient transition-all duration-300 border-b border-purple-200">
+                            <tr class="bg-gradient-to-r @rowGradient transition-all duration-300 border-b border-purple-200 cursor-pointer" onclick="window.location.href = '@Url.Action("OrderDetails", "Sale", new { id = order.OrderId })'">
                                 <td class="table-cell-padding">
-                                    <div class="flex-items-center">
+                                    <div class="flex items-center">
                                         <div class="user-initials-avatar">
                                             @userInitials
                                         </div>
@@ -527,12 +521,13 @@
                                 </td>
                                 <td class="table-cell-padding">
                                     <span class="total-amount-display">
-                                        <i class="fas fa-lira-sign mr-1"></i>@order.TotalAmount.ToString("N2")
+                                        @order.TotalAmount.ToString("C", new System.Globalization.CultureInfo("tr-TR"))
                                     </span>
                                 </td>
                                 <td class="table-cell-padding">
-                                    <div class="flex-items-center space-x-3">
-                                        <span class="@statusColorClass px-4 py-2 rounded-full text-sm font-bold shadow-lg"> <i class="@iconClass mr-1"></i>@currentStatusDisplay
+                                    <div class="flex items-center space-x-3" onclick="event.stopPropagation();">
+                                        <span class="@statusColorClass px-4 py-2 rounded-full text-sm font-bold shadow-lg">
+                                            <i class="@iconClass mr-1"></i>@currentStatusDisplay
                                         </span>
                                         <div class="relative inline-block text-left">
                                             <button onclick="toggleDropdown('@order.OrderId')" type="button"
@@ -589,6 +584,11 @@
                                     <i class="fas fa-flag mr-1 text-red-500"></i>@order.Country
                                 </td>
                                 <td class="table-cell-padding text-center">
+                                    <a href="@Url.Action("OrderDetails", "Sale", new { id = order.OrderId })" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-full transition duration-300 ease-in-out">
+                                        <i class="fas fa-search-plus mr-1"></i> Detay
+                                    </a>
+                                </td>
+                                <td class="table-cell-padding text-center">
                                     <span id="message-@order.OrderId" class="hidden message-span">
                                         <i class="fas fa-check-circle mr-1"></i>Güncellendi!
                                     </span>
@@ -617,20 +617,17 @@
 
 <script>
     function toggleDropdown(orderId) {
-        // Tüm açık dropdown'ları kapat
         document.querySelectorAll('[id^="dropdown-"]').forEach(dropdown => {
             if (dropdown.id !== `dropdown-${orderId}`) {
                 dropdown.classList.add('hidden');
             }
         });
 
-        // İlgili dropdown'ı aç/kapat
         const dropdown = document.getElementById(`dropdown-${orderId}`);
         dropdown.classList.toggle('hidden');
     }
 
-    // Sayfa herhangi bir yerine tıklandığında dropdown'ları kapat
-    document.addEventListener('click', function(event) {
+    document.addEventListener('click', function (event) {
         if (!event.target.closest('[onclick^="toggleDropdown"]')) {
             document.querySelectorAll('[id^="dropdown-"]').forEach(dropdown => {
                 dropdown.classList.add('hidden');
@@ -657,8 +654,6 @@
 
             if (response.ok) {
                 messageElement.classList.remove('hidden');
-
-                // 3 saniye sonra sayfayı yenile
                 setTimeout(() => location.reload(), 3000);
             } else {
                 const errorText = await response.text();
@@ -671,7 +666,6 @@
             errorElement.classList.remove('hidden');
         }
 
-        // Dropdown'ı kapat
         const dropdown = document.getElementById(`dropdown-${orderId}`);
         dropdown.classList.add('hidden');
     }
@@ -681,14 +675,11 @@
         return tokenElement ? tokenElement.value : '';
     }
 
-    // Animasyonları başlat
-    document.addEventListener('DOMContentLoaded', function() {
-        // Floating animasyonu için random delay
+    document.addEventListener('DOMContentLoaded', function () {
         document.querySelectorAll('.floating').forEach((el, index) => {
             el.style.animationDelay = `${index * 0.5}s`;
         });
 
-        // Pulse animasyonu için random delay
         document.querySelectorAll('.pulse-animation').forEach((el, index) => {
             el.style.animationDelay = `${index * 0.2}s`;
         });

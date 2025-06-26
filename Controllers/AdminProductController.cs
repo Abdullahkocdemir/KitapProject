@@ -119,7 +119,6 @@ namespace KitapProject.Controllers
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit([FromForm] UpdateProductDTO updateProductDto)
         {
-            // Fetch the product from the database first to retain its ID and other properties
             var product = await _context.Products.AsNoTracking().FirstOrDefaultAsync(p => p.ProductId == updateProductDto.ProductId);
 
             if (product == null)

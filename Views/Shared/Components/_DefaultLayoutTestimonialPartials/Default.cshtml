@@ -1,0 +1,14 @@
+﻿@model List<Testimonial>
+<section id="okur-yorumlari" class="testimonials-section container">
+    <h2 class="section-title">Okurlarımız Ne Diyor?</h2>
+    <div class="testimonial-grid">
+        @foreach (var item in Model)
+        {
+            <div class="testimonial-card">
+                <div class="testimonial-rating">★★★★★</div>
+                <p class="testimonial-text">@item.Description</p>
+                <div class="testimonial-author">@item.Name</div>
+            </div>
+        }
+    </div>
+</section>
