@@ -37,7 +37,7 @@ namespace KitapProject.Controllers
 
             return View(userOrders);
         }
-
+        [Authorize]
         public async Task<IActionResult> OrderDetails(int id)
         {
             var currentUserId = _userManager.GetUserId(User);

@@ -4,7 +4,6 @@
     ViewData["Title"] = "Ürün Listesi";
     Layout = "~/Views/Shared/_AdminLayout.cshtml";
 
-    // Kategori listesini ViewBag üzerinden SelectList olarak alalım
     var categoriesSelectList = ViewBag.Categories as SelectList;
 }
 
@@ -12,214 +11,9 @@
 <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
 <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css" rel="stylesheet" />
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet" />
-
-<style>
-    body {
-        background-color: #f0f2f5; /* Hafif gri bir arka plan */
-        font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
-    }
-
-    .container.mt-5 {
-        background-color: #ffffff; /* Beyaz kart konteyneri */
-        padding: 40px;
-        border-radius: 15px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-    }
-
-    h3.text-primary {
-        color: #1a2a4b !important; /* Koyu lacivert başlık */
-        font-size: 2.5rem;
-        margin-bottom: 45px !important;
-        font-weight: 700;
-        text-align: center;
-    }
-
-    .filter-section {
-        background-color: #f8f9fa;
-        padding: 20px;
-        border-radius: 10px;
-        margin-bottom: 30px;
-        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
-    }
-
-    .form-control, .form-select {
-        border-radius: 8px;
-        border: 1px solid #e0e0e0;
-        padding: 0.75rem 1rem;
-        transition: border-color 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    .form-control:focus, .form-select:focus {
-        border-color: #8bb4ff;
-        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
-    }
-
-    .btn-primary-custom {
-        background-color: #007bff;
-        border-color: #007bff;
-        border-radius: 8px;
-        padding: 0.75rem 1.5rem;
-        font-weight: 600;
-        transition: all 0.3s ease;
-    }
-
-    .btn-primary-custom:hover {
-        background-color: #0056b3;
-        border-color: #0056b3;
-        transform: translateY(-2px);
-        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.25);
-    }
-
-    .product-card {
-        background-color: #ffffff;
-        border-radius: 12px;
-        box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
-        margin-bottom: 25px;
-        padding: 25px;
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-        display: flex;
-        align-items: center;
-        gap: 20px;
-    }
-
-    .product-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
-    }
-
-    .product-info {
-        flex-grow: 1;
-    }
-
-    .product-info h5 {
-        font-weight: 600;
-        color: #343a40;
-        margin-bottom: 8px;
-        font-size: 1.3rem;
-    }
-
-    .product-info p {
-        margin-bottom: 5px;
-        color: #6c757d;
-        font-size: 0.95rem;
-    }
-
-    .product-info .price {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #28a745; /* Yeşil fiyat */
-    }
-
-    .product-info .category-badge {
-        display: inline-block;
-        background-color: #e9ecef;
-        color: #495057;
-        padding: 0.4em 0.8em;
-        border-radius: 6px;
-        font-size: 0.85em;
-        font-weight: 500;
-        margin-top: 10px;
-    }
-
-    /* Status Badge */
-    .status-badge {
-        padding: 0.5em 1em;
-        border-radius: 0.5rem;
-        font-size: 0.85em;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        /* margin-left: auto; */ /* No need to push right, we want alignment */
-    }
-
-    .status-badge.bg-success {
-        background-color: #28a745 !important;
-        color: #fff;
-    }
-
-    .status-badge.bg-danger {
-        background-color: #dc3545 !important;
-        color: #fff;
-    }
-
-    /* Populer Product Badge */
-    .popular-badge {
-        padding: 0.5em 1em;
-        border-radius: 0.5rem;
-        font-size: 0.85em;
-        font-weight: 700;
-        letter-spacing: 0.5px;
-        color: #fff;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        width: 80px; /* Sabit genişlik */
-    }
-
-    .popular-badge.bg-primary-pop { /* Custom color for popular YES */
-        background-color: #6f42c1 !important; /* Mor tonu */
-    }
-
-    .popular-badge.bg-secondary-pop { /* Custom color for popular NO */
-        background-color: #6c757d !important; /* Gri tonu */
-    }
+<link href="~/css/admin-product.css" rel="stylesheet" />
 
 
-    .card-actions {
-        display: flex;
-        gap: 10px;
-        align-items: center;
-        flex-wrap: wrap; /* Butonların küçük ekranlarda alt alta gelmesi için */
-        justify-content: flex-end; /* Butonları sağa yasla */
-    }
-
-    .card-actions .btn {
-        border-radius: 8px;
-        padding: 0.6rem 0.9rem;
-        font-size: 0.9em;
-        display: flex;
-        align-items: center;
-        gap: 5px;
-    }
-
-    /* Toggle Button for Popular Product */
-    .toggle-populer-btn {
-        background-color: #ffc107;
-        color: #212529;
-        border: 1px solid #ffc107;
-        padding: 0.6rem 0.9rem;
-        border-radius: 8px;
-        font-size: 0.9em;
-        font-weight: 500;
-        transition: all 0.2s ease;
-    }
-
-    .toggle-populer-btn:hover {
-        background-color: #e0a800;
-        border-color: #e0a800;
-        color: #212529;
-    }
-
-    .pagination .page-item .page-link {
-        border-radius: 8px !important;
-        margin: 0 4px;
-        transition: all 0.3s ease;
-        color: #007bff;
-        border-color: #dee2e6;
-    }
-
-    .pagination .page-item.active .page-link {
-        background-color: #007bff;
-        border-color: #007bff;
-        color: white;
-        box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
-    }
-
-    .pagination .page-item .page-link:hover {
-        background-color: #e9ecef;
-        border-color: #007bff;
-        color: #0056b3;
-    }
-</style>
 
 <div class="container mt-5">
     <h3 class="text-primary">Ürün Yönetimi</h3>
@@ -260,7 +54,7 @@
                     <span class="category-badge">@item.CategoryName</span>
                 </div>
                 
-                <div class="d-flex flex-column align-items-center gap-2 me-3"> @* Popüler ve Aktif/Pasif durumları için dikey hizalama ve boşluk *@
+                <div class="d-flex flex-column align-items-center gap-2 me-3"> 
                     @if (item.PopulerProduct)
                     {
                         <span class="popular-badge bg-primary-pop">Popüler: Evet</span>
@@ -318,7 +112,6 @@
         const productListContainer = $("#productListContainer");
         const pagination = $("#pagination");
 
-        // SweetAlert ile silme onayı
         $(document).on("click", ".delete-btn", function () {
             const productId = $(this).data("id");
             const productName = $(this).data("name");
@@ -339,12 +132,11 @@
             });
         });
 
-        // Popüler ürün durumunu değiştirme ve SweetAlert ile onay
         $(document).on("click", ".toggle-populer-btn", function () {
             const productId = $(this).data("id");
-            const currentStatus = $(this).data("current-status") === "true"; // true/false stringini boolean'a çevir
+            const currentStatus = $(this).data("current-status") === "true"; 
             const actionText = currentStatus ? "pasif" : "popüler";
-            const newStatus = !currentStatus; // Yeni durum
+            const newStatus = !currentStatus; 
 
             Swal.fire({
                 title: 'Emin misiniz?',
@@ -357,21 +149,18 @@
                 cancelButtonText: 'İptal'
             }).then((result) => {
                 if (result.isConfirmed) {
-                    // AJAX çağrısı ile popüler ürün durumunu güncelle
                     $.ajax({
-                        url: '/AdminProduct/TogglePopularStatus', // Bu endpoint'i controller'ınızda oluşturmanız gerekecek
+                        url: '/AdminProduct/TogglePopularStatus',
                         type: 'POST',
                         data: { productId: productId, status: newStatus },
                         headers: {
-                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() // Anti-forgery token'ı ekleyin
+                            'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val() 
                         },
                         success: function (response) {
                             if (response.success) {
                                 Swal.fire('Güncellendi!', 'Ürünün popülerlik durumu başarıyla güncellendi.', 'success')
                                     .then(() => {
-                                        // Sayfayı yeniden yükleyerek veya sadece ilgili kartı güncelleyerek değişikliği yansıtın
-                                        location.reload(); // En basit çözüm
-                                        // Veya daha gelişmiş: renderProductCards(); // Tüm kartları yeniden filtrele/göster
+                                        location.reload();
                                     });
                             } else {
                                 Swal.fire('Hata!', response.message || 'Popülerlik durumu güncellenirken bir hata oluştu.', 'error');
@@ -386,7 +175,6 @@
             });
         });
 
-        // Ürün kartlarını filtreleyen ve sayfalayan ana fonksiyon
         function renderProductCards() {
             const searchTerm = searchInput.val().toLowerCase();
             const selectedCategory = categoryFilter.val().toLowerCase();
@@ -402,11 +190,11 @@
                 return matchesSearch && matchesCategory;
             });
 
-            productCards.hide(); // Tüm kartları gizle
-            pagination.empty(); // Mevcut sayfalandırmayı temizle
+            productCards.hide(); 
+            pagination.empty();
 
             const pageCount = Math.ceil(filteredCards.length / itemsPerPage);
-            let currentPage = 1; // Her filtreleme/arama işleminde sayfayı sıfırla
+            let currentPage = 1;
 
             function showPage(page) {
                 currentPage = page;
@@ -415,7 +203,6 @@
                 const end = start + itemsPerPage;
                 filteredCards.slice(start, end).show();
 
-                // Sayfalandırma butonlarını oluştur
                 pagination.empty();
                 if (pageCount > 1) {
                     pagination.append(`
@@ -444,7 +231,6 @@
                 }
             }
 
-            // Sayfalama butonlarına tıklama olayı
             pagination.off("click").on("click", "a.page-link", function (e) {
                 e.preventDefault();
                 const targetPage = parseInt($(this).data("page"));
@@ -456,12 +242,10 @@
             showPage(1);
         }
 
-        // Arama, kategori ve sayfa başına öğe değiştiğinde kartları yeniden render et
         searchInput.on("input", renderProductCards);
         categoryFilter.on("change", renderProductCards);
         rowsPerPageSelect.on("change", renderProductCards);
 
-        // Sayfa yüklendiğinde kartları ilk kez render et
         renderProductCards();
     });
 </script>

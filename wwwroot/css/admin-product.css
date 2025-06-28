@@ -1,0 +1,202 @@
+﻿body {
+    background-color: #f0f2f5;
+    font-family: 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+}
+
+.container.mt-5 {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 15px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+}
+
+h3.text-primary {
+    color: #1a2a4b !important;
+    font-size: 2.5rem;
+    margin-bottom: 45px !important;
+    font-weight: 700;
+    text-align: center;
+}
+
+.filter-section {
+    background-color: #f8f9fa;
+    padding: 20px;
+    border-radius: 10px;
+    margin-bottom: 30px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.form-control, .form-select {
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+    padding: 0.75rem 1rem;
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+
+    .form-control:focus, .form-select:focus {
+        border-color: #8bb4ff;
+        box-shadow: 0 0 0 0.25rem rgba(0, 123, 255, 0.25);
+    }
+
+.btn-primary-custom {
+    background-color: #007bff;
+    border-color: #007bff;
+    border-radius: 8px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+}
+
+    .btn-primary-custom:hover {
+        background-color: #0056b3;
+        border-color: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 6px 15px rgba(0, 123, 255, 0.25);
+    }
+
+.product-card {
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.07);
+    margin-bottom: 25px;
+    padding: 25px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+    .product-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 25px rgba(0, 0, 0, 0.12);
+    }
+
+.product-info {
+    flex-grow: 1;
+}
+
+    .product-info h5 {
+        font-weight: 600;
+        color: #343a40;
+        margin-bottom: 8px;
+        font-size: 1.3rem;
+    }
+
+    .product-info p {
+        margin-bottom: 5px;
+        color: #6c757d;
+        font-size: 0.95rem;
+    }
+
+    .product-info .price {
+        font-size: 1.15rem;
+        font-weight: 700;
+        color: #28a745;
+    }
+
+    .product-info .category-badge {
+        display: inline-block;
+        background-color: #e9ecef;
+        color: #495057;
+        padding: 0.4em 0.8em;
+        border-radius: 6px;
+        font-size: 0.85em;
+        font-weight: 500;
+        margin-top: 10px;
+    }
+
+.status-badge {
+    padding: 0.5em 1em;
+    border-radius: 0.5rem;
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+}
+
+    .status-badge.bg-success {
+        background-color: #28a745 !important;
+        color: #fff;
+    }
+
+    .status-badge.bg-danger {
+        background-color: #dc3545 !important;
+        color: #fff;
+    }
+
+.popular-badge {
+    padding: 0.5em 1em;
+    border-radius: 0.5rem;
+    font-size: 0.85em;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    color: #fff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 80px;
+}
+
+    .popular-badge.bg-primary-pop {
+        background-color: #6f42c1 !important;
+    }
+
+    .popular-badge.bg-secondary-pop {
+        background-color: #6c757d !important;
+    }
+
+
+.card-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+}
+
+    .card-actions .btn {
+        border-radius: 8px;
+        padding: 0.6rem 0.9rem;
+        font-size: 0.9em;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+.toggle-populer-btn {
+    background-color: #ffc107;
+    color: #212529;
+    border: 1px solid #ffc107;
+    padding: 0.6rem 0.9rem;
+    border-radius: 8px;
+    font-size: 0.9em;
+    font-weight: 500;
+    transition: all 0.2s ease;
+}
+
+    .toggle-populer-btn:hover {
+        background-color: #e0a800;
+        border-color: #e0a800;
+        color: #212529;
+    }
+
+.pagination .page-item .page-link {
+    border-radius: 8px !important;
+    margin: 0 4px;
+    transition: all 0.3s ease;
+    color: #007bff;
+    border-color: #dee2e6;
+}
+
+.pagination .page-item.active .page-link {
+    background-color: #007bff;
+    border-color: #007bff;
+    color: white;
+    box-shadow: 0 4px 10px rgba(0, 123, 255, 0.2);
+}
+
+.pagination .page-item .page-link:hover {
+    background-color: #e9ecef;
+    border-color: #007bff;
+    color: #0056b3;
+}
+

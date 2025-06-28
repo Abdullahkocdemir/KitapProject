@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Yeni Ürün Ekle";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Admin layout'unuzu burada kullanın
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; 
 }
 
 <div class="page-header mb-4">
@@ -95,18 +95,18 @@
     }
     <style>
         :root {
-            --primary-color: #007bff; /* Bootstrap primary blue */
-            --success-color: #28a745; /* Bootstrap success green */
-            --danger-color: #dc3545; /* Bootstrap danger red */
-            --secondary-color: #6c757d; /* Bootstrap secondary grey */
-            --border-color: #ced4da; /* Bootstrap default border color */
-            --text-primary: #343a40; /* Dark text color */
+            --primary-color: #007bff; 
+            --success-color: #28a745; 
+            --danger-color: #dc3545; 
+            --secondary-color: #6c757d; 
+            --border-color: #ced4da; 
+            --text-primary: #343a40; 
             --shadow-sm: 0 .125rem .25rem rgba(0,0,0,.075) !important;
             --shadow-md: 0 .5rem 1rem rgba(0,0,0,.15) !important;
         }
 
         body {
-            background-color: #f8f9fa; /* Light background for the page */
+            background-color: #f8f9fa; 
         }
 
         .page-header {
@@ -128,12 +128,12 @@
 
         .card {
             border: none;
-            border-radius: 1rem; /* More rounded corners for the card */
-            box-shadow: var(--shadow-md); /* More prominent shadow */
+            border-radius: 1rem; 
+            box-shadow: var(--shadow-md); 
         }
 
         .card-body {
-            padding: 2rem; /* Increased padding inside the card */
+            padding: 2rem; 
         }
 
         .form-label {
@@ -152,17 +152,17 @@
             transition: all 0.2s ease-in-out;
             background-color: #fff;
             color: var(--text-primary);
-            border-radius: 0.5rem; /* Slightly rounded input fields */
+            border-radius: 0.5rem; 
         }
 
             .form-control:focus, .form-select:focus, .form-control-file:focus {
                 border-color: var(--primary-color);
-                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); /* Bootstrap-like focus shadow */
+                box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25); 
                 outline: none;
             }
 
         .form-control-file {
-            padding: 0.75rem 1rem; /* Consistent padding */
+            padding: 0.75rem 1rem; 
             border-radius: 0.5rem;
         }
 
@@ -184,12 +184,12 @@
         .btn {
             font-size: 0.95rem;
             font-weight: 600;
-            border-radius: 0.5rem; /* Standard button border-radius */
+            border-radius: 0.5rem; 
             transition: all 0.2s ease-in-out;
         }
 
         .btn-success {
-            background: linear-gradient(45deg, #28a745, #218838); /* Gradient for save button */
+            background: linear-gradient(45deg, #28a745, #218838); 
             border: none;
             color: white;
             box-shadow: var(--shadow-sm);
@@ -199,7 +199,7 @@
                 background: linear-gradient(45deg, #218838, #1e7e34);
                 transform: translateY(-2px);
                 box-shadow: var(--shadow-md);
-                color: white; /* Keep text white on hover */
+                color: white; 
             }
 
         .btn-outline-secondary {
@@ -219,32 +219,30 @@
             margin-top: 1.5rem;
         }
 
-        /* Custom Switch Styling */
         .custom-switch .form-check-input {
-            width: 3.5em; /* Make switch wider */
-            height: 2em; /* Make switch taller */
-            margin-left: 0; /* Remove default margin */
-            background-color: var(--border-color); /* Default off state background */
+            width: 3.5em;
+            height: 2em; 
+            margin-left: 0; 
+            background-color: var(--border-color);
             border-color: var(--border-color);
             transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
             cursor: pointer;
-            box-shadow: none !important; /* Remove default focus shadow if any */
+            box-shadow: none !important; 
         }
 
             .custom-switch .form-check-input:checked {
-                background-color: var(--success-color); /* On state background */
+                background-color: var(--success-color); 
                 border-color: var(--success-color);
             }
 
         .custom-switch .form-check-label {
-            margin-left: 0.75rem; /* Space between switch and label */
-            padding-top: 0.2rem; /* Align text vertically */
+            margin-left: 0.75rem; 
+            padding-top: 0.2rem; 
             font-weight: 500;
             color: var(--text-primary);
             cursor: pointer;
         }
 
-        /* Adjustments for smaller screens */
         @@media (max-width: 768px) {
             .page-title {
                 font-size: 1.75rem;

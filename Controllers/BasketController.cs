@@ -183,7 +183,6 @@ namespace KitapProject.Controllers
                 basket.CartItems.Remove(basketItem);
                 _context.BasketItems.Remove(basketItem);
 
-                // Toplam fiyatı yeniden hesapla
                 basket.TotalPrice = basket.CartItems.Sum(bi => bi.ItemTotalPrice);
                 basket.UpdatedDate = DateTime.UtcNow;
 

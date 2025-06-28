@@ -2,7 +2,7 @@
 
 @{
     ViewData["Title"] = "Ürün Detayı";
-    Layout = "~/Views/Shared/_AdminLayout.cshtml"; // Ensure this points to your admin layout
+    Layout = "~/Views/Shared/_AdminLayout.cshtml"; 
 }
 
 <div class="container">
@@ -80,7 +80,7 @@
                         <a href="/Product/UpdateProduct/@Model.ProductId" class="btn btn-edit">
                             <i class="fas fa-edit"></i> Ürünü Düzenle
                         </a>
-                        <a href="/Product/Index" class="btn btn-secondary btn-back">
+                        <a href="/AdminProduct/Index" class="btn btn-secondary btn-back">
                             <i class="fas fa-arrow-left"></i> Ürün Listesine Geri Dön
                         </a>
                     </div>
@@ -103,14 +103,14 @@
 
         .product-detail-image {
             width: 100%;
-            height: auto; /* Otomatik yüksekliğe ayarla */
-            max-width: 300px; /* Maksimum genişliği ayarla */
-            max-height: 300px; /* Maksimum yüksekliği ayarla */
-            object-fit: contain; /* Resmi kutunun içine sığdır, oranı koruyarak */
+            height: auto; 
+            max-width: 300px; 
+            max-height: 300px; 
+            object-fit: contain; 
             border-radius: 12px;
             box-shadow: var(--shadow-sm);
-            margin: 0 auto; /* Resmi ortala */
-            display: block; /* margin: auto için block olması gerekli */
+            margin: 0 auto; 
+            display: block; 
         }
 
         .form-label {
@@ -127,17 +127,17 @@
             padding: 0.75rem 1rem;
             font-size: 0.875rem;
             font-weight: 500;
-            background-color: #f0f4f8; /* Hafif gri arka plan */
+            background-color: #f0f4f8; 
             color: var(--text-primary);
-            cursor: default; /* Ok tuşu olmamasını sağlar */
-            opacity: 0.9; /* Okunabilirliği artırır */
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); /* Hafif iç gölge */
+            cursor: default; 
+            opacity: 0.9; 
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); 
         }
 
             .form-control:focus {
                 outline: none;
-                border-color: var(--border-color); /* Odaklanmada bile border rengini değiştirme */
-                box-shadow: none; /* Odaklanmada bile box-shadow'u kaldırma */
+                border-color: var(--border-color); 
+                box-shadow: none; 
             }
 
         .btn-edit {

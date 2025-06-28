@@ -1,6 +1,6 @@
 ﻿@model KitapProject.Models.OrderCreateViewModel
 @{
-    Layout = null; 
+    Layout = null;
 }
 
 <!DOCTYPE html>
@@ -10,6 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sipariş Tamamla - Kitap Mağazası</title>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <!-- SweetAlert2 CDN -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/limonte-sweetalert2/11.10.1/sweetalert2.min.css" rel="stylesheet">
     <style>
         * {
             margin: 0;
@@ -43,6 +45,7 @@
                 opacity: 0;
                 transform: translateY(50px);
             }
+
             to {
                 opacity: 1;
                 transform: translateY(0);
@@ -58,20 +61,25 @@
             overflow: hidden;
         }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            animation: rotate 20s linear infinite;
-        }
+            .header::before {
+                content: '';
+                position: absolute;
+                top: -50%;
+                left: -50%;
+                width: 200%;
+                height: 200%;
+                background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+                animation: rotate 20s linear infinite;
+            }
 
         @@keyframes rotate {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
         }
 
         .header h1 {
@@ -115,9 +123,9 @@
             gap: 10px;
         }
 
-        .section-title i {
-            color: #667eea;
-        }
+            .section-title i {
+                color: #667eea;
+            }
 
         .form-row {
             display: grid;
@@ -130,9 +138,9 @@
             margin-bottom: 25px;
         }
 
-        .form-group.full-width {
-            grid-column: 1 / -1;
-        }
+            .form-group.full-width {
+                grid-column: 1 / -1;
+            }
 
         label {
             display: block;
@@ -145,7 +153,7 @@
         input[type="text"],
         input[type="email"],
         textarea,
-        select { 
+        select {
             width: 100%;
             padding: 15px;
             border: 2px solid #e1e5e9;
@@ -155,15 +163,15 @@
             background: white;
         }
 
-        input[type="text"]:focus,
-        input[type="email"]:focus,
-        textarea:focus,
-        select:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
-            transform: translateY(-2px);
-        }
+            input[type="text"]:focus,
+            input[type="email"]:focus,
+            textarea:focus,
+            select:focus {
+                outline: none;
+                border-color: #667eea;
+                box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+                transform: translateY(-2px);
+            }
 
         .card-form {
             background: linear-gradient(135deg, #667eea, #764ba2);
@@ -172,19 +180,19 @@
             margin-top: 30px;
         }
 
-        .card-form label {
-            color: white;
-        }
+            .card-form label {
+                color: white;
+            }
 
-        .card-form input,
-        .card-form select { 
-            background: rgba(255, 255, 255, 0.9);
-        }
+            .card-form input,
+            .card-form select {
+                background: rgba(255, 255, 255, 0.9);
+            }
 
-        .card-form input:focus,
-        .card-form select:focus {
-            background: white;
-        }
+                .card-form input:focus,
+                .card-form select:focus {
+                    background: white;
+                }
 
         .card-row {
             display: grid;
@@ -203,10 +211,10 @@
             transition: transform 0.2s ease;
         }
 
-        .basket-item:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-        }
+            .basket-item:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+            }
 
         .item-image {
             width: 60px;
@@ -218,14 +226,14 @@
             color: white;
             font-size: 1.5rem;
             margin-right: 15px;
-            overflow: hidden; 
-        }
-        .item-image img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
+            overflow: hidden;
         }
 
+            .item-image img {
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
 
         .item-details {
             flex: 1;
@@ -266,13 +274,13 @@
             padding: 5px 0;
         }
 
-        .total-row.final {
-            border-top: 2px solid #667eea;
-            padding-top: 15px;
-            font-size: 1.2rem;
-            font-weight: 700;
-            color: #667eea;
-        }
+            .total-row.final {
+                border-top: 2px solid #667eea;
+                padding-top: 15px;
+                font-size: 1.2rem;
+                font-weight: 700;
+                color: #667eea;
+            }
 
         .submit-btn {
             width: 100%;
@@ -290,32 +298,32 @@
             overflow: hidden;
         }
 
-        .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
-        }
+            .submit-btn:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 10px 30px rgba(102, 126, 234, 0.4);
+            }
 
-        .submit-btn:active {
-            transform: translateY(-1px);
-        }
+            .submit-btn:active {
+                transform: translateY(-1px);
+            }
 
-        .submit-btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            background: rgba(255, 255, 255, 0.2);
-            border-radius: 50%;
-            transform: translate(-50%, -50%);
-            transition: width 0.3s ease, height 0.3s ease;
-        }
+            .submit-btn::before {
+                content: '';
+                position: absolute;
+                top: 50%;
+                left: 50%;
+                width: 0;
+                height: 0;
+                background: rgba(255, 255, 255, 0.2);
+                border-radius: 50%;
+                transform: translate(-50%, -50%);
+                transition: width 0.3s ease, height 0.3s ease;
+            }
 
-        .submit-btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
+            .submit-btn:hover::before {
+                width: 300px;
+                height: 300px;
+            }
 
         .progress-steps {
             display: flex;
@@ -406,8 +414,13 @@
         }
 
         @@keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+            0%, 100% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
         }
 
         .validation-summary-errors ul {
@@ -433,6 +446,37 @@
             display: block;
         }
 
+        /* SweetAlert2 özelleştirmeleri */
+        .swal2-popup {
+            border-radius: 20px !important;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.3) !important;
+        }
+
+        .custom-success-icon {
+            font-size: 4rem !important;
+            color: #28a745 !important;
+            animation: bounceIn 0.8s ease-out !important;
+        }
+
+        @@keyframes bounceIn {
+            0% {
+                transform: scale(0.3);
+                opacity: 0;
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            70% {
+                transform: scale(0.9);
+            }
+
+            100% {
+                transform: scale(1);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 <body>
@@ -532,7 +576,6 @@
                             <p style="color:white; font-size:0.9em; margin-bottom:15px;">Veya aşağıdaki alanları doldurarak yeni bir kart kullanın.</p>
                         }
 
-
                         <div id="newCardFields">
                             <div class="form-group">
                                 <label for="CardHolderName">Kart Sahibi Adı *</label>
@@ -625,6 +668,8 @@
         </form>
     </div>
 
+
+
     <div class="loading-overlay" id="loadingOverlay">
         <div class="loading-content">
             <i class="fas fa-spinner fa-spin fa-3x" style="color: #667eea; margin-bottom: 20px;"></i>
@@ -638,7 +683,7 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-validation-unobtrusive/3.2.11/jquery.validate.unobtrusive.min.js"></script>
 
     <script>
-        document.getElementById('CardNumber').addEventListener('input', function(e) {
+        document.getElementById('CardNumber').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\s/g, '');
             let formattedValue = value.replace(/(.{4})/g, '$1 ').trim();
             if (formattedValue.length <= 19) {
@@ -646,7 +691,7 @@
             }
         });
 
-        document.getElementById('ExpirationDate').addEventListener('input', function(e) {
+        document.getElementById('ExpirationDate').addEventListener('input', function (e) {
             let value = e.target.value.replace(/\D/g, '');
             if (value.length >= 2) {
                 value = value.substring(0, 2) + '/' + value.substring(2, 4);
@@ -654,16 +699,16 @@
             e.target.value = value;
         });
 
-        document.getElementById('CVV').addEventListener('input', function(e) {
+        document.getElementById('CVV').addEventListener('input', function (e) {
             e.target.value = e.target.value.replace(/\D/g, '');
         });
 
-        document.getElementById('orderForm').addEventListener('submit', function(e) {
+        document.getElementById('orderForm').addEventListener('submit', function (e) {
             if (!$(this).valid()) {
                 return;
             }
 
-            e.preventDefault(); 
+            e.preventDefault();
 
             document.getElementById('loadingOverlay').style.display = 'flex';
 
@@ -677,40 +722,40 @@
                     'RequestVerificationToken': $('input[name="__RequestVerificationToken"]').val()
                 }
             })
-            .then(response => {
-                if (response.ok && response.redirected) {
-                    window.location.href = response.url; 
-                } else if (response.ok) {
-                    return response.text().then(text => { 
-                        try {
-                            return JSON.parse(text); 
-                        } catch (error) {
-                            return text; 
-                        }
-                    });
-                } else {
-                    return response.text().then(text => { throw new Error(text) });
-                }
-            })
-            .then(data => {
-                if (typeof data === 'string' && data.includes("validation-summary-errors")) {
-                    document.documentElement.innerHTML = data;
-                }
-                else {
-                    document.getElementById('loadingOverlay').style.display = 'none';
-                    if (data && data.success === false) { 
-                        alert(data.message || "Sipariş işlenirken bir hata oluştu.");
+                .then(response => {
+                    if (response.ok && response.redirected) {
+                        window.location.href = response.url;
+                    } else if (response.ok) {
+                        return response.text().then(text => {
+                            try {
+                                return JSON.parse(text);
+                            } catch (error) {
+                                return text;
+                            }
+                        });
+                    } else {
+                        return response.text().then(text => { throw new Error(text) });
                     }
-                }
-            })
-            .catch(error => {
-                console.error('Sipariş gönderilirken hata oluştu:', error);
-                alert('Bir hata oluştu: ' + error.message);
-                document.getElementById('loadingOverlay').style.display = 'none'; 
-            });
+                })
+                .then(data => {
+                    if (typeof data === 'string' && data.includes("validation-summary-errors")) {
+                        document.documentElement.innerHTML = data;
+                    }
+                    else {
+                        document.getElementById('loadingOverlay').style.display = 'none';
+                        if (data && data.success === false) {
+                            alert(data.message || "Sipariş işlenirken bir hata oluştu.");
+                        }
+                    }
+                })
+                .catch(error => {
+                    console.error('Sipariş gönderilirken hata oluştu:', error);
+                    alert('Bir hata oluştu: ' + error.message);
+                    document.getElementById('loadingOverlay').style.display = 'none';
+                });
         });
 
-        document.addEventListener('DOMContentLoaded', function() {
+        document.addEventListener('DOMContentLoaded', function () {
             const selectedPaymentInfoId = document.getElementById('SelectedPaymentInfoId');
             const newCardFields = document.getElementById('newCardFields');
             const cardHolderNameInput = document.getElementById('CardHolderName');
@@ -736,7 +781,7 @@
 
             if (selectedPaymentInfoId) {
                 selectedPaymentInfoId.addEventListener('change', toggleNewCardFields);
-                toggleNewCardFields(); 
+                toggleNewCardFields();
             }
 
             const observer = new IntersectionObserver((entries) => {
@@ -752,5 +797,7 @@
             });
         });
     </script>
+
+
 </body>
 </html>

@@ -9,8 +9,18 @@
     <title>Kitap Mağazası</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <link rel="stylesheet" href="~/css/Product.css" />
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     @Html.AntiForgeryToken()
     <style>
+        .header-actions a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+            .header-actions a:hover {
+                text-decoration: underline;
+            }
         @@media (max-width: 992px) {
             .nav-menu {
                 gap: 15px;
@@ -31,9 +41,9 @@
             display: flex;
             align-items: center;
             gap: 15px;
-            .cart-container
+        }
 
-        {
+        .cart-container {
             position: relative;
             color: var(--text-dark);
             text-decoration: none;
@@ -173,34 +183,34 @@
         function renderBooks(booksToRender) {
             if (booksToRender.length === 0) {
                 booksGrid.innerHTML = `
-                                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
-                                    <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; color: rgba(255, 255, 255, 0.3);"></i>
-                                    <p>Aradığınız kriterlere uygun kitap bulunamadı.</p>
-                                </div>
-                            `;
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
+                                <i class="fas fa-search" style="font-size: 4rem; margin-bottom: 1rem; color: rgba(255, 255, 255, 0.3);"></i>
+                                <p>Aradığınız kriterlere uygun kitap bulunamadı.</p>
+                            </div>
+                        `;
                 return;
             }
 
             booksGrid.innerHTML = booksToRender.map(book => `
-                                <div class="book-card">
-                                    <div class="book-image" style="background-image: url('${book.image}'); background-size: cover; background-position: center;">
-                                        ${!book.image || book.image.includes('placeholder') || book.image.length < 5 ? 'Görsel Yok' : ''}
-                                    </div>
-                                    <div class="book-content">
-                                        <h3 class="book-title">${book.title}</h3>
-                                        <p class="book-author">${book.author}</p>
-                                        <div class="book-price">₺${book.price.toFixed(2)}</div>
-                                        <div class="book-actions">
-                                            <button class="btn btn-primary" onclick="addToCart(${book.id})">
-                                                <i class="fas fa-shopping-cart"></i> Sepete Ekle
-                                            </button>
-                                            <button class="btn btn-secondary" onclick="viewDetails(${book.id})">
-                                                <i class="fas fa-eye"></i> Detay
-                                            </button>
-                                        </div>
-                                    </div>
+                        <div class="book-card">
+                            <div class="book-image" style="background-image: url('${book.image}'); background-size: cover; background-position: center;">
+                                ${!book.image || book.image.includes('placeholder') || book.image.length < 5 ? 'Görsel Yok' : ''}
+                            </div>
+                            <div class="book-content">
+                                <h3 class="book-title">${book.title}</h3>
+                                <p class="book-author">${book.author}</p>
+                                <div class="book-price">₺${book.price.toFixed(2)}</div>
+                                <div class="book-actions">
+                                    <button class="btn btn-primary" onclick="addToCart(${book.id})">
+                                        <i class="fas fa-shopping-cart"></i> Sepete Ekle
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="viewDetails(${book.id})">
+                                        <i class="fas fa-eye"></i> Detay
+                                    </button>
                                 </div>
-                            `).join('');
+                            </div>
+                        </div>
+                    `).join('');
         }
 
         function showLoading() {
@@ -243,11 +253,11 @@
             } catch (error) {
                 console.error("Kitaplar yüklenirken hata oluştu:", error);
                 booksGrid.innerHTML = `
-                                <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
-                                    <p>Kitaplar yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
-                                    <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">Hata: ${error.message}</p>
-                                </div>
-                            `;
+                            <div style="grid-column: 1 / -1; text-align: center; padding: 4rem 2rem; color: rgba(255, 255, 255, 0.7); font-size: 1.2rem;">
+                                <p>Kitaplar yüklenemedi. Lütfen daha sonra tekrar deneyin.</p>
+                                <p style="font-size: 0.9rem; color: rgba(255, 255, 255, 0.5);">Hata: ${error.message}</p>
+                            </div>
+                        `;
             } finally {
                 hideLoading();
             }
@@ -272,7 +282,11 @@
         async function addToCart(bookId) {
             const book = currentFilteredBooks.find(b => b.id === bookId);
             if (!book) {
-                alert('Hata: Kitap bulunamadı.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Hata!',
+                    text: 'Kitap bilgisi bulunamadı. Lütfen sayfayı yenileyip tekrar deneyin.',
+                });
                 return;
             }
 
@@ -281,8 +295,20 @@
                 const loginStatusData = await loginStatusResponse.json();
 
                 if (!loginStatusData.isLoggedIn) {
-                    alert("Sepete ürün eklemek için lütfen giriş yapmalısınız.");
-                    window.location.href = '/Account/Login';
+                    Swal.fire({
+                        title: 'Giriş Gerekli',
+                        text: "Sepete ürün eklemek için lütfen giriş yapmalısınız.",
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#3085d6',
+                        cancelButtonColor: '#d33',
+                        confirmButtonText: 'Giriş Yap',
+                        cancelButtonText: 'Vazgeç'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '/Account/Login';
+                        }
+                    });
                     return;
                 }
 
@@ -301,27 +327,60 @@
 
                 if (response.ok) {
                     const data = await response.json();
-                    alert(data.message);
+                    Swal.fire({
+                        toast: true,
+                        position: 'top-end',
+                        icon: 'success',
+                        title: data.message || 'Ürün sepete eklendi!',
+                        showConfirmButton: false,
+                        timer: 3000,
+                        timerProgressBar: true
+                    });
                 } else {
                     const errorText = await response.text();
                     console.error('Server-side sepete ürün eklenirken hata:', response.status, response.statusText, errorText);
                     try {
                         const errorData = JSON.parse(errorText);
-                        alert(`Sepete eklenirken hata oluştu: ${errorData.message || 'Bilinmeyen Hata'}`);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Oops...',
+                            text: `Sepete eklenirken hata oluştu: ${errorData.message || 'Bilinmeyen Hata'}`,
+                        });
                     } catch (e) {
-                        alert(`Sepete eklenirken beklenmedik bir hata oluştu. Lütfen tekrar deneyin. (Sunucu yanıtı: ${errorText.substring(0, 100)}...)`);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Beklenmedik Hata!',
+                            text: `Sepete eklenirken beklenmedik bir hata oluştu. Lütfen tekrar deneyin.`,
+                        });
                     }
                 }
             } catch (error) {
                 console.error('AJAX add-to-basket isteği gönderilirken hata:', error);
-                alert('Ağ hatası: Ürün sepete eklenemedi. Lütfen internet bağlantınızı kontrol edin.');
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Ağ Hatası',
+                    text: 'Ürün sepete eklenemedi. Lütfen internet bağlantınızı kontrol edin.',
+                });
             }
         }
 
         function viewDetails(bookId) {
             const book = currentFilteredBooks.find(b => b.id === bookId);
             if (book) {
-                alert(`"${book.title}" detay sayfası açılacak. (ID: ${book.id})`);
+                Swal.fire({
+                    title: `<strong>${book.title}</strong>`,
+                    html: `
+                                <p><b>Yazar:</b> ${book.author}</p>
+                                <p><b>Fiyat:</b> ₺${book.price.toFixed(2)}</p>
+                                <p>Bu sadece bir önizlemedir. Detay sayfasına yönlendiriliyorsunuz...</p>
+                            `,
+                    icon: 'info',
+                    showCloseButton: true,
+                    showCancelButton: false,
+                    focusConfirm: false,
+                    confirmButtonText: '<i class="fa fa-thumbs-up"></i> Harika!',
+                }).then(() => {
+                });
             }
         }
 

@@ -35,7 +35,10 @@
                     }
                     @fullName
                 </span>
-                <a href="/Account/Logout/" class="auth-btn auth-btn-secondary">Çıkış Yap</a>
+                <form id="logoutForm" asp-controller="Account" asp-action="Logout" method="post" style="display:inline;">
+                    <button type="submit" class="auth-btn auth-btn-secondary">Çıkış Yap</button>
+                </form>
+
             }
             else
             {

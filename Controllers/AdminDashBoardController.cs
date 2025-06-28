@@ -26,7 +26,7 @@ namespace KitapProject.Controllers
 
             viewModel.LastAddedBooks = _context.Products
                 .OrderByDescending(p => p.CreatedDate)
-                .Take(5) // Son 5 kitabı al
+                .Take(5) 
                 .Select(p => new LastAddedBookDTO
                 {
                     Name = p.Name,

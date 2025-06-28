@@ -4,11 +4,11 @@ using Microsoft.AspNetCore.Authorization;
 using System.Security.Claims;
 using Microsoft.EntityFrameworkCore;
 using KitapProject.Entities;
-using KitapProject.Models; 
+using KitapProject.Models;
 
 namespace KitapProject.Controllers
 {
-    [Authorize] 
+    [Authorize]
     public class OrderController : Controller
     {
         private readonly BookContext _context;
@@ -22,12 +22,12 @@ namespace KitapProject.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _context.Users
-                                    .Include(u => u.UserPaymentInfos) 
+                                    .Include(u => u.UserPaymentInfos)
                                     .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
             {
-                
+
                 return RedirectToAction("Login", "Account");
             }
 
@@ -36,14 +36,14 @@ namespace KitapProject.Controllers
                 .ThenInclude(bi => bi.Product)
                 .FirstOrDefaultAsync(b => b.AppUserId == userId);
 
-            if (basket == null || !basket.CartItems.Any()) 
+            if (basket == null || !basket.CartItems.Any())
             {
                 TempData["ErrorMessage"] = "Sepetiniz boş. Lütfen önce sepetinize ürün ekleyin.";
                 return RedirectToAction("Index", "Basket");
             }
 
-            const decimal VAT_RATE = 0.18m; 
-            const decimal SHIPPING_FEE = 15.00m; 
+            const decimal VAT_RATE = 0.18m;
+            const decimal SHIPPING_FEE = 15.00m;
 
             decimal booksSubtotal = basket.CartItems.Sum(bi => bi.ItemTotalPrice);
             decimal vatAmount = booksSubtotal * VAT_RATE;
@@ -60,7 +60,7 @@ namespace KitapProject.Controllers
                 TotalAmount = finalTotal,
                 VATAmount = vatAmount,
                 ShippingFee = SHIPPING_FEE,
-                SavedPaymentInfos = user.UserPaymentInfos.ToList() 
+                SavedPaymentInfos = user.UserPaymentInfos.ToList()
             };
 
             return View(orderViewModel);
@@ -72,7 +72,7 @@ namespace KitapProject.Controllers
         {
             var userId = User.FindFirstValue(ClaimTypes.NameIdentifier);
             var user = await _context.Users
-                                    .Include(u => u.UserPaymentInfos) 
+                                    .Include(u => u.UserPaymentInfos)
                                     .FirstOrDefaultAsync(u => u.Id == userId);
 
             if (user == null)
@@ -100,8 +100,9 @@ namespace KitapProject.Controllers
             model.TotalAmount = calculatedTotalAmount;
             model.VATAmount = vatAmount;
             model.ShippingFee = SHIPPING_FEE;
-            model.BasketItems = basket.CartItems.ToList(); 
-            model.SavedPaymentInfos = user.UserPaymentInfos.ToList(); 
+            model.BasketItems = basket.CartItems.ToList();
+            model.SavedPaymentInfos = user.UserPaymentInfos.ToList();
+
             if (string.IsNullOrWhiteSpace(model.ShippingAddress) ||
                 string.IsNullOrWhiteSpace(model.City) ||
                 string.IsNullOrWhiteSpace(model.Country) ||
@@ -109,7 +110,8 @@ namespace KitapProject.Controllers
             {
                 ModelState.AddModelError("", "Lütfen tüm teslimat bilgilerini eksiksiz doldurun.");
             }
-            if (model.SelectedPaymentInfoId.HasValue) 
+
+            if (model.SelectedPaymentInfoId.HasValue)
             {
                 var selectedCard = user.UserPaymentInfos.FirstOrDefault(pi => pi.PaymentInfoId == model.SelectedPaymentInfoId.Value);
                 if (selectedCard == null)
@@ -117,7 +119,7 @@ namespace KitapProject.Controllers
                     ModelState.AddModelError("", "Geçersiz kayıtlı kart seçimi.");
                 }
             }
-            else 
+            else
             {
                 if (string.IsNullOrWhiteSpace(model.CardHolderName) ||
                     string.IsNullOrWhiteSpace(model.CardNumber) ||
@@ -143,10 +145,9 @@ namespace KitapProject.Controllers
                 }
             }
 
-
             if (!ModelState.IsValid)
             {
-                return View("Index", model); 
+                return View("Index", model);
             }
 
             user.ShippingAddress = model.ShippingAddress;
@@ -161,7 +162,7 @@ namespace KitapProject.Controllers
             {
                 paymentInfoToUse = user.UserPaymentInfos.FirstOrDefault(pi => pi.PaymentInfoId == model.SelectedPaymentInfoId.Value);
             }
-            else if (!string.IsNullOrWhiteSpace(model.CardNumber)) 
+            else if (!string.IsNullOrWhiteSpace(model.CardNumber))
             {
                 paymentInfoToUse = new UserPaymentInfo
                 {
@@ -169,16 +170,17 @@ namespace KitapProject.Controllers
                     CardHolderName = model.CardHolderName!,
                     CardNumberLastFour = model.CardNumber!.Replace(" ", "").Substring(model.CardNumber.Replace(" ", "").Length - 4),
                     ExpirationDate = model.ExpirationDate!,
-                    CVV = model.CVV!, 
-                    IsDefault = false 
+                    CVV = model.CVV!,
+                    IsDefault = false
                 };
                 _context.UserPaymentInfos.Add(paymentInfoToUse);
             }
+
             var order = new Order
             {
                 AppUserId = userId!,
                 OrderDate = DateTime.UtcNow,
-                TotalAmount = calculatedTotalAmount, 
+                TotalAmount = calculatedTotalAmount,
                 OrderStatus = "Beklemede",
                 ShippingAddress = model.ShippingAddress,
                 City = model.City,
@@ -188,6 +190,7 @@ namespace KitapProject.Controllers
 
             _context.Orders.Add(order);
             await _context.SaveChangesAsync();
+
             foreach (var item in basket.CartItems)
             {
                 var orderDetail = new OrderDetail
@@ -195,7 +198,7 @@ namespace KitapProject.Controllers
                     OrderId = order.OrderId,
                     ProductId = item.ProductId,
                     Quantity = item.Quantity,
-                    UnitPrice = item.UnitPrice 
+                    UnitPrice = item.UnitPrice
                 };
                 _context.OrderDetails.Add(orderDetail);
             }
@@ -209,14 +212,30 @@ namespace KitapProject.Controllers
                 InvoiceDate = DateTime.UtcNow,
                 Amount = order.TotalAmount,
                 InvoiceStatus = "Oluşturuldu",
-                InvoiceNumber = Guid.NewGuid().ToString() 
+                InvoiceNumber = Guid.NewGuid().ToString()
             };
             _context.Invoices.Add(invoice);
 
             await _context.SaveChangesAsync();
 
-            TempData["SuccessMessage"] = "Siparişiniz başarıyla alındı ve onaylandı!";
-            return RedirectToAction("Index", "Default"); 
+            // AJAX isteği için JSON response döndür
+            if (Request.Headers["X-Requested-With"] == "XMLHttpRequest" ||
+                Request.Headers["Content-Type"].ToString().Contains("application/json"))
+            {
+                return Json(new
+                {
+                    success = true,
+                    message = "Siparişiniz başarıyla alındı ve onaylandı!",
+                    orderNumber = order.OrderId,
+                    totalAmount = calculatedTotalAmount.ToString("N2")
+                });
+            }
+
+            // Normal form submit için TempData kullan
+            TempData["OrderSuccess"] = "true";
+            TempData["OrderNumber"] = order.OrderId.ToString();
+            TempData["TotalAmount"] = calculatedTotalAmount.ToString("N2");
+            return RedirectToAction("Index", "Default");
         }
     }
 }
